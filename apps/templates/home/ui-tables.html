@@ -1,0 +1,412 @@
+{% extends "layouts/base.html" %} {% block title %} UI Tables {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<style>
+  .container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 56px;
+    height: 30px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 23px;
+    width: 23px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-text {
+    position: absolute;
+    top: 50%;
+    font-size: 10px;
+    transform: translateY(-50%);
+    left: 5px;
+    color: gray;
+}
+
+input:checked + .slider {
+    background-color: #66bb6a;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+input:checked + .slider + .toggle-text {
+    left: 35px;
+}
+
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const colorToggles = document.querySelectorAll(".colorToggle");
+
+    colorToggles.forEach(function (toggle) {
+        const toggleText = toggle.nextElementSibling.nextElementSibling;
+
+        toggle.addEventListener("change", function () {
+            if (toggle.checked) {
+                toggleText.innerText = "ON";
+            } else {
+                toggleText.innerText = "OFF";
+            }
+        });
+    });
+});
+
+
+
+
+</script>
+<h4>ハウス</h4>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-success" style="display: flex;padding: 20px;">
+        <h4 class="card-title">いちご</h4> 
+        <i class="material-icons" style="margin-left: 20px;">device_thermostat</i> <span style="margin-left: 4px;">18°C</span>
+        <i class="material-icons" style="margin-left: 20px;">opacity</i> <span style="margin-left: 4px;">32%</span> 
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis">
+              <th>LED No</th>
+              <th>光源距離</th>
+              <th>照射時間</th>
+              <th>照射</th>
+              <th>履歴</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>-</td>
+                <td>00:00:00</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">19 Oct 2023</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>    
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-success" style="display: flex;padding: 20px;">
+        <h4 class="card-title">きゅうり</h4> 
+        <i class="material-icons" style="margin-left: 20px;">device_thermostat</i> <span style="margin-left: 4px;">18°C</span>
+        <i class="material-icons" style="margin-left: 20px;">opacity</i> <span style="margin-left: 4px;">32%</span> 
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis">
+              <th>LED No</th>
+              <th>光源距離</th>
+              <th>照射時間</th>
+              <th>照射</th>
+              <th>履歴</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>-</td>
+                <td>00:00:00</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle">
+                    <span class="slider round"></span>
+                    <span class="toggle-text">OFF</span>
+                </label>
+                </td>
+                <td class="text-warning">19 Oct 2023</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header card-header-success align-items-center text-center" style="display: flex;padding: 20px;">
+          <h4 class="card-title">にんじん</h4> 
+          <i class="material-icons" style="margin-left: 20px;">device_thermostat</i> <span style="margin-left: 4px;">18°C</span>
+          <i class="material-icons" style="margin-left: 20px;">opacity</i> <span style="margin-left: 4px;">32%</span> 
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="text-primary-emphasis">
+                <th>LED No</th>
+                <th>光源距離</th>
+                <th>照射時間</th>
+                <th>照射</th>
+                <th>履歴</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>2m</td>
+                  <td>00:02:34</td>
+                  <td>
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle">
+                      <span class="slider round"></span>
+                      <span class="toggle-text">OFF</span>
+                  </label>
+                  </td>
+                  <td class="text-warning">27 Sep 2023</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>2m</td>
+                  <td>00:02:34</td>
+                  <td>
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle">
+                      <span class="slider round"></span>
+                      <span class="toggle-text">OFF</span>
+                  </label>
+                  </td>
+                  <td class="text-warning">27 Sep 2023</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>2m</td>
+                  <td>00:02:34</td>
+                  <td>
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle">
+                      <span class="slider round"></span>
+                      <span class="toggle-text">OFF</span>
+                  </label>
+                  </td>
+                  <td class="text-warning">27 Sep 2023</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>2m</td>
+                  <td>00:02:34</td>
+                  <td>
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle">
+                      <span class="slider round"></span>
+                      <span class="toggle-text">OFF</span>
+                  </label>
+                  </td>
+                  <td class="text-warning">27 Sep 2023</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>2m</td>
+                  <td>00:02:34</td>
+                  <td>
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle">
+                      <span class="slider round"></span>
+                      <span class="toggle-text">OFF</span>
+                  </label>
+                  </td>
+                  <td class="text-warning">27 Sep 2023</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>-</td>
+                  <td>00:00:00</td>
+                  <td>
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle">
+                      <span class="slider round"></span>
+                      <span class="toggle-text">OFF</span>
+                  </label>
+                  </td>
+                  <td class="text-warning">19 Oct 2023</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  
+      
+    </div>
+    
+  </div>
+ 
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
