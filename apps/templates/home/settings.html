@@ -1,13 +1,95 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} UI Typography {% endblock %} 
+{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
-{% block content %}
-
-        <div class="card">
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<h3>光源設定</h3>
+  <form method="post">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <!-- <label class="bmd-label-floating">Username</label> -->
+          <input type="text" class="form-control" placeholder="ハウス名" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="作物名" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="場所" />
+        </div>
+      </div>
+      <div class="col-md-3">
+      <button type="submit" name="search" class="btn btn-success">検索</button>
+    </div>
+    </div>
+  </form>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis table-success">
+              <th>LED No</th>
+              <th>光源距離</th>
+              <th>照射時間</th>
+              <th>照射</th>
+              <th>履歴</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>00:02:34</td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>00:02:34</td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>00:02:34</td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>00:02:34</td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td>00:02:34</td>
+                <td class="text-warning">27 Sep 2023</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>-</td>
+                <td>00:00:00</td>
+                <td>00:02:34</td>
+                <td class="text-warning">19 Oct 2023</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="card">
             <div class="card-header card-header-primary">
               <h4 class="card-title">Material Dashboard Heading</h4>
               <p class="card-category">Created using Roboto Font Family</p>
@@ -101,7 +183,7 @@
                 </div>
               </div>
             </div>
-        </div>
+        </div> -->
 
 {% endblock content %}
 

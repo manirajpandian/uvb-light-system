@@ -5,7 +5,9 @@
           <div class="navbar-wrapper">
             <!-- <a class="navbar-brand" href="#">UVB照射 管理サイト</a> -->
           </div>
+          {% if request.path != '/login/' %}
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+            {% endif %}
             <span class="sr-only">Toggle navigation</span>
             <span class="navbar-toggler-icon icon-bar"></span>
             <span class="navbar-toggler-icon icon-bar"></span>
