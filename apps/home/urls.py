@@ -13,5 +13,6 @@ urlpatterns = [
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
+    path('sensor_data', views.sensor_data, name='sensor_data'),
 
 ]

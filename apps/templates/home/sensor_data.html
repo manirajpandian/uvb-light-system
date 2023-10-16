@@ -1,0 +1,93 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page 404 {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Data Dashboard</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Sensor Data</h1>
+
+    <div>
+        <p>Temperature:</p>
+        <canvas id="temperatureChart" width="400" height="200"></canvas>
+    </div>
+
+    <div>
+        <p>Humidity:</p>
+        <canvas id="humidityChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        var temperatureData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Temperature',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                },
+            ],
+        };
+
+        var humidityData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Humidity',
+                    data: [],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                },
+            ],
+        };
+
+        var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+        var temperatureChart = new Chart(temperatureCtx, {
+            type: 'line',
+            data: temperatureData,
+        });
+
+        var humidityCtx = document.getElementById('humidityChart').getContext('2d');
+        var humidityChart = new Chart(humidityCtx, {
+            type: 'line',
+            data: humidityData,
+        });
+
+        function updateData() {
+            fetch('http://mosaique.local/sensor_data', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                temperatureData.labels = data.labels;
+                temperatureData.datasets[0].data = data.temperatureData;
+                humidityData.labels = data.labels;
+                humidityData.datasets[0].data = data.humidityData;
+                temperatureChart.update();
+                humidityChart.update();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Call the updateData function every 5 seconds
+        setInterval(updateData, 5000); // 5000 milliseconds = 5 seconds
+    </script>
+</body>
+</html>
+
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
