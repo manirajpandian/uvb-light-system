@@ -1,0 +1,305 @@
+{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<style>
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #66bb6a;
+  }
+
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(16px);
+  }
+
+  input:checked+.slider+.toggle-text {
+    left: 35px;
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const colorToggles = document.querySelectorAll(".colorToggle");
+
+    colorToggles.forEach(function (toggle) {
+      const toggleText = toggle.nextElementSibling.nextElementSibling;
+
+      toggle.addEventListener("change", function () {});
+    });
+  });
+</script>
+
+<div class="flex-container">
+  <h3>管理者</h3>
+  <a href="/apps/templates/home/add-user.html"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+    </span>&nbsp;&nbsp;追加</button></a>
+</div>
+<!-- <form method="post">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="名前" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <button type="submit" name="search" class="btn btn-success">追加</button>
+    </div>
+  </div>
+</form> -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis table-success">
+              <th>ID</th>
+              <th>⽒名</th>
+              <th>メール</th>
+              <th>所属</th>
+              <th>権限</th>
+              <th>ステイタス</th>
+              <th>アクション</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>マニラジュ</td>
+                <td>maniraj@mosaique.com</td>
+                <td>-</td>
+                <td>管理者</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </td>
+                <td class="text-warning" >管理人</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>スマン</td>
+                <td>suman@mosaique.com</td>
+                <td>ー</td>
+                <td>ユーザ</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </td>
+                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" style="color: #ff9800;"><span>削除</span></a></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>マニ</td>
+                <td>mani@mosaique.com</td>
+                <td>ー</td>
+                <td>ユーザ</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </td>
+                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" style="color: #ff9800;"><span>削除</span></a></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>カビ</td>
+                <td>kavi@mosaique.com</td>
+                <td>ー</td>
+                <td>ユーザ</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </td>
+                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" style="color: #ff9800;"><span>削除</span></a></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>クラクラ</td>
+                <td>lalandhi@mosaique.com</td>
+                <td>ー</td>
+                <td>ユーザ</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </td>
+                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" style="color: #ff9800;"><span>削除</span></a></td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>-</td>
+                <td>ravi@mosaique.com</td>
+                <td>ー</td>
+                <td>ユーザ</td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="colorToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </td>
+                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" style="color: #ff9800;"><span>削除</span></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="card">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title">Material Dashboard Heading</h4>
+              <p class="card-category">Created using Roboto Font Family</p>
+            </div>
+            <div class="card-body">
+              <div id="typography">
+                <div class="card-title">
+                  <h2>Typography</h2>
+                </div>
+                <div class="row">
+                  <div class="tim-typo">
+                    <h1>
+                      <span class="tim-note">Header 1</span>The Life of Material Dashboard </h1>
+                  </div>
+                  <div class="tim-typo">
+                    <h2>
+                      <span class="tim-note">Header 2</span>The Life of Material Dashboard</h2>
+                  </div>
+                  <div class="tim-typo">
+                    <h3>
+                      <span class="tim-note">Header 3</span>The Life of Material Dashboard</h3>
+                  </div>
+                  <div class="tim-typo">
+                    <h4>
+                      <span class="tim-note">Header 4</span>The Life of Material Dashboard</h4>
+                  </div>
+                  <div class="tim-typo">
+                    <h5>
+                      <span class="tim-note">Header 5</span>The Life of Material Dashboard</h5>
+                  </div>
+                  <div class="tim-typo">
+                    <h6>
+                      <span class="tim-note">Header 6</span>The Life of Material Dashboard</h6>
+                  </div>
+                  <div class="tim-typo">
+                    <p>
+                      <span class="tim-note">Paragraph</span>
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers. I understand culture. I am the nucleus. I think that’s a responsibility that I have, to push possibilities, to show people, this is the level that things could be at.</p>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Quote</span>
+                    <blockquote class="blockquote">
+                      <p>
+                        I will be the leader of a company that ends up being worth billions of dollars, because I got the answers. I understand culture. I am the nucleus. I think that’s a responsibility that I have, to push possibilities, to show people, this is the level that things could be at.
+                      </p>
+                      <small>
+                        Kanye West, Musician
+                      </small>
+                    </blockquote>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Muted Text</span>
+                    <p class="text-muted">
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers...
+                    </p>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Primary Text</span>
+                    <p class="text-primary">
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers... </p>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Info Text</span>
+                    <p class="text-info">
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers... </p>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Success Text</span>
+                    <p class="text-success">
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers... </p>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Warning Text</span>
+                    <p class="text-warning">
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers...
+                    </p>
+                  </div>
+                  <div class="tim-typo">
+                    <span class="tim-note">Danger Text</span>
+                    <p class="text-danger">
+                      I will be the leader of a company that ends up being worth billions of dollars, because I got the answers... </p>
+                  </div>
+                  <div class="tim-typo">
+                    <h2>
+                      <span class="tim-note">Small Tag</span>
+                      Header with small subtitle
+                      <br>
+                      <small>Use "small" tag for the headers</small>
+                    </h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div> -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

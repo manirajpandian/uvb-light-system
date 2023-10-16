@@ -16,7 +16,7 @@
 
           <div class="collapse navbar-collapse justify-content-end">
           {% if request.user.is_authenticated %}
-
+          {% if request.path != '/house.html' %}
             <form class="navbar-form">
               <div class="input-group no-border">
                 <input type="text" value="" class="form-control" placeholder="Search...">
@@ -26,6 +26,7 @@
                 </button>
               </div>
             </form>
+            {% endif %}
             <ul class="navbar-nav">
               <!-- <li class="nav-item">
                 <a class="nav-link" href="#pablo">

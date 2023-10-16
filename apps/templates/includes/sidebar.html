@@ -1,68 +1,75 @@
-    <div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
-      <div class="logo">
-        <a target="_blank" rel="noopener noreferrer" 
-           href="#" class="simple-text logo-normal">
-           UVB照射 管理サイト
-        </a>
-      </div>
-      <div class="sidebar-wrapper">
-        <ul class="nav">
-        {% if request.user.is_authenticated %}
+<div
+  class="sidebar"
+  data-color="purple"
+  data-background-color="white"
+  data-image="/static/assets/img/sidebar-1.jpg"
+>
+  <div class="logo">
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      href="#"
+      class="simple-text logo-normal"
+    >
+      UVB照射 管理サイト
+    </a>
+  </div>
+  <div class="sidebar-wrapper">
+    <ul class="nav">
+      {% if request.user.is_authenticated %}
 
-          <li class="nav-item {% if 'index' in segment %} active {% endif %}">
-            <a class="nav-link" href="/">
-              <i class="material-icons">dashboard</i>
-              <p>ダッシュボード</p>
-            </a>
-          </li>
-          <!-- <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
+      <li class="nav-item {% if 'index' in segment %} active {% endif %}">
+        <a class="nav-link" href="/">
+          <i class="material-icons">dashboard</i>
+          <p>ダッシュボード</p>
+        </a>
+      </li>
+      <!-- <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
             <a class="nav-link" href="/page-user.html">
               <i class="material-icons">person</i>
               <p>User Profile</p>
             </a>
           </li> -->
-          <li class="nav-item {% if 'ui-maps' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-maps.html">
-              <i class="material-icons">location_ons</i>
-              <p>地図</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'house' in segment %} active {% endif %}">
-            <a class="nav-link" href="/house.html">
-              <i class="material-icons">warehouse</i>
-              <p>ハウス</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
-            <a class="nav-link" href="/settings.html">
-              <i class="material-icons">settings_suggest</i>
-              <p>光源設定</p>
-            </a>
-          </li>
-          <!-- <li class="nav-item {% if 'ui-notifications' in segment %} active {% endif %}">
+      <!-- <li class="nav-item {% if 'ui-maps' in segment %} active {% endif %}">
+        <a class="nav-link" href="/ui-maps.html">
+          <i class="material-icons">location_ons</i>
+          <p>地図</p>
+        </a>
+      </li> -->
+      <li class="nav-item {% if 'house' in segment %} active {% endif %}">
+        <a class="nav-link" href="/house.html">
+          <i class="material-icons">warehouse</i>
+          <p>ハウス</p>
+        </a>
+      </li>
+      <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
+        <a class="nav-link" href="/settings.html">
+          <i class="material-icons">settings_suggest</i>
+          <p>光源設定</p>
+        </a>
+      </li>
+      <!-- <li class="nav-item {% if 'ui-notifications' in segment %} active {% endif %}">
             <a class="nav-link" href="/ui-notifications.html">
               <i class="material-icons">notifications</i>
               <p>Notifications</p>
             </a>
           </li> -->
-          
-          <li class="nav-item ">
-            <a class="nav-link" href="/page-rtl-support.html">
-              <i class="material-icons">manage_accounts</i>
-              <p>管理者</p>
-            </a>
-          </li>
 
-          <li class="nav-item ">
-            <a class="nav-link" href="{% url 'logout' %}" >
-              <i class="material-icons">logout</i>
-              <p>ログアウト</p>
-            </a>
-          </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin.html">
+          <i class="material-icons">manage_accounts</i>
+          <p>管理者</p>
+        </a>
+      </li>
 
-        {% else %}
-        {% endif %}
-        </ul>
-      </div>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">
+          <i class="material-icons">logout</i>
+          <p>ログアウト</p>
+        </a>
+      </li>
 
-    </div>
+      {% else %} {% endif %}
+    </ul>
+  </div>
+</div>

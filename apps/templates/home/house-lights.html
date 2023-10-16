@@ -1,0 +1,159 @@
+{% extends "layouts/base.html" %} {% block title %} ハウス {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<style>
+    .arrow-icon-span {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        margin: 2px;
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .vertical-line {
+        width: 5px;
+        height: 100%;
+        background: #333;
+
+    }
+
+    .bulb {
+        width: 40px;
+        height: 40px;
+        color: yellow;
+        background-color: green;
+        border-radius: 50%;
+        margin: 20px 0px;
+    }
+
+    .bulb-text {
+        margin: 20px 0px;
+    }
+
+    .line-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+<h3 class="title">
+    ダッシュボード<span class="material-icons">chevron_right</span>ハウス
+</h3>
+<div class="row">
+    <div class="col-md-12 d-flex align-items-center justify-content-end">
+        <span class="arrow-icon-span bg-success"><i class="material-icons">arrow_back_ios</i></span>
+
+        <span class="arrow-icon-span bg-success"><i class="material-icons">arrow_forward_ios</i></span>
+    </div>
+    <div class="d-flex align-items-center w-100" style="justify-content: space-evenly;">
+    <div class="row">
+        <div class="col-md-12">きゅうり</div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">リンゴ</div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">いちご</div>
+    </div>
+</div>
+    
+    <div class="d-flex align-items-center w-100" style="justify-content: space-evenly;">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="material-icons bulb">emoji_objects</div>
+                
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+            </div>
+            <div class="col-md-2">
+                <div class="vertical-line"></div>
+            </div>
+            <div class="col-md-5 d-flex justify-content-start" style="flex-direction: column;">
+
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+            </div>
+            <div class="col-md-2">
+                <div class="vertical-line"></div>
+            </div>
+            <div class="col-md-5 d-flex justify-content-start" style="flex-direction: column;">
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+            </div>
+            <div class="col-md-2">
+                <div class="vertical-line"></div>
+            </div>
+            <div class="col-md-5 d-flex justify-content-start" style="flex-direction: column;">
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+                <div class="bulb-text ">12:00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 d-flex align-items-center justify-content-end">
+        <span class="arrow-icon-span bg-success"><i class="material-icons">arrow_back_ios</i></span>
+
+        <span class="arrow-icon-span bg-success"><i class="material-icons">arrow_forward_ios</i></span>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

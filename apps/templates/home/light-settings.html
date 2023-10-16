@@ -80,10 +80,10 @@
 </script>
 <div class="flex-container">
   <h3>光源設定</h3>
-  <a href="/apps/templates/home/light-settings.html"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
-    </span>&nbsp;&nbsp;検索</button></a>
+  <button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+    </span>&nbsp;&nbsp;検索</button>
 </div>
-  <!-- <form method=" post">
+  <form method=" post">
       <div class="row">
         <div class="col-md-3">
           <div class="form-group">
@@ -104,7 +104,7 @@
           <button type="submit" name="search" class="btn btn-success">検索</button>
         </div>
       </div>
-      </form> -->
+      </form>
       <div class="row">
         <div class="col-md-12">
           <div class="card">
@@ -112,56 +112,47 @@
               <div class="table-responsive">
                 <table class="table table-striped">
                   <thead class="text-primary-emphasis table-success">
-                    <th>ハウス名</th>
-                    <th>作物名</th>
+                    <th>LED No</th>
+                    <th>名称</th>
                     <th>場所</th>
                     <th>光源距離</th>
                     <th>照射時間（日）</th>
-                    <th>ステイタス</th>
-                    <th>アクション</th>
+                    <th>備考</th>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>A</td>
+                      <td>1</td>
                       <td>いちご</td>
                       <td>南相馬</td>
                       <td>2m</td>
                       <td>00:02:34</td>
-                      <td><label class="switch">
-                          <input type="checkbox" class="colorToggle" />
-                          <span class="slider round"></span>
-                        </label></td>
-                      <td><a style="color: #ff9800;" href="#">編集</a></td>
+                      <td></td>
                     </tr>
                     <tr>
-                      <td>B</td>
+                      <td>2</td>
                       <td>きゅうり</td>
                       <td>南相馬</td>
                       <td>1.5m</td>
                       <td>00:02:34</td>
-                      <td><label class="switch">
-                          <input type="checkbox" class="colorToggle" />
-                          <span class="slider round"></span>
-                        </label></td>
-                      <td><a style="color: #ff9800 !important;" href="#">編集</a></td>
+                      <td></td>
                     </tr>
                     <tr>
-                      <td>C</td>
+                      <td>3</td>
                       <td>きゅうり</td>
                       <td>南相馬</td>
                       <td>1.5m</td>
                       <td>00:02:34</td>
-                      <td><label class="switch">
-                          <input type="checkbox" class="colorToggle" />
-                          <span class="slider round"></span>
-                        </label></td>
-                      <td><a style="color: #ff9800 !important;" href="#">編集</a></td>
+                      <td></td>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="flex-container" style="justify-content: flex-end;">
+        <button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+          </span>&nbsp;&nbsp;登録</button>
       </div>
       {% endblock content %}
 

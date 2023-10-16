@@ -1,0 +1,68 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Login {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<style>
+    .center-container{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+</style>
+<form method=" post">
+    <div class="row">
+        <div class="col-md-1"></div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="ハウス名" />
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="作物名" />
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1"></div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="ハウス名" />
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="作物名" />
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1"></div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="ハウス名" />
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="作物名" />
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" name="search" class="btn btn-success">検索</button>
+      </div>
+    </form>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
