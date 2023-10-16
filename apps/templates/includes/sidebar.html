@@ -55,12 +55,12 @@
             </a>
           </li> -->
 
-      <li class="nav-item">
-        <a class="nav-link" href="/admin.html">
-          <i class="material-icons">manage_accounts</i>
-          <p>管理者</p>
-        </a>
-      </li>
+          <li class="nav-item {% if 'admin' in segment or 'add-user' in segment %} active {% endif %}">
+            <a class="nav-link" href="/admin.html">
+                <i class="material-icons">manage_accounts</i>
+                <p>管理者</p>
+            </a>
+        </li>
 
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">
