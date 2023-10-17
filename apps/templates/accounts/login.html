@@ -10,13 +10,13 @@
   <div class="col-md-12">
     <div class="card">
       <div class="card-header card-header-primary">
-        <h4 class="card-title">Login</h4>
+        <h4 class="card-title">ログイン</h4>
       </div>
       <div class="card-body">
         <h6 class="card-category">
           {% if msg %}
           <span class="text-danger">{{ msg | safe }}</span>
-          {% else %} Login to your account {% endif %}
+          {% else %} アカウントにログインしてください。 {% endif %}
         </h6>
 
         <br />
@@ -44,7 +44,7 @@
           </div>
           <br />
           <button type="submit" name="login" class="btn btn-primary pull-left">
-            Login
+            ログイン
           </button>
           <!-- &nbsp; &nbsp; 
             <span class="pull-right">
