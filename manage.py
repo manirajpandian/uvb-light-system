@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (c) 2019 - present AppSeed.us
+© copyrights BEAM Technologies
 """
 
 import os
