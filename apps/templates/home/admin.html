@@ -81,7 +81,7 @@
 
 <div class="flex-container">
   <h3>管理者</h3>
-  <a href="/apps/templates/home/add-user.html"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+  <a href="/add_user"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
 </div>
 <!-- <form method="post">
@@ -96,6 +96,11 @@
     </div>
   </div>
 </form> -->
+<!-- <ul>
+  {% for user in users %}
+      <li>{{ users.name }} - {{ users.email }}</li>
+  {% endfor %}
+</ul> -->
 <div class="row">
   <div class="col-md-12">
     <div class="card">
@@ -112,90 +117,28 @@
               <th>アクション</th>
             </thead>
             <tbody>
+              {% for user in user_list %}
               <tr>
-                <td>1</td>
-                <td>マニラジュ</td>
-                <td>maniraj@mosaique.com</td>
-                <td>-</td>
-                <td>管理者</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                  </label>
-                </td>
-                <td class="text-warning" >管理人</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>スマン</td>
-                <td>suman@mosaique.com</td>
-                <td>ー</td>
-                <td>ユーザ</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                  </label>
-                </td>
-                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" data-toggle="modal" data-target="#exampleModal" style="color: #ff9800;"><span>削除</span></a></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>マニ</td>
-                <td>mani@mosaique.com</td>
-                <td>ー</td>
-                <td>ユーザ</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                  </label>
-                </td>
-                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" data-toggle="modal" data-target="#exampleModal" style="color: #ff9800;"><span>削除</span></a></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>カビ</td>
-                <td>kavi@mosaique.com</td>
-                <td>ー</td>
-                <td>ユーザ</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                  </label>
-                </td>
-                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" data-toggle="modal" data-target="#exampleModal" style="color: #ff9800;"><span>削除</span></a></td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>クラクラ</td>
-                <td>lalandhi@mosaique.com</td>
-                <td>ー</td>
-                <td>ユーザ</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                  </label>
-                </td>
-                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" data-toggle="modal" data-target="#exampleModal" style="color: #ff9800;"><span>削除</span></a></td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>-</td>
-                <td>ravi@mosaique.com</td>
-                <td>ー</td>
-                <td>ユーザ</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                  </label>
-                </td>
-                <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" data-toggle="modal" data-target="#exampleModal" style="color: #ff9800;"><span>削除</span></a></td>
-              </tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>admin</td>
+              <td>{% if user.affiliation %}
+                {{ user.affiliation }}
+              {% else %}
+                -
+              {% endif %}</td>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td class="text-warning" ><a href="#" style="color: #ff9800;"><span>編集</span></a>　｜　<a href="#" data-toggle="modal" data-target="#exampleModal" style="color: #ff9800;"><span>削除</span></a></td>
+              
+              
+            </tr>
+              {% endfor %}
             </tbody>
           </table>
           <nav aria-label="...">

@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
+from django.shortcuts import render, redirect
+from .forms import UserAddForm
+from .models import users
 
 
 @login_required(login_url="/login/")
@@ -16,6 +19,22 @@ def index(request):
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
+
+
+def user_list(request):
+    context = {'user_list': users.objects.all()} 
+    return render(request, 'home/admin.html', context)
+
+@login_required
+def add_user(request):
+    if request.method == "GET":
+        form = UserAddForm()
+        return render(request, 'home/add-user.html',{"form":form})
+    else:
+        form = UserAddForm(request.POST)
+        if form.is_valid():
+            form.save()
+        return redirect('/user_list')
 
 
 @login_required(login_url="/login/")
@@ -42,3 +61,4 @@ def pages(request):
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
+

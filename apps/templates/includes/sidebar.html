@@ -18,12 +18,13 @@
     <ul class="nav">
       {% if request.user.is_authenticated %}
 
-      <li class="nav-item {% if 'index' in segment %} active {% endif %}">
+      <li class="nav-item {% if 'dashboard' in request.path %} active {% endif %}">
         <a class="nav-link" href="/">
-          <i class="material-icons">dashboard</i>
-          <p>ダッシュボード</p>
+            <i class="material-icons">dashboard</i>
+            <p>ダッシュボード</p>
         </a>
-      </li>
+    </li>
+    
       <!-- <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
             <a class="nav-link" href="/page-user.html">
               <i class="material-icons">person</i>
@@ -55,8 +56,8 @@
             </a>
           </li> -->
 
-          <li class="nav-item {% if 'admin' in segment or 'add-user' in segment %} active {% endif %}">
-            <a class="nav-link" href="/admin.html">
+          <li class="nav-item {% if '/user_list' in request.path %} active {% endif %}">
+            <a class="nav-link" href="/user_list">
                 <i class="material-icons">manage_accounts</i>
                 <p>管理者</p>
             </a>
