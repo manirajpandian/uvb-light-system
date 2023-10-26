@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if permanent_token %}
+    <p>Your permanent authentication token: {{ permanent_token }}</p>
+    <a href="{% url 'receive_data' %}">Receive  Data</a>
+{% else %}
+    <p>No permanent authentication token available. Click the button below to generate one.</p>
+    <a href="{% url 'generate_permanent_token' %}">Generate Permanent Token</a>
+{% endif %}
+</body>
+</html>
