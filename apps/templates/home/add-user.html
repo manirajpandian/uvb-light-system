@@ -1,69 +1,91 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} ユーザ追加 {% endblock %} 
+{% block title %} ユーザ追加 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 <style>
-    .center-container{
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-    }
+  .center-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
 </style>
 <h3>管理者</h3>
 
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/user_list">管理者</a></li>
+    {% if show == 'true' %}
+    <li class="breadcrumb-item" aria-current="page">編集</li>
+    {% else %}
+    <li class="breadcrumb-item active" aria-current="page">
+      ユーザ追加
+    </li>
+    {% endif %}
+
+  </ol>
+</nav>
+{% if error_message %}
+<p class="text-danger">{{ error_message }}</p>
+{% endif %}
 <form action="" method="post" autocomplete="off">
   {% csrf_token %}
-  {{form}}
-    <!-- <div class="row my-4">
-        <div class="col-md-1"></div>
-      <div class="col-md-5">
-        <div class="form-group">
-          <input type="text" name="name" class="form-control" placeholder="ハウス名" />
-        </div>
-      </div>
-      <div class="col-md-5">
-        <div class="form-group">
-          <input type="email" name="email" class="form-control" placeholder="メール" />
-        </div>
-        <div class="col-md-1"></div>
-      </div>
+  <div class="row">
+    <div class="col-md-6 my-4">
+      {{ form.name }}
     </div>
-    <div class="row my-4">
-        <div class="col-md-1"></div>
-      <div class="col-md-5">
-        <div class="form-group">
-          <input type="text" name="Affiliation" class="form-control" placeholder="所属" />
-        </div>
-      </div>
-      <div class="col-md-5">
-        <input type="text" name="address" class="form-control" placeholder="住所" />
-      </div>
-        <div class="col-md-1"></div>
-      </div>
-    <div class="row my-4">
-        <div class="col-md-1"></div>
-      <div class="col-md-5">
-        <div class="form-group">
-          <input type="text" name="houseName" class="form-control" placeholder="ハウス名" />
-        </div>
-      </div>
-      <div class="col-md-5">
-        <div class="form-group">
-          <input type="text" name="plantName" class="form-control" placeholder="作物名" />
-        </div>
-        <div class="col-md-1"></div>
-      </div>
-    </div> -->
-    <div class="center-container">
-        <button type="submit" id="addBtn" class="btn btn-success">追加</button>
-      </div>
-    </form>
+    {% if show == 'true' %}
+    <div class="col-md-6 my-4">
+      {{ form.email }}
+    </div>
+    {% else %}
+    <div class="col-md-6 my-4">
+      {{ form.email }}
+    </div>
+    {% endif %}
+
+  </div>
+  <div class="row">
+    <div class="col-md-6 my-4">
+      {{ form.affiliation }}
+    </div>
+    <div class="col-md-6 my-4">
+      {{ form.address }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 my-4">
+      {{ form.houseName }}
+    </div>
+    <div class="col-md-6 my-4">
+      {{ form.plantName }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 my-4">
+      {{ form.role }}
+    </div>
+  </div>
+  <div class="center-container">
+    <a href="/user_list">
+      <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+    {% if show == 'true' %}
+    <button type="submit" id="addBtn" class="btn btn-success">変更</button>
+    {% else %}
+    <button type="submit" id="addBtn" class="btn btn-success">追加</button>
+    {% endif %}
+  </div>
+</form>
 
 {% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var selectElement = document.getElementById('id_role');
+    selectElement.options[0].disabled = true;
+  });
+</script>
+{% endblock javascripts %}

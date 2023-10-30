@@ -14,11 +14,9 @@ class users(models.Model):
     address = models.CharField(max_length=100)
     houseName = models.CharField(max_length=100)
     plantName = models.CharField(max_length=100)
-    # isActive = models.BooleanField('True')
+    isActive = models.BooleanField(default='true')
+    role = models.CharField(max_length=100)
+    isDeleted = models.BooleanField(default=False)
+    createdAt = models.DateTimeField(auto_now_add=True, blank=True)
+    updatedAt = models.DateTimeField(auto_now=True, null=True)
 
-
-class Employee(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    firstname = models.CharField(max_length=100)
-    lastname = models.CharField(max_length=100)
-    mobile = models.CharField(max_length=15)
