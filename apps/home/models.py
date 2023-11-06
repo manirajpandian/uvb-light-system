@@ -17,6 +17,8 @@ class users(models.Model):
     isActive = models.BooleanField(default='true')
     role = models.CharField(max_length=100)
     isDeleted = models.BooleanField(default=False)
+    createdBy = models.IntegerField(default=1)
     createdAt = models.DateTimeField(auto_now_add=True, blank=True)
+    updatedBy = models.IntegerField(default=1)
     updatedAt = models.DateTimeField(auto_now=True, null=True)
 

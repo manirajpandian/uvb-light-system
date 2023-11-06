@@ -24,7 +24,6 @@ def index(request):
 
 # Get user list and Active/Disabled user
 
-
 def user_list(request):
     try:
         user_list = users.objects.all().order_by('id')
@@ -139,3 +138,15 @@ def pages(request):
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
+
+# House list 
+
+def house_list(request):
+    context={}
+    html_template = loader.get_template('home/house-list.html')
+    return HttpResponse(html_template.render(context, request))
+
+def add_house(request):
+    context={}
+    html_template = loader.get_template('home/add-house.html')
+    return HttpResponse(html_template.render(context, request))
