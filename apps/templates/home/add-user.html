@@ -28,6 +28,8 @@
 
   </ol>
 </nav>
+<div class="card">
+<div class="card-body">
 {% if error_message %}
 <p class="text-danger">{{ error_message }}</p>
 {% endif %}
@@ -50,18 +52,10 @@
   </div>
   <div class="row">
     <div class="col-md-6 my-4">
-      {{ form.affiliation }}
-    </div>
-    <div class="col-md-6 my-4">
-      {{ form.address }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6 my-4">
       {{ form.houseName }}
     </div>
     <div class="col-md-6 my-4">
-      {{ form.plantName }}
+      {{ form.address }}
     </div>
   </div>
   <div class="row">
@@ -79,7 +73,8 @@
     {% endif %}
   </div>
 </form>
-
+</div>
+</div>
 {% endblock content %}
 {% block javascripts %}
 <script>
