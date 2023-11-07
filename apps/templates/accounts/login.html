@@ -40,9 +40,9 @@
 </style>
 {% endblock stylesheets %} {% block content %}
 
-<div class="row d-flex justify-content-center align-items-center" style="min-width: 30vw">
-  <div class="col-md-12">
-    <div class="card">
+<div class="row justify-content-center align-items-center">
+  <div class="col-12">
+    <div class="card" style="min-width: 364px;">
       {% comment %} <div class="card-avatar text-center">
         <div class="card-header card-header-primary">
           <h4 class="card-title">ログイン</h4>
@@ -113,14 +113,8 @@
                 </label>
               </div>
             </div>
-            <div class="col-7 text-right">
-              <!-- Forgot Password Link -->
-
-
-
-              <!-- Modal -->
-              <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="ForgotModalLabel"
-                aria-hidden="true">
+              <!--Forgot Modal -->
+              <div class="modal fade" id="ForgotModal" tabindex="-1" aria-labelledby="ForgotModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -132,7 +126,7 @@
                     <div class="modal-body">
                       <div class="col-md-12">
                         <div class="form-group">
-                          <label>メールを入力してください</label>
+                          <label class="bmd-label-floating">メールを入力してください</label>
                           <input type="email" name="email" class="form-control" value="">
                         </div>
                       </div>
@@ -144,20 +138,19 @@
                   </div>
                 </div>
               </div>
-            </div>
           </div>
           <br>
           {% comment %} submit button {% endcomment %}
           <div class="row">
-            <div class="col-lg-12">
-              <button type="submit" name="login" class="btn btn-primary pull-left" style="width:100%;">
+            <div class="col-12">
+              <button type="submit" name="login" class="btn btn-primary pull-left w-100">
                 ログイン
               </button>
-
-              <div class="card-avatar text-center">
-                <a class="text-primary" data-toggle="modal" data-target="#exampleModal">パスワードをお忘れですか？</a>
-              </div>
             </div>
+              <div class="col-12 text-center mt-3">
+                <a class="text-primary" data-toggle="modal" data-target="#ForgotModal">パスワードをお忘れですか？</a>
+              </div>
+            
           </div>
           <!-- &nbsp; &nbsp; 
             <span class="pull-right">
