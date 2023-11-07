@@ -1,114 +1,111 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Page User {% endblock %} 
+{% block title %} Page User {% endblock %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
+{% block stylesheets %}
+<style>
+  .card-avatar.text-center img {
+    width: 200px;
+    height: 200px;
+  }
+</style>
+{% endblock stylesheets %}
 {% block content %}
+<!-- Header -->
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">ホーム</a></li>
+    <li class="breadcrumb-item" aria-current="page">プロフィール</li>
+  </ol>
+</nav>
+<!-- Profile Image -->
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-avatar text-center">
+          <a href="#pablo">
+            <img class="img rounded-circle" src="/static/assets/img/faces/marc.jpg" id="profile-image" />
+            <div id="upload-icon" class="camera-icon">
+              <i class="material-icons">camera_alt</i>
 
+            </div>
+          </a>
+          <!-- Hidden file input -->
+          <input type="file" id="image-upload" style="display: none;" accept="image/*">
+        </div>
+
+
+        <div class="card-body text-center">
+          <h6 class="card-category text-gray">
+            XXXXXXX
+          </h6>
+        </div>
+        <!-- Form for getting the input fields  -->
+        <form>
           <div class="row">
-            <div class="col-md-8">
-              <div class="card">
-                <div class="card-header card-header-primary">
-                  <h4 class="card-title">プロフィール編集</h4>
-                  <p class="card-category">プロフィールを完成させましょう</p>
-                </div>
-                <div class="card-body">
-                  <form>
-                    <div class="row">
-                      <div class="col-md-5">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">ユーザID</label>
-                          <input type="text" class="form-control" disabled value="{{ current_user.id }}">
-                        </div>
-                      </div>
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">ユーザ名</label>
-                          <input type="text" class="form-control" value="{{ current_user.username }}">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">メール</label>
-                          <input type="email" class="form-control" value="{{ current_user.email }}">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">ファーストネーム</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">苗字</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-12">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">住所</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">市</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">国</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">郵便番号</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary pull-right">プロフィール更新</button>
-                    <div class="clearfix"></div>
-                  </form>
-                </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">氏名</label>
+                <input type="text" name="name" class="form-control" value="{{ current_user.username }}">
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card card-profile">
-                <div class="card-avatar">
-                  <a href="#pablo">
-                    <img class="img" src="/static/assets/img/faces/marc.jpg" />
-                  </a>
-                </div>
-                <div class="card-body">
-                  <h6 class="card-category text-gray">
-                    {{ current_user.username }}
-                  </h6>
-                  <h4 class="card-title">
-                    {{ current_user.email }}
-                  </h4>
-                  <p class="card-description">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure ducimus rem quia, nostrum officiis impedit. Asperiores laborum tempora in labore porro hic vero est fugit sequi minus. Ratione, assumenda asperiores?
-                  Fuga eveniet assumenda ab nisi doloremque minima, magni dignissimos blanditiis ea odio unde quam deleniti ducimus, fugit excepturi facere ex veritatis sint adipisci, qui nesciunt maxime. Quos possimus vitae nisi.
-                  Nostrum laboriosam molestias iste quis! Tenetur nobis quasi consequuntur aperiam est suscipit provident praesentium quia quae hic nam facilis reiciendis, quo porro recusandae a eveniet error nemo quaerat dolores laudantium.
-                  </p>
-                </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">メール</label>
+                <input type="email" name="email" class="form-control" value="{{ current_user.email }}">
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">役割</label>
+                <input type="text" name="role" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">パスワード</label>
+                <input type="text" name="password" class="form-control">
               </div>
             </div>
           </div>
-
+          <!-- submit button -->
+          <button type="submit" class="btn btn-primary pull-right">プロフィール更新</button>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+//Profile-Image Upload (image-click function)
+  document.getElementById('profile-image').addEventListener('click', function () {
+    document.getElementById('image-upload').click();
+  });
+//Camera-Icon Upload (image-click function)
+  document.getElementById('upload-icon').addEventListener('click', function () {
+    document.getElementById('image-upload').click();
+  });
+
+  document.getElementById('image-upload').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const profileImage = document.getElementById('profile-image');
+        profileImage.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+</script>
+
+{% endblock javascripts %}
