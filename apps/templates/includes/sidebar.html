@@ -17,7 +17,7 @@
       <li class="nav-item {% if '/' in segment %} active {% endif %}">
         <a class="nav-link" href="/dashboard.html">
           <i class="material-icons">dashboard</i>
-          <p>!!ダッシュボード</p>
+          <p>ダッシュボード</p>
         </a>
       </li>
       <li class="nav-item {% if 'house' in segment %} active {% endif %}">
@@ -34,15 +34,15 @@
       </li>
       <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
         <a class="nav-link" href="/settings.html">
-          <i class="material-icons">settings_suggest</i>
-          <p>光源設定</p>
+          <i class="material-icons">compost</i>
+          <p>作物管理</p>
         </a>
       </li>
       {% comment %} new settings  {% endcomment %}
       <li class="nav-item {% if '/farm_manage' in request.path%} active {% endif %}">
         <a class="nav-link" href="/farm_manage">
           <i class="material-icons">settings_suggest</i>
-          <p>**光源設定</p>
+          <p>農家管理</p>
         </a>
       </li>
       <li class="nav-item {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} active {% endif %}">
