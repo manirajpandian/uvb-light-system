@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %} {% block title %} Form data{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} 
+
+
+{% block content %}
+<nav aria-label="breadcrumb" role="navigation">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">ホーム</a></li>
+        <li class="breadcrumb-item" aria-current="page">光源設定 データ</li>
+    </ol>
+</nav>
+
+<br>
+<br>
+<form>
+    <div class="form-group">
+        <label class="bmd-label-floating" for="farmername">農家名</label>
+        <input type="text" class="form-control" id="farmername">
+
+    </div>
+    <br>
+    <div class="form-group">
+        <label class="bmd-label-floating" for="farmerID">ID</label>
+        <input type="text" class="form-control" id="farmerID">
+
+    </div>
+    <br>
+    <div class="form-group">
+        <label class="bmd-label-floating" for="Managerrole">担当者</label>
+        <input type="text" class="form-control" id="Managerrole">
+
+    </div>
+    <br>
+    <div class="form-group">
+        <label class="bmd-label-floating" for="exampleInputEmail1">メール</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+
+    </div>
+    <br>
+    <div class="form-group">
+        <label class="bmd-label-floating" for="address">住所</label>
+        <input type="text" class="form-control" id="address">
+    </div>
+    <button type="submit" class="btn btn-primary">追加</button>
+</form>
+
+{% endblock content %}
+
+      <!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

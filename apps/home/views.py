@@ -150,3 +150,12 @@ def add_house(request):
     context={}
     html_template = loader.get_template('home/add-house.html')
     return HttpResponse(html_template.render(context, request))
+
+def  new_manage (request):
+    context={}
+    html_template = loader.get_template('home/settingsn.html')
+    return HttpResponse(html_template.render(context, request))
+def  reset_password (request):
+    context={}
+    html_template = loader.get_template('accounts/reset_password.html')
+    return HttpResponse(html_template.render(context, request))
