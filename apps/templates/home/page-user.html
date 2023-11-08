@@ -1,124 +1,111 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Page User {% endblock %} 
+{% block title %} Page User {% endblock %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
+{% block stylesheets %}
+<style>
+  .card-avatar.text-center img {
+    width: 200px;
+    height: 200px;
+  }
+</style>
+{% endblock stylesheets %}
 {% block content %}
+<!-- Header -->
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">ホーム</a></li>
+    <li class="breadcrumb-item" aria-current="page">プロフィール</li>
+  </ol>
+</nav>
+<!-- Profile Image -->
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-avatar text-center">
+          <a href="#pablo">
+            <img class="img rounded-circle" src="/static/assets/img/faces/marc.jpg" id="profile-image" />
+            <div id="upload-icon" class="camera-icon">
+              <i class="material-icons">camera_alt</i>
 
+            </div>
+          </a>
+          <!-- Hidden file input -->
+          <input type="file" id="image-upload" style="display: none;" accept="image/*">
+        </div>
+
+
+        <div class="card-body text-center">
+          <h6 class="card-category text-gray">
+            XXXXXXX
+          </h6>
+        </div>
+        <!-- Form for getting the input fields  -->
+        <form>
           <div class="row">
-            <div class="col-md-8">
-              <div class="card">
-                <div class="card-header card-header-primary">
-                  <h4 class="card-title">Edit Profile</h4>
-                  <p class="card-category">Complete your profile</p>
-                </div>
-                <div class="card-body">
-                  <form>
-                    <div class="row">
-                      <div class="col-md-5">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">UserID (disabled)</label>
-                          <input type="text" class="form-control" disabled value="{{ current_user.id }}">
-                        </div>
-                      </div>
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Username</label>
-                          <input type="text" class="form-control" value="{{ current_user.username }}">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Email address</label>
-                          <input type="email" class="form-control" value="{{ current_user.email }}">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Fist Name</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Last Name</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-12">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Adress</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">City</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Country</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Postal Code</label>
-                          <input type="text" class="form-control">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-12">
-                        <div class="form-group">
-                          <label>About Me</label>
-                          <div class="form-group">
-                            <label class="bmd-label-floating"> Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo.</label>
-                            <textarea class="form-control" rows="5"></textarea>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
-                    <div class="clearfix"></div>
-                  </form>
-                </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">氏名</label>
+                <input type="text" name="name" class="form-control" value="{{ current_user.username }}">
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card card-profile">
-                <div class="card-avatar">
-                  <a href="#pablo">
-                    <img class="img" src="/static/assets/img/faces/marc.jpg" />
-                  </a>
-                </div>
-                <div class="card-body">
-                  <h6 class="card-category text-gray">
-                    {{ current_user.username }}
-                  </h6>
-                  <h4 class="card-title">
-                    {{ current_user.email }}
-                  </h4>
-                  <p class="card-description">
-                    Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
-                  </p>
-                  <a href="#pablo" class="btn btn-primary btn-round">Follow</a>
-                </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">メール</label>
+                <input type="email" name="email" class="form-control" value="{{ current_user.email }}">
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">役割</label>
+                <input type="text" name="role" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">パスワード</label>
+                <input type="text" name="password" class="form-control">
               </div>
             </div>
           </div>
-
+          <!-- submit button -->
+          <button type="submit" class="btn btn-primary pull-right">プロフィール更新</button>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+//Profile-Image Upload (image-click function)
+  document.getElementById('profile-image').addEventListener('click', function () {
+    document.getElementById('image-upload').click();
+  });
+//Camera-Icon Upload (image-click function)
+  document.getElementById('upload-icon').addEventListener('click', function () {
+    document.getElementById('image-upload').click();
+  });
+
+  document.getElementById('image-upload').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const profileImage = document.getElementById('profile-image');
+        profileImage.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+</script>
+
+{% endblock javascripts %}
