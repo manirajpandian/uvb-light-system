@@ -5,28 +5,29 @@
 
 
 {% block content %}
+<style>
+    .center-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  </style>
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">ホーム</a></li>
         <li class="breadcrumb-item" aria-current="page">光源設定 データ</li>
     </ol>
 </nav>
-
-<br>
-<br>
-<form>
+<div class="card">
+    <div class="card-body">
+        <form>
     <div class="form-group">
-        <label class="bmd-label-floating" for="farmername">農家名</label>
-        <input type="text" class="form-control" id="farmername">
+        <label class="bmd-label-floating" for="farmname">農家名</label>
+        <input type="text" class="form-control" id="farmname">
 
     </div>
     <br>
-    <div class="form-group">
-        <label class="bmd-label-floating" for="farmerID">ID</label>
-        <input type="text" class="form-control" id="farmerID">
-
-    </div>
-    <br>
+    
     <div class="form-group">
         <label class="bmd-label-floating" for="Managerrole">担当者</label>
         <input type="text" class="form-control" id="Managerrole">
@@ -34,8 +35,8 @@
     </div>
     <br>
     <div class="form-group">
-        <label class="bmd-label-floating" for="exampleInputEmail1">メール</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        <label class="bmd-label-floating" for="Email1">メール</label>
+        <input type="email" class="form-control" id="Email1" aria-describedby="emailHelp">
 
     </div>
     <br>
@@ -43,8 +44,13 @@
         <label class="bmd-label-floating" for="address">住所</label>
         <input type="text" class="form-control" id="address">
     </div>
-    <button type="submit" class="btn btn-primary">追加</button>
+    <div class="center-container">
+    <button type="submit" class="btn btn-success">追加</button>
+    </div>
 </form>
+    </div>
+</div>
+
 
 {% endblock content %}
 

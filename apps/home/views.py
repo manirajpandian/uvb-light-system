@@ -151,9 +151,9 @@ def add_house(request):
     html_template = loader.get_template('home/add-house.html')
     return HttpResponse(html_template.render(context, request))
 
-def  new_manage (request):
+def  farm_manage (request):
     context={}
-    html_template = loader.get_template('home/settingsn.html')
+    html_template = loader.get_template('home/farm_manage.html')
     return HttpResponse(html_template.render(context, request))
 def  reset_password (request):
     context={}
