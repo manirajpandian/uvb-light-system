@@ -1,166 +1,72 @@
-{% extends "layouts/base.html" %} {% block title %} Login {% endblock %}
+{% extends "layouts/base.html" %}
+
+{% block title %} Login {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}
-<style>
-  img {
-    width: 100px;
-    height: 100px;
-  }
+{% block stylesheets %}{% endblock stylesheets %}
 
-  .card .card-header card-header-primary {
-    width: 50px;
+{% block content %}
 
-  }
-
-  .title,
-  .title a,
-  .card-title,
-  .card-title a,
-  .info-title,
-  .info-title a,
-  .footer-brand,
-  .footer-brand a,
-  .footer-big h5,
-  .footer-big h5 a,
-  .footer-big h4,
-  .footer-big h4 a,
-  .media .media-heading,
-  .media .media-heading a {
-    color: #3C4858;
-    padding-top: 20px;
-    text-shadow: 0px 0px 9px violet;
-    font-size: 30px;
-  }
-
-  .custom-checkmark::before {
-    font-size: 10px;
-    /* Adjust this value as needed */
-  }
-</style>
-{% endblock stylesheets %} {% block content %}
-
-<div class="row justify-content-center align-items-center">
-  <div class="col-12">
-    <div class="card" style="min-width: 364px;">
-      {% comment %} <div class="card-avatar text-center">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card">
         <div class="card-header card-header-primary">
-          <h4 class="card-title">ログイン</h4>
+          <h4 class="card-title">
+            Login
+          </h4>
         </div>
-      </div> {% endcomment %}
-      <div class="card-body">
-        {% comment %} <h6 class="card-category">
-          {% if msg %}
-          <span class="text-danger">{{ msg | safe }}</span>
-          {% else %} アカウントにログインしてください。 {% endif %}
-        </h6> {% endcomment %}
+        <div class="card-body">
 
-        <br />
-
-        <form role="form" method="post" action="">
-          {% comment %} Company Logo {% endcomment %}
-          <div class="card-avatar text-center">
-            <a href="#pablo">
-              <img class="img rounded-circle" src="/static/assets/img/company_logo1.png" id="profile-image" />
-
-            </a>
-            <br>
-            <h4 class="card-title"><b>ログイン</b></h4>
-          </div>
-
-          {% comment %} User ID {% endcomment %}
-          {% csrf_token %}
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label class="bmd-label-floating">⽣産者ID</label>
-                {{ form.username }}
-              </div>
-            </div>
-          </div>
-
+          <h6 class="card-category">
+              {% if msg %}
+                <span class="text-danger">{{ msg | safe }}</span>
+              {% else %}
+                  Add your credentials
+              {% endif %}  
+          </h6>
+          
           <br />
-          {% comment %} Password {% endcomment %}
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label class="bmd-label-floating">パスワード</label>
-                {{ form.password }}
-              </div>
-            </div>
-          </div>
-          <br />
-          {% comment %} ID3 {% endcomment %}
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label class="bmd-label-floating">ID3</label>
-                <input type="email" name="email" class="form-control" value="">
-              </div>
-            </div>
-          </div>
-          <br />
-          {% comment %} Remember me {% endcomment %}
-          <div class="row">
-            <div class="col-12">
-              <!-- Remember Me Checkbox -->
-              <div class="form-check">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" name="remember" style="size:10px;"> ログイン状態を維持する
-                  <span class="form-check-sign">
-                    <span class="check custom-checkmark"></span>
-                  </span>
-                </label>
-              </div>
-            </div>
-              <!--Forgot Modal -->
-              <div class="modal fade" id="ForgotModal" tabindex="-1" aria-labelledby="ForgotModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="ForgotModalLabel"> パスワードのリセット </h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="col-md-12">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">メールを入力してください</label>
-                          <input type="email" name="email" class="form-control" value="">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">近い</button>
-                      <button type="button" class="btn btn-primary">送信</button>
-                    </div>
-                  </div>
+
+          <form role="form" method="post" action="">
+              
+            {% csrf_token %} 
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Username</label>
+                  {{ form.username }}
                 </div>
               </div>
-          </div>
-          <br>
-          {% comment %} submit button {% endcomment %}
-          <div class="row">
-            <div class="col-12">
-              <button type="submit" name="login" class="btn btn-primary pull-left w-100">
-                ログイン
-              </button>
             </div>
-              <div class="col-12 text-center mt-3">
-                <a class="text-primary" data-toggle="modal" data-target="#ForgotModal">パスワードをお忘れですか？</a>
+
+            <br />
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Password</label>
+                  {{ form.password }}
+                </div>
               </div>
-            
-          </div>
-          <!-- &nbsp; &nbsp; 
+            </div>
+
+            <br />
+
+            <button type="submit" name="login" class="btn btn-primary pull-left">Login</button>
+
+            &nbsp; &nbsp; 
             <span class="pull-right">
               Don't have an account? <a href="{% url 'register' %}" class="text-primary">Create</a>
-            </span> -->
-        </form>
+            </span>
+
+            <div class="clearfix"></div>
+
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 {% endblock content %}
 
