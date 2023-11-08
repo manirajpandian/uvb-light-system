@@ -44,11 +44,11 @@
 </head>
 
 <body>
-  <div {% if request.path != '/login/' %} class="wrapper" {% endif %} class="wrapper d-flex justify-content-center align-items-center" >
-    {% if request.path != '/login/' %}
+  <div {% if request.path != '/login/' and request.path != '/reset_password' %} class="wrapper" {% endif %} class="wrapper d-flex justify-content-center align-items-center" >
+    {% if request.path != '/login/' and request.path != '/reset_password' %}
     {% include 'includes/sidebar.html' %}
     {% endif %}
-    <div  {% if request.path != '/login/' %}class="main-panel"{% endif %} >
+    <div  {% if request.path != '/login/' and request.path != '/reset_password' %}class="main-panel"{% endif %} >
 
       {% include 'includes/navigation.html' %}
 
@@ -60,7 +60,7 @@
 
         </div>
       </div>
-      {% if request.path != '/login/' %}
+      {% if request.path != '/login/' and request.path != '/reset_password' %}
       {% include 'includes/footer.html' %}
       {% endif %}
     </div>
@@ -76,4 +76,5 @@
   {% block javascripts %}{% endblock javascripts %}
   
 </body>
+
 </html>
