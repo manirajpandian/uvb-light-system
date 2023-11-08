@@ -1,24 +1,10 @@
 # -*- encoding: utf-8 -*-
 """
-© copyrights BEAM Technologies
+Copyright (c) 2019 - present AppSeed.us
 """
 
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
-class users(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-    affiliation = models.CharField(max_length=100)
-    address = models.CharField(max_length=100)
-    houseName = models.CharField(max_length=100)
-    plantName = models.CharField(max_length=100)
-    isActive = models.BooleanField(default='true')
-    role = models.CharField(max_length=100)
-    isDeleted = models.BooleanField(default=False)
-    createdBy = models.IntegerField(default=1)
-    createdAt = models.DateTimeField(auto_now_add=True, blank=True)
-    updatedBy = models.IntegerField(default=1)
-    updatedAt = models.DateTimeField(auto_now=True, null=True)
 

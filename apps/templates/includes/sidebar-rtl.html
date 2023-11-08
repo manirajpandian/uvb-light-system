@@ -1,63 +1,65 @@
     <div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
+      <!--
+        Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
+
+        Tip 2: you can also add an image using data-image tag
+    -->
       <div class="logo">
         <a target="_blank" rel="noopener noreferrer" 
-           href="#" class="simple-text logo-normal">
-           UVB照射 管理サイト
+           href="https://appseed.us/admin-dashboards/django-dashboard-material" class="simple-text logo-normal">
+          تیم خلاق
         </a>
       </div>
       <div class="sidebar-wrapper">
         <ul class="nav">
-        {% if request.user.is_authenticated %}
-
-          <li class="nav-item {% if 'index' in segment %} active {% endif %}">
+          <li class="nav-item ">
             <a class="nav-link" href="/">
               <i class="material-icons">dashboard</i>
-              <p>ダッシュボード</p>
+              <p>داشبورد</p>
             </a>
           </li>
-          <!-- <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
+          <li class="nav-item ">
             <a class="nav-link" href="/page-user.html">
               <i class="material-icons">person</i>
-              <p>User Profile</p>
+              <p>پروفایل کاربر</p>
             </a>
-          </li> -->
-          <li class="nav-item {% if 'ui-tables' in segment %} active {% endif %}">
+          </li>
+          <li class="nav-item ">
             <a class="nav-link" href="/ui-tables.html">
               <i class="material-icons">content_paste</i>
-              <p>ハウス</p>
+              <p>جدول</p>
             </a>
           </li>
-          <!-- <li class="nav-item {% if 'ui-typography' in segment %} active {% endif %}">
+          <li class="nav-item ">
             <a class="nav-link" href="/ui-typography.html">
               <i class="material-icons">library_books</i>
-              <p>Typography</p>
+              <p>تایپوگرافی</p>
             </a>
-          </li> -->
-          <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
+          </li>
+          <li class="nav-item ">
             <a class="nav-link" href="/ui-icons.html">
               <i class="material-icons">bubble_chart</i>
-              <p>Icons</p>
+              <p>آیکن‌ها</p>
             </a>
           </li>
-          <li class="nav-item {% if 'ui-maps' in segment %} active {% endif %}">
+          <li class="nav-item ">
             <a class="nav-link" href="/ui-maps.html">
               <i class="material-icons">location_ons</i>
-              <p>Maps</p>
+              <p>نقشه</p>
             </a>
           </li>
-          <!-- <li class="nav-item {% if 'ui-notifications' in segment %} active {% endif %}">
+          <li class="nav-item ">
             <a class="nav-link" href="/ui-notifications.html">
               <i class="material-icons">notifications</i>
-              <p>Notifications</p>
+              <p>اعلان‌ها</p>
             </a>
-          </li> -->
-          
-          <!-- <li class="nav-item ">
+          </li>
+          <li class="nav-item active  ">
             <a class="nav-link" href="/page-rtl-support.html">
               <i class="material-icons">language</i>
-              <p>RTL Support</p>
+              <p>پشتیبانی از راست به چپ</p>
             </a>
-          </li> -->
+          </li>
 
           <li class="nav-item ">
             <a class="nav-link" href="{% url 'logout' %}" >
@@ -66,9 +68,15 @@
             </a>
           </li>
 
-        {% else %}
-        {% endif %}
+          <li class="nav-item active-pro ">
+            <a class="nav-link" 
+               target="_blank" rel="noopener noreferrer"  
+               href="https://appseed.us/admin-dashboards/django-dashboard-material-pro">
+              <i class="material-icons">unarchive</i>
+              <p>PRO Version</p>
+            </a>
+          </li>
+
         </ul>
       </div>
-
     </div>
