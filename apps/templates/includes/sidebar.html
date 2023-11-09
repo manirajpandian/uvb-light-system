@@ -26,7 +26,7 @@
           <p>LED管理</p>
         </a>
       </li>
-      <li class="nav-item {% if 'house_list' in request.path  %} active {% endif %}">
+      <li class="nav-item {% if 'house_list' in request.path or 'add_house' in request.path  %} active {% endif %}">
         <a class="nav-link" href="/house_list">
           <i class="material-icons">warehouse</i>
           <p>ハウス</p>
@@ -34,14 +34,14 @@
       </li>
       <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
         <a class="nav-link" href="/settings.html">
-          <i class="material-icons">compost</i>
-          <p>作物管理</p>
+          <i class="material-icons">settings_suggest</i>
+          <p>作物設定</p>
         </a>
       </li>
       {% comment %} new settings  {% endcomment %}
       <li class="nav-item {% if '/farm_manage' in request.path%} active {% endif %}">
         <a class="nav-link" href="/farm_manage">
-          <i class="material-icons">settings_suggest</i>
+          <i class="material-icons">compost</i>
           <p>農家管理</p>
         </a>
       </li>
