@@ -165,6 +165,7 @@
               <th>ID</th>
               <th>⽒名</th>
               <th>メール</th>
+              <th>権限</th>
               <th>ステイタス</th>
               <th>アクション</th>
             </thead>
@@ -175,7 +176,11 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
+                <td>{% if user.role == "管理者" %} 管理者 {% else %} ユーザ {% endif %}</td>
                 <td>
+                  {% if user.role == "管理者" %}
+                  -
+                  {% else %}
                   <form method="post" action="" autocomplete="off">
                     {% csrf_token %}
                     <input type="hidden" name="id" value={{user.id}}>
@@ -190,6 +195,7 @@
                       <span class="slider round"></span>
                     </label>
                   </form>
+                  {% endif %}
                 </td>
                 <td class="text-warning">
                   {% if user.role == "管理者" %}

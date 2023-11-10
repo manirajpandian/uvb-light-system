@@ -1,6 +1,6 @@
 <div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
   <div class="logo">
-    <a target="_blank" rel="noopener noreferrer" href="#" class="simple-text logo-normal">
+    <a target="_blank" rel="noopener noreferrer" href="#" class="simple-text logo-normal text-decoration-none">
       UVB照射 管理サイト
     </a>
   </div>
@@ -14,14 +14,14 @@
           <p>ダッシュボード</p>
         </a>
       </li> -->
-      <li class="nav-item {% if '/' in segment %} active {% endif %}">
-        <a class="nav-link" href="/dashboard.html">
+      <li class="nav-item {% if 'dashboard' in segment or 'house_lights' in segment %} active {% endif %}">
+        <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>
           <p>ダッシュボード</p>
         </a>
       </li>
-      <li class="nav-item {% if 'house' in segment %} active {% endif %}">
-        <a class="nav-link" href="/house.html">
+      <li class="nav-item {% if 'LED_control' in segment %} active {% endif %}">
+        <a class="nav-link" href="/LED_control">
             <i class="material-icons">wb_incandescent</i>
           <p>LED管理</p>
         </a>
@@ -29,7 +29,7 @@
       <li class="nav-item {% if 'house_list' in request.path or 'add_house' in request.path  %} active {% endif %}">
         <a class="nav-link" href="/house_list">
           <i class="material-icons">warehouse</i>
-          <p>ハウス</p>
+          <p>ハウス管理</p>
         </a>
       </li>
       <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
@@ -39,7 +39,7 @@
         </a>
       </li>
       {% comment %} new settings  {% endcomment %}
-      <li class="nav-item {% if '/farm_manage' in request.path%} active {% endif %}">
+      <li class="nav-item {% if '/farm_manage' in request.path or '/apps/templates/home/add_farm.html' in request.path %} active {% endif %}">
         <a class="nav-link" href="/farm_manage">
           <i class="material-icons">compost</i>
           <p>農家管理</p>
