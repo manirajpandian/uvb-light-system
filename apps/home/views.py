@@ -18,9 +18,20 @@ from django.contrib import messages
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index'}
-    html_template = loader.get_template('home/index.html')
+    context = {'segment': 'dashboard'}
+    html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
+
+def house_lights(request):
+    context = {'segment': 'house_lights'}
+    html_template = loader.get_template('home/house-lights.html')
+    return HttpResponse(html_template.render(context, request))
+
+def LED_control(request):
+    context = {'segment' : 'LED_control'}
+    html_template = loader.get_template('home/house.html')
+    return HttpResponse(html_template.render(context, request))
+
 
 # Get user list and Active/Disabled user
 

@@ -18,6 +18,8 @@ urlpatterns = [
     path('add_house',views.add_house,name="add_house"),
     path('farm_manage',views.farm_manage, name="farm_manage"),
      path('reset_password',views.reset_password, name="reset_password"),
+    path('house_lights',views.house_lights, name='house_lights'),
+    path('LED_control',views.LED_control, name='LED_control'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

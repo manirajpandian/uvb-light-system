@@ -49,19 +49,9 @@
         padding: 50px 0px;
     }
 
-    .wizard {
-        width: 95vw;
-    }
-    .nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    padding-left: 0;
-    margin-bottom: 0;
-    list-style: none;
-    width: 50%;
-}
+    /* .wizard {
+        width: 80vw;
+    } */
     .wizard .nav-tabs {
         position: relative;
         margin-bottom: 0;
@@ -78,7 +68,7 @@
         height: 2px;
         background: #e0e0e0;
         position: absolute;
-        width: 45vw;
+        width: 62%;
         margin: 0 auto;
         left: 0;
         right: 0;
@@ -330,50 +320,6 @@
         float: right;
     }
 
-    /*-----------custom-checkbox-----------*/
-    /*----------Custom-Checkbox---------*/
-    input[type="checkbox"] {
-        position: relative;
-        display: inline-block;
-        margin-right: 5px;
-    }
-
-    input[type="checkbox"]::before,
-    input[type="checkbox"]::after {
-        position: absolute;
-        content: "";
-        display: inline-block;
-    }
-
-    input[type="checkbox"]::before {
-        height: 16px;
-        width: 16px;
-        border: 1px solid #999;
-        left: 0px;
-        top: 0px;
-        background-color: #fff;
-        border-radius: 2px;
-    }
-
-    input[type="checkbox"]::after {
-        height: 5px;
-        width: 9px;
-        left: 4px;
-        top: 4px;
-    }
-
-    input[type="checkbox"]:checked::after {
-        content: "";
-        border-left: 1px solid #fff;
-        border-bottom: 1px solid #fff;
-        transform: rotate(-45deg);
-    }
-
-    input[type="checkbox"]:checked::before {
-        background-color: #18ba60;
-        border-color: #18ba60;
-    }
-
     @media (max-width: 767px) {
         .sign-content h3 {
             font-size: 40px;
@@ -458,11 +404,10 @@
     <section class="signup-step-container">
         <div class="container">
             <div class="row d-flex justify-content-center">
-                <div class="col-md-12">
+                <div class="col-12">
                     <div class="wizard mb-5">
-                        <div class="">
                             <div class="connecting-line"></div>
-                            <ul class="nav nav-tabs" role="tablist">
+                            <ul class="nav nav-tabs align-items-center justify-content-around" role="tablist">
                                 <li role="presentation" class="active">
                                     <a href="#step1" data-toggle="tab" aria-controls="step1" role="tab"
                                         aria-expanded="true"><span class="round-tab">1 </span> <i>ハウス名登録 </i></a>
@@ -476,8 +421,9 @@
                                             class="round-tab">3</span> <i>確認</i></a>
                                 </li>
                             </ul>
-                        </div>
                     </div>
+                </div>
+                <div class="col-md-12">
                     <form role="form" action="index.html" class="login-box">
                         <div class="tab-content" id="main_form">
                             <!-- ハウス名登録 -->
