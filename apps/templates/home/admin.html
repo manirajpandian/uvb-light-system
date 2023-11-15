@@ -202,7 +202,7 @@
                   管理者
                   {% else %}
                   <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
-                  ｜
+                  &nbsp; &nbsp;|&nbsp;&nbsp; 
                   <a href="#" data-toggle="modal" class="text-danger"  data-target="#userDeleteModal" data-user-id="{{ user.id }}"
                     data-csrf-token={{ csrf_token }} data-user-name="{{ user.name }}"
                     ><span>削除</span></a>

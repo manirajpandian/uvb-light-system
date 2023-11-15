@@ -7,13 +7,6 @@
   <div class="sidebar-wrapper">
     <ul class="nav">
       {% if request.user.is_authenticated %}
-
-      <!-- <li class="nav-item {% if '/' in segment %} active {% endif %}"">
-        <a class="nav-link" href="/">
-          <i class="material-icons">dashboard</i>
-          <p>ダッシュボード</p>
-        </a>
-      </li> -->
       <li class="nav-item {% if 'dashboard' in segment or 'house_lights' in segment %} active {% endif %}">
         <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>
@@ -34,14 +27,14 @@
       </li>
       <li class="nav-item {% if 'plant_settings' in segment or '/apps/templates/home/add_plant.html' in request.path %} active {% endif %}">
         <a class="nav-link" href="/plant_setting">
-          <i class="material-icons">settings_suggest</i>
+          <i class="material-icons">compost</i>
           <p>作物設定</p>
         </a>
       </li>
       {% comment %} new settings  {% endcomment %}
       <li class="nav-item {% if '/farm_manage' in request.path or '/apps/templates/home/add_farm.html' in request.path %} active {% endif %}">
         <a class="nav-link" href="/farm_manage">
-          <i class="material-icons">compost</i>
+          <i class="material-icons">agriculture</i>
           <p>農家管理</p>
         </a>
       </li>
