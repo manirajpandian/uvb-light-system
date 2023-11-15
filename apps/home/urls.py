@@ -20,6 +20,7 @@ urlpatterns = [
      path('reset_password',views.reset_password, name="reset_password"),
     path('house_lights',views.house_lights, name='house_lights'),
     path('LED_control',views.LED_control, name='LED_control'),
+    path('plant_setting',views.plant_setting, name='plant_setting'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

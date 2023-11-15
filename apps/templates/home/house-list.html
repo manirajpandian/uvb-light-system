@@ -83,7 +83,7 @@
   <a href="/add_house"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
 </div>
-      <div class="row">
+      <div class=" row">
         <div class="col-md-12">
           <div class="card">
             <div class="card-body">
@@ -109,8 +109,9 @@
                           <input type="checkbox" class="colorToggle" />
                           <span class="slider round"></span>
                         </label></td>
-                      <td><a  style="color: #ff9800;" href="#">編集</a>　｜
-                      <a class="text-danger" href="#">削除</a></td>
+                      <td><a style="color: #ff9800;" href="#">編集</a>　｜
+                        <a class="text-danger" data-toggle="modal" data-target="#DeleteModal" href="#">削除</a>
+                      </td>
                     </tr>
                     <tr>
                       <td>B</td>
@@ -122,8 +123,9 @@
                           <input type="checkbox" class="colorToggle" />
                           <span class="slider round"></span>
                         </label></td>
-                        <td><a  style="color: #ff9800;" href="#">編集</a>　｜
-                            <a class="text-danger" href="#">削除</a></td>
+                      <td><a style="color: #ff9800;" href="#">編集</a>　｜
+                        <a class="text-danger" data-toggle="modal" data-target="#DeleteModal" href="#">削除</a>
+                      </td>
                     </tr>
                     <tr>
                       <td>C</td>
@@ -135,8 +137,9 @@
                           <input type="checkbox" class="colorToggle" />
                           <span class="slider round"></span>
                         </label></td>
-                        <td><a  style="color: #ff9800;" href="#">編集</a>　｜
-                            <a class="text-danger" href="#">削除</a></td>
+                      <td><a style="color: #ff9800;" href="#">編集</a>　｜
+                        <a class="text-danger" data-toggle="modal" data-target="#DeleteModal" href="#">削除</a>
+                      </td>
                   </tbody>
                 </table>
                 <nav aria-label="...">
@@ -156,11 +159,31 @@
                 </nav>
               </div>
             </div>
-              
+            <!--Delete Modal -->
+            <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">削除</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    ハウス<span id="deleteNameSpan"></span> を削除してもよろしいですか？
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                    <button type="button" id="deleteButton" class="btn btn-danger">削除</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      {% endblock content %}
+</div>
+{% endblock content %}
 
-      <!-- Specific Page JS goes HERE  -->
-      {% block javascripts %}{% endblock javascripts %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

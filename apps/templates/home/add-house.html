@@ -328,19 +328,6 @@
         .wizard .nav-tabs>li a i {
             display: none;
         }
-
-        .signup-logo-header .navbar-toggle {
-            margin: 0;
-            margin-top: 8px;
-        }
-
-        .signup-logo-header .logo_area {
-            margin-top: 0;
-        }
-
-        .signup-logo-header .header-flex {
-            display: block;
-        }
     }
 
     .vertical-line {
@@ -406,21 +393,21 @@
             <div class="row d-flex justify-content-center">
                 <div class="col-12">
                     <div class="wizard mb-5">
-                            <div class="connecting-line"></div>
-                            <ul class="nav nav-tabs align-items-center justify-content-around" role="tablist">
-                                <li role="presentation" class="active">
-                                    <a href="#step1" data-toggle="tab" aria-controls="step1" role="tab"
-                                        aria-expanded="true"><span class="round-tab">1 </span> <i>ハウス名登録 </i></a>
-                                </li>
-                                <li role="presentation" class="disabled">
-                                    <a href="#step2" data-toggle="tab" aria-controls="step2" role="tab"
-                                        aria-expanded="false"><span class="round-tab">2</span> <i>レーン・ポール・LED追加</i></a>
-                                </li>
-                                <li role="presentation" class="disabled">
-                                    <a href="#step3" data-toggle="tab" aria-controls="step3" role="tab"><span
-                                            class="round-tab">3</span> <i>確認</i></a>
-                                </li>
-                            </ul>
+                        <div class="connecting-line"></div>
+                        <ul class="nav nav-tabs align-items-center justify-content-around" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#step1" data-toggle="tab" aria-controls="step1" role="tab"
+                                    aria-expanded="true"><span class="round-tab">1 </span> <i>ハウス名登録 </i></a>
+                            </li>
+                            <li role="presentation" class="disabled">
+                                <a href="#step2" data-toggle="tab" aria-controls="step2" role="tab"
+                                    aria-expanded="false"><span class="round-tab">2</span> <i>レーン・ポール・LED追加</i></a>
+                            </li>
+                            <li role="presentation" class="disabled">
+                                <a href="#step3" data-toggle="tab" aria-controls="step3" role="tab"><span
+                                        class="round-tab">3</span> <i>確認</i></a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -434,13 +421,14 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class="text-dark bmd-label-floating">ハウス名 *</label>
-                                            <input class="form-control" id="houseName" type="text" name="houseName" placeholder="" />
+                                            <input class="form-control" id="houseName" type="text" name="houseName"
+                                                placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-3">
-                                        <div class="form-group text-left">
+                                        <!-- <div class="form-group text-left">
                                             <label class="text-dark bmd-label-floating">作物名 *</label>
                                             <select name="plantName" class="form-control" id="plantName">
                                                 <option value="" selected="selected" disabled>
@@ -450,15 +438,25 @@
                                                 <option value="りんご">りんご</option>
                                                 <option value="いちご">いちご</option>
                                             </select>
-                                        </div>
+                                        </div> -->
+                                        <div class="form-group">
+                                            <label for="exampleFormControlSelect1">Example select</label>
+                                            <select class="form-control" id="exampleFormControlSelect1">
+                                              <option>1</option>
+                                              <option>2</option>
+                                              <option>3</option>
+                                              <option>4</option>
+                                              <option>5</option>
+                                            </select>
+                                          </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class="text-dark bmd-label-floating">メモ </label>
-                                            <input class="form-control" type="text" name="description" placeholder="" />
-                                        </div>
+                                            <label class="text-dark bmd-label-floating" for="formControlTextarea">メモ</label>
+                                            <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
+                                          </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                 </div>
@@ -551,13 +549,15 @@
                                     <div class="col-md-3 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class="text-dark bmd-label-floating">ハウス名</label>
-                                            <input class="form-control" type="text" id="houseNameReg" name="houseNameReg" placeholder="" />
+                                            <input class="form-control" type="text" id="houseNameReg"
+                                                name="houseNameReg" placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class="text-dark bmd-label-floating">作物名</label>
-                                            <input class="form-control" type="text" id="plantNameReg" name="plantNameReg" placeholder="" />
+                                            <input class="form-control" type="text" id="plantNameReg"
+                                                name="plantNameReg" placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -573,8 +573,8 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class="text-dark bmd-label-floating">１レーンのポールの数</label>
-                                            <input class="form-control" type="text"
-                                                name="laneCountPerPole" placeholder="" />
+                                            <input class="form-control" type="text" name="laneCountPerPole"
+                                                placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -844,16 +844,16 @@
             window.location.pathname = '/house_list'
         })
         // houseName value 
-        $('#houseName').on('input', function(e){
+        $('#houseName').on('input', function (e) {
             let houseName = e.target.value
-            localStorage.setItem('houseName',houseName)
+            localStorage.setItem('houseName', houseName)
             var storedHouseValue = localStorage.getItem('houseName')
             $('#houseNameReg').val(storedHouseValue);
         })
         // plantName value 
-        $('#plantName').change(function(e){
+        $('#plantName').change(function (e) {
             let plantName = e.target.value
-            localStorage.setItem('plantName',plantName)
+            localStorage.setItem('plantName', plantName)
             var storedPlantValue = localStorage.getItem('plantName')
             $('#plantNameReg').val(storedPlantValue);
         })

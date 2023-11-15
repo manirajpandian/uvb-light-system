@@ -32,6 +32,10 @@ def LED_control(request):
     html_template = loader.get_template('home/house.html')
     return HttpResponse(html_template.render(context, request))
 
+def plant_setting(request):
+    context = {'segment':'plant_settings'}
+    html_template = loader.get_template('home/settings.html')
+    return HttpResponse(html_template.render(context, request))
 
 # Get user list and Active/Disabled user
 

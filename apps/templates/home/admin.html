@@ -203,9 +203,9 @@
                   {% else %}
                   <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
                   ｜
-                  <a href="#" data-toggle="modal" data-target="#userDeleteModal" data-user-id="{{ user.id }}"
+                  <a href="#" data-toggle="modal" class="text-danger"  data-target="#userDeleteModal" data-user-id="{{ user.id }}"
                     data-csrf-token={{ csrf_token }} data-user-name="{{ user.name }}"
-                    style="color: #ff9800;"><span>削除</span></a>
+                    ><span>削除</span></a>
                   {% endif %}
                 </td>
               </tr>

@@ -15,8 +15,8 @@
 {% block content %}
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/settings.html">作物管理</a></li>
-        <li class="breadcrumb-item" aria-current="page">作物設定</li>
+        <li class="breadcrumb-item"><a href="/settings.html">作物設定</a></li>
+        <li class="breadcrumb-item" aria-current="page">作物設定追加</li>
     </ol>
 </nav>
 <div class="card">
@@ -63,6 +63,8 @@
                 </div>
             </div>
             <div class="center-container">
+                <a href="/apps/templates/home/settings.html">
+                    <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
                 <button type="submit" class="btn btn-success" onclick="validateAndCombine()">追加</button>
             </div>
         </form>

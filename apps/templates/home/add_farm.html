@@ -1,59 +1,60 @@
 {% extends "layouts/base.html" %} {% block title %} Form data{% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %} 
+{% block stylesheets %}{% endblock stylesheets %}
 
 
 {% block content %}
 <style>
     .center-container {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
     }
-  </style>
+</style>
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/farm_manage">農家管理</a></li>
-        <li class="breadcrumb-item" aria-current="page">光源設定</li>
+        <li class="breadcrumb-item" aria-current="page">光源設定追加</li>
     </ol>
 </nav>
 <div class="card">
     <div class="card-body">
         <form>
-    <div class="form-group">
-        <label class="bmd-label-floating" for="farmname">農家名</label>
-        <input type="text" class="form-control" id="farmname">
+            <div class="form-group">
+                <label class="bmd-label-floating" for="farmname">農家名</label>
+                <input type="text" class="form-control" id="farmname">
 
-    </div>
-    <br>
-    
-    <div class="form-group">
-        <label class="bmd-label-floating" for="Managerrole">担当者</label>
-        <input type="text" class="form-control" id="Managerrole">
+            </div>
+            <br>
 
-    </div>
-    <br>
-    <div class="form-group">
-        <label class="bmd-label-floating" for="Email1">メール</label>
-        <input type="email" class="form-control" id="Email1" aria-describedby="emailHelp">
+            <div class="form-group">
+                <label class="bmd-label-floating" for="Managerrole">担当者</label>
+                <input type="text" class="form-control" id="Managerrole">
 
-    </div>
-    <br>
-    <div class="form-group">
-        <label class="bmd-label-floating" for="address">住所</label>
-        <input type="text" class="form-control" id="address">
-    </div>
-    <div class="center-container">
-    <button type="button" class="btn btn-Secondary mr-3">戻る</button>
-    <button type="submit" class="btn btn-success">追加</button>
-    </div>
-</form>
+            </div>
+            <br>
+            <div class="form-group">
+                <label class="bmd-label-floating" for="Email1">メール</label>
+                <input type="email" class="form-control" id="Email1" aria-describedby="emailHelp">
+
+            </div>
+            <br>
+            <div class="form-group">
+                <label class="bmd-label-floating" for="address">住所</label>
+                <input type="text" class="form-control" id="address">
+            </div>
+            <div class="center-container">
+                <a href="/farm_manage">
+                    <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+                <button type="submit" class="btn btn-success">追加</button>
+            </div>
+        </form>
     </div>
 </div>
 
 
 {% endblock content %}
 
-      <!-- Specific Page JS goes HERE  -->
+<!-- Specific Page JS goes HERE  -->
 {% block javascripts %}{% endblock javascripts %}

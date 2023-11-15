@@ -16,7 +16,7 @@
 <!-- Header -->
 <nav aria-label="breadcrumb" role="navigation">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/">ホーム</a></li>
+    <li class="breadcrumb-item"><a href="/">ダッシュボード</a></li>
     <li class="breadcrumb-item" aria-current="page">プロフィール</li>
   </ol>
 </nav>
@@ -26,11 +26,10 @@
     <div class="card">
       <div class="card-body">
         <div class="card-avatar text-center">
-          <a href="#pablo">
+          <a href="#">
             <img class="img rounded-circle" src="/static/assets/img/faces/marc.jpg" id="profile-image" />
-            <div id="upload-icon" class="camera-icon">
-              <i class="material-icons">camera_alt</i>
-
+            <div class="camera-icon m-3">
+              <i id="upload-icon" class="material-icons">camera_alt</i>
             </div>
           </a>
           <!-- Hidden file input -->
@@ -38,33 +37,33 @@
         </div>
 
 
-        <div class="card-body text-center">
-          <h6 class="card-category text-gray">
+        <div class="text-center">
+          <h6 class="text-gray">
             XXXXXXX
           </h6>
         </div>
         <!-- Form for getting the input fields  -->
         <form>
           <div class="row">
-            <div class="col-12">
+            <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">氏名</label>
                 <input type="text" name="name" class="form-control" value="{{ current_user.username }}">
               </div>
             </div>
-            <div class="col-12">
+            <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">メール</label>
                 <input type="email" name="email" class="form-control" value="{{ current_user.email }}">
               </div>
             </div>
-            <div class="col-12">
+            <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">役割</label>
                 <input type="text" name="role" class="form-control">
               </div>
             </div>
-            <div class="col-12">
+            <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">パスワード</label>
                 <input type="text" name="password" class="form-control">
@@ -72,8 +71,9 @@
             </div>
           </div>
           <!-- submit button -->
-          <button type="submit" class="btn btn-primary pull-right">プロフィール更新</button>
-          <div class="clearfix"></div>
+          <div class="d-flex justify-content-end col-12 m-2">
+            <button type="submit" class="btn btn-primary pull-right">プロフィール更新</button>
+          </div>
         </form>
       </div>
     </div>
@@ -84,11 +84,11 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-//Profile-Image Upload (image-click function)
+  //Profile-Image Upload (image-click function)
   document.getElementById('profile-image').addEventListener('click', function () {
     document.getElementById('image-upload').click();
   });
-//Camera-Icon Upload (image-click function)
+  //Camera-Icon Upload (image-click function)
   document.getElementById('upload-icon').addEventListener('click', function () {
     document.getElementById('image-upload').click();
   });
