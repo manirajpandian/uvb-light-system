@@ -374,36 +374,37 @@
         margin: 4px;
         text-align: center;
     }
+
     .form-group select {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      background-color: #fff;
-      position: relative;
-      z-index: 1;
+        appearance: none;
+        -webkit-appearance: none;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: #fff;
+        position: relative;
+        z-index: 1;
     }
 
     .form-group.active label {
-      top: 8px;
-      font-size: 12px;
-      color: #555;
+        top: 8px;
+        font-size: 12px;
+        color: #555;
     }
 
     .form-group.active::before {
-      border-top: 0;
-      border-bottom: 8px solid #555;
+        border-top: 0;
+        border-bottom: 8px solid #555;
     }
 
     .form-group.select-open select {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
     }
 
     .form-group.select-open::before {
-      border-top: 0;
-      border-bottom: 8px solid transparent;
+        border-top: 0;
+        border-bottom: 8px solid transparent;
     }
 </style>
 {% endblock stylesheets %} {% block content %}
@@ -485,9 +486,10 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class="text-dark bmd-label-floating" for="formControlTextarea">メモ</label>
+                                            <label class="text-dark bmd-label-floating"
+                                                for="formControlTextarea">メモ</label>
                                             <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
-                                          </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                 </div>
@@ -507,7 +509,8 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class="text-dark bmd-label-floating">レーンの数 *</label>
-                                            <input class="form-control" type="text" name="houseName" placeholder="" />
+                                            <input class="form-control" id="N-leanCount" type="text" name="leanCount"
+                                                placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -515,7 +518,7 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class="text-dark bmd-label-floating">１レーンのポールの数 *</label>
-                                            <input class="form-control" id="horizontalCount" type="text"
+                                            <input class="form-control" id="N-poleCount" type="text"
                                                 name="laneCountPerPole" placeholder="" />
                                         </div>
                                     </div>
@@ -524,7 +527,8 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class="text-dark bmd-label-floating">1ポールのLEDの数 *</label>
-                                            <input class="form-control" type="text" name="houseName" placeholder="" />
+                                            <input class="form-control" type="text" id="N-LEDCount" name="LEDcount"
+                                                placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
@@ -544,15 +548,15 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-3"></div>
-                                    <div class="col-6 mt-4">
+                                    <div class="col-1.5"></div>
+                                    <div class="col-9 mt-4">
                                         <div id="customVerticalLineContainer" class="verticalLineContainer">
 
                                         </div>
                                         <div id="customInputs" class="inputLayout"></div>
 
                                     </div>
-                                    <div class="col-md-3"></div>
+                                    <div class="col-1.5"></div>
                                 </div>
                                 <ul class="list-inline pull-right">
                                     <li>
@@ -768,6 +772,7 @@
                     }
                 }
             });
+
             localStorage.setItem("poleCountPerLine", JSON.stringify(inputValues));
         });
         var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
@@ -778,7 +783,7 @@
                 sampleArray.push('');
             }
             poleInputValues.push(sampleArray);
-            console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
+            // console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
         }
         // var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
 
@@ -887,6 +892,26 @@
             localStorage.setItem('plantName', plantName)
             var storedPlantValue = localStorage.getItem('plantName')
             $('#plantNameReg').val(storedPlantValue);
+        })
+        var leanCount
+        var poleCount
+        var LEDCount
+        $('#N-leanCount, #N-poleCount, #N-LEDCount').on('keyup', function (e) {
+            leanCount = $("#N-leanCount").val()
+            poleCount = $("#N-poleCount").val()
+            LEDCount = $("#N-LEDCount").val()
+            if (leanCount && poleCount && LEDCount) {
+                let poleCountArray = []
+                let LEDCountArray = []
+                for (i = 1; i <= leanCount; i++) {
+                    poleCountArray.push(poleCount)
+                }
+                for (let j = 0; j < poleCountArray.length; j++) {
+                    let subArray = Array.from({ length: parseInt(poleCountArray[j], 10) }, () => LEDCount);
+                    LEDCountArray.push(subArray);
+                }
+                console.log('leanCount & poleCountArray & LEDCountArray', leanCount, poleCountArray, LEDCountArray);
+            }
         })
     });
 </script>

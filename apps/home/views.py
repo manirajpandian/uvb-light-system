@@ -29,7 +29,7 @@ def house_lights(request):
 
 def LED_control(request):
     context = {'segment' : 'LED_control'}
-    html_template = loader.get_template('home/house.html')
+    html_template = loader.get_template('home/LED-control.html')
     return HttpResponse(html_template.render(context, request))
 
 def plant_setting(request):
