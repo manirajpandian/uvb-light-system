@@ -1,5 +1,5 @@
 from django import forms
-from .models import User
+from .models import User,Plant
 
 
 class UserAddForm(forms.ModelForm):
@@ -17,3 +17,8 @@ class UserAddForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'role_id')
+
+class PlantForm(forms.ModelForm):
+    class Meta:
+        model = Plant
+        fields = ['plant_name', 'distance', 'time_required','remarks']

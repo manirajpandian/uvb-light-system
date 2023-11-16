@@ -80,7 +80,7 @@
 </script>
 <div class="flex-container">
   <h3>作物設定</h3>
-  <a href="/apps/templates/home/add-plant.html"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+  <a href="/add_plant"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
 </div>
       <div class="row">
@@ -91,35 +91,40 @@
                 <table class="table table-striped">
                   <thead class="text-primary-emphasis table-success">
                     <th>作物名</th>
-                    <th>照射時間（日）</th>
-                    <th>光源距離（ｃｍ）</th>
+                    <th>光源距離（cｍ）</th>
+                    <th>照射時間（時間）</th>
                     <th>参考</th>
                     <th>アクション</th>
                   </thead>
+                  {% if plant_list|length > 0 %}
                   <tbody>
+                    {% for plant in plant_list %}
+                    {% if not plant.isDeleted %}
                     <tr>
-                      <td>いちご</td>
-                      <td>2m</td>
-                      <td>00:02:34</td>
-                      <td>xxxx</td>
-                      <td><a style="color: #ff9800;" href="#">編集</a></td>
-                    </tr>
-                    <tr>
-                      <td>きゅうり</td>
-                      
-                      <td>1.5m</td>
-                      <td>00:02:34</td>
-                      <td>xxxx</td>
-                      <td><a style="color: #ff9800 !important;" href="#">編集</a></td>
-                    </tr>
-                    <tr>
-                      <td>きゅうり</td>
-                      
-                      <td>1.5m</td>
-                      <td>00:02:34</td>
-                      <td>xxxx</td>
-                      <td><a style="color: #ff9800 !important;" href="#">編集</a></td>
+                      <td>{{ plant.plant_name }}</td>
+                      <td>{{ plant.distance }}</td>
+                      <td>{{ plant.time_required }}</td>
+                      <td>{{ plant.remarks }}</td>
+                      <td>
+                        <a href="{% url 'update_plant' plant.plant_id %}" style="color: #ff9800;"><span>編集</span></a>
+                        &nbsp; &nbsp;|&nbsp;&nbsp;<span class="text-danger">削除</span>
+                        <!-- <a href="#" data-toggle="modal" class="text-danger"  data-target="#userDeleteModal" data-user-id="{{ user.user_id }}"
+                        data-csrf-token={{ csrf_token }} data-user-name="{{ user.username }}"><span>削除</span></a> -->
+                      </td>
+                    {% endif %}
+                    {% endfor %}
                   </tbody>
+                  {% else %}
+                  <tbody> 
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-warning">データがありません</td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                  {% endif %}
                 </table>
                 <nav aria-label="...">
                   <ul class="pagination justify-content-end">
