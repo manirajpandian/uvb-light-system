@@ -36,30 +36,30 @@
   {% csrf_token %}
   <div class="row">
     <div class="col-md-6 my-4">
-      {{ form.name }}
+      <div class="form-group">
+      <label for="userName" class="bmd-label-floating">⽒名</label>
+      {{ form.username }}
+    </div>
     </div>
     {% if show == 'true' %}
     <div class="col-md-6 my-4">
+      <div class="form-group">
+        <label for="email" class="bmd-label-floating">メール</label>
       {{ form.email }}
+      </div>
     </div>
     {% else %}
     <div class="col-md-6 my-4">
+      <div class="form-group">
+        <label for="email" class="bmd-label-floating">メール</label>
       {{ form.email }}
     </div>
+    </div>
     {% endif %}
-
   </div>
   <div class="row">
     <div class="col-md-6 my-4">
-      {{ form.houseName }}
-    </div>
-    <div class="col-md-6 my-4">
-      {{ form.address }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6 my-4">
-      {{ form.role }}
+      {{ form.role_id }}
     </div>
   </div>
   <div class="center-container">
@@ -75,11 +75,4 @@
 </div>
 </div>
 {% endblock content %}
-{% block javascripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var selectElement = document.getElementById('id_role');
-    selectElement.options[0].disabled = true;
-  });
-</script>
-{% endblock javascripts %}
+{% block javascripts %}{% endblock javascripts %}

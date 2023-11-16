@@ -10,7 +10,7 @@ from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UserAddForm
-from .models import users
+from .models import User
 from django.core.paginator import Paginator
 import json
 from django.contrib import messages
@@ -41,20 +41,20 @@ def plant_setting(request):
 
 def user_list(request):
     try:
-        user_list = users.objects.all().order_by('id')
+        user_list = User.objects.all().order_by('user_id')
         page = Paginator(user_list, 5)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
         if request.method == "GET":
             return render(request, 'home/admin.html', {'page': page})
         elif request.method == "POST":
-            id = request.POST['id']
+            user_id = request.POST['user_id']
             is_active = request.POST['is_active']
-            user = get_object_or_404(users, pk=id)
+            user = get_object_or_404(User, pk=user_id)
             user.isActive = is_active
             user.save()
             success_message = "ユーザーステータスの変更に成功しました"  # success message here
-            return render(request, 'home/admin.html', {'page': page, 'success_message': success_message, 'page': page})
+        return render(request, 'home/admin.html', {'page': page, 'success_message': success_message, 'page': page})
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
@@ -71,7 +71,7 @@ def add_user(request):
         form = UserAddForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data.get('email')
-            if users.objects.filter(email=email).exists():
+            if User.objects.filter(email=email).exists():
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
                 return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})
             else:
@@ -82,18 +82,16 @@ def add_user(request):
             error_message = "無効なフォームデータです。フォームフィールドを確認して、もう一度やり直してください。"
             return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})
 
-# Update users
+ # Update User
 
-
-@login_required
 def update_user(request, pk):
     show = 'true'
-    user = users.objects.get(id=pk)
+    user = User.objects.get(id=pk)
     if request.method == 'POST':
         form = UserAddForm(request.POST, instance=user)
         if form.is_valid():
             email = form.cleaned_data.get('email')
-            if users.objects.filter(email=email).exclude(id=pk).exists():
+            if User.objects.filter(email=email).exclude(id=pk).exists():
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
                 return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})
             form.save()
@@ -107,27 +105,27 @@ def update_user(request, pk):
     return render(request, 'home/add-user.html', context)
 
 
-# Delete user api
+# # Delete user api
 
 
-@login_required
-def delete_user(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        # Extract the user_id from the request data
-        user_id = data.get('user_id')
-        if user_id:
-            # Assuming your model is named 'User'
-            user = get_object_or_404(users, pk=user_id)
-            user.isDeleted = True
-            user.save()
-            response_data = {'message': 'ユーザー削除成功されました。'}
-            return JsonResponse(response_data, status=200)
-        else:
-            response_data = {'error': 'ユーザーIDが提供されていないです。'}
-            return JsonResponse(response_data, status=400)
-    else:
-        return JsonResponse({'error': '無効なリクエストメソッド'}, status=400)
+# @login_required
+# def delete_user(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         # Extract the user_id from the request data
+#         user_id = data.get('user_id')
+#         if user_id:
+#             # Assuming your model is named 'User'
+#             user = get_object_or_404(User, pk=user_id)
+#             user.isDeleted = True
+#             user.save()
+#             response_data = {'message': 'ユーザー削除成功されました。'}
+#             return JsonResponse(response_data, status=200)
+#         else:
+#             response_data = {'error': 'ユーザーIDが提供されていないです。'}
+#             return JsonResponse(response_data, status=400)
+#     else:
+#         return JsonResponse({'error': '無効なリクエストメソッド'}, status=400)
 
 
 @login_required(login_url="/login/")
