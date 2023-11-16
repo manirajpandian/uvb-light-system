@@ -1,74 +1,57 @@
-    <div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
-      <div class="logo">
-        <a target="_blank" rel="noopener noreferrer" 
-           href="#" class="simple-text logo-normal">
-           UVB照射 管理サイト
+<div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
+  <div class="logo">
+    <a target="_blank" rel="noopener noreferrer" href="#" class="simple-text logo-normal text-decoration-none">
+      UVB照射 管理サイト
+    </a>
+  </div>
+  <div class="sidebar-wrapper">
+    <ul class="nav">
+      {% if request.user.is_authenticated %}
+      <li class="nav-item {% if 'dashboard' in segment or 'house_lights' in segment %} active {% endif %}">
+        <a class="nav-link" href="/">
+          <i class="material-icons">dashboard</i>
+          <p>ダッシュボード</p>
         </a>
-      </div>
-      <div class="sidebar-wrapper">
-        <ul class="nav">
-        {% if request.user.is_authenticated %}
+      </li>
+      <li class="nav-item {% if 'LED_control' in segment %} active {% endif %}">
+        <a class="nav-link" href="/LED_control">
+            <i class="material-icons">wb_incandescent</i>
+          <p>LED管理</p>
+        </a>
+      </li>
+      <li class="nav-item {% if 'house_list' in request.path or 'add_house' in request.path  %} active {% endif %}">
+        <a class="nav-link" href="/house_list">
+          <i class="material-icons">warehouse</i>
+          <p>ハウス管理</p>
+        </a>
+      </li>
+      <li class="nav-item {% if 'plant_settings' in segment or '/apps/templates/home/add-plant.html' in request.path %} active {% endif %}">
+        <a class="nav-link" href="/plant_setting">
+          <i class="material-icons">compost</i>
+          <p>作物設定</p>
+        </a>
+      </li>
+      {% comment %} new settings  {% endcomment %}
+      <li class="nav-item {% if '/farm_manage' in request.path or '/apps/templates/home/add-farm.html' in request.path %} active {% endif %}">
+        <a class="nav-link" href="/farm_manage">
+          <i class="material-icons">agriculture</i>
+          <p>農家管理</p>
+        </a>
+      </li>
+      <li class="nav-item {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} active {% endif %}">
+        <a class="nav-link" href="/user_list">
+            <i class="material-icons">manage_accounts</i>
+            <p>管理者</p>
+        </a>
+    </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">
+          <i class="material-icons">logout</i>
+          <p>ログアウト</p>
+        </a>
+      </li>
 
-          <li class="nav-item {% if 'index' in segment %} active {% endif %}">
-            <a class="nav-link" href="/">
-              <i class="material-icons">dashboard</i>
-              <p>ダッシュボード</p>
-            </a>
-          </li>
-          <!-- <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
-            <a class="nav-link" href="/page-user.html">
-              <i class="material-icons">person</i>
-              <p>User Profile</p>
-            </a>
-          </li> -->
-          <li class="nav-item {% if 'ui-tables' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-tables.html">
-              <i class="material-icons">content_paste</i>
-              <p>ハウス</p>
-            </a>
-          </li>
-          <!-- <li class="nav-item {% if 'ui-typography' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-typography.html">
-              <i class="material-icons">library_books</i>
-              <p>Typography</p>
-            </a>
-          </li> -->
-          <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-icons.html">
-              <i class="material-icons">bubble_chart</i>
-              <p>Icons</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'ui-maps' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-maps.html">
-              <i class="material-icons">location_ons</i>
-              <p>Maps</p>
-            </a>
-          </li>
-          <!-- <li class="nav-item {% if 'ui-notifications' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-notifications.html">
-              <i class="material-icons">notifications</i>
-              <p>Notifications</p>
-            </a>
-          </li> -->
-          
-          <!-- <li class="nav-item ">
-            <a class="nav-link" href="/page-rtl-support.html">
-              <i class="material-icons">language</i>
-              <p>RTL Support</p>
-            </a>
-          </li> -->
-
-          <li class="nav-item ">
-            <a class="nav-link" href="{% url 'logout' %}" >
-              <i class="material-icons">directions_run</i>
-              <p>Logout</p>
-            </a>
-          </li>
-
-        {% else %}
-        {% endif %}
-        </ul>
-      </div>
-
-    </div>
+      {% else %} {% endif %}
+    </ul>
+  </div>
+</div>

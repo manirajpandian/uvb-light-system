@@ -1,0 +1,919 @@
+{% extends "layouts/base.html" %} {% block title %} ハウスの追加 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+    i {
+        margin-right: 10px;
+    }
+
+    /*------------------------*/
+    input:focus,
+    button:focus,
+    .form-control:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .inputLayout {
+        position: relative;
+        width: 2em;
+        bottom: 13rem;
+        right: 1rem;
+    }
+
+    .form-control:disabled,
+    .form-control[readonly] {
+        background-color: #fff;
+    }
+
+    /*----------step-wizard------------*/
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-center {
+        justify-content: center;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+
+    /*---------signup-step-------------*/
+    .bg-color {
+        background-color: #333;
+    }
+
+    .signup-step-container {
+        padding: 50px 0px;
+    }
+
+    /* .wizard {
+        width: 80vw;
+    } */
+    .wizard .nav-tabs {
+        position: relative;
+        margin-bottom: 0;
+        border-bottom-color: transparent;
+    }
+
+    .wizard>div.wizard-inner {
+        position: relative;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+
+    .connecting-line {
+        height: 2px;
+        background: #e0e0e0;
+        position: absolute;
+        width: 62%;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        top: 15px;
+        z-index: 1;
+    }
+
+    .wizard .nav-tabs>li.active>a,
+    .wizard .nav-tabs>li.active>a:hover,
+    .wizard .nav-tabs>li.active>a:focus {
+        color: #555555;
+        cursor: default;
+        border: 0;
+        border-bottom-color: transparent;
+    }
+
+    span.round-tab {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        display: inline-block;
+        border-radius: 50%;
+        background: #fff;
+        z-index: 2;
+        position: absolute;
+        left: -12px;
+        text-align: center;
+        font-size: 16px;
+        color: #0e214b;
+        font-weight: 500;
+        border: 1px solid #ddd;
+    }
+
+    span.round-tab i {
+        color: #555555;
+    }
+
+    .wizard li.active span.round-tab {
+        background: #9c27b0;
+        color: #fff;
+        border-color: #9c27b0;
+    }
+
+    .wizard li.active span.round-tab i {
+        color: #5bc0de;
+    }
+
+    .wizard .nav-tabs>li.active>a i {
+        color: #9c27b0;
+    }
+
+    .wizard .nav-tabs>li {
+        width: 25%;
+    }
+
+    .wizard li:after {
+        content: " ";
+        position: absolute;
+        left: 46%;
+        opacity: 0;
+        margin: 0 auto;
+        bottom: 0px;
+        border: 5px solid transparent;
+        border-bottom-color: red;
+        transition: 0.1s ease-in-out;
+    }
+
+    .wizard .nav-tabs>li a {
+        width: 30px;
+        height: 30px;
+        margin: 20px auto;
+        border-radius: 100%;
+        padding: 0;
+        background-color: transparent;
+        position: relative;
+        top: 0;
+    }
+
+    .wizard .nav-tabs>li a i {
+        position: absolute;
+        top: -15px;
+        font-style: normal;
+        font-weight: 400;
+        white-space: nowrap;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        font-weight: 700;
+        color: #000;
+    }
+
+    .wizard .nav-tabs>li a:hover {
+        background: transparent;
+    }
+
+    .wizard .tab-pane {
+        position: relative;
+        padding-top: 20px;
+    }
+
+    .wizard h3 {
+        margin-top: 0;
+    }
+
+    .prev-step,
+    .next-step {
+        font-size: 13px;
+        padding: 8px 24px;
+        border: none;
+        border-radius: 4px;
+        margin-top: 30px;
+        cursor: pointer;
+        background-color: #999999;
+        color: white;
+    }
+
+    .next-step {
+        background-color: #9c27b0;
+        color: white;
+        cursor: pointer;
+    }
+
+    .skip-btn {
+        background-color: #cec12d;
+    }
+
+    .step-head {
+        font-size: 20px;
+        text-align: center;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    .term-check {
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    .custom-file {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        height: 40px;
+        margin-bottom: 0;
+    }
+
+    .custom-file-input {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 40px;
+        margin: 0;
+        opacity: 0;
+    }
+
+    .custom-file-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1;
+        height: 40px;
+        padding: 0.375rem 0.75rem;
+        font-weight: 400;
+        line-height: 2;
+        color: #495057;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .custom-file-label::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        display: block;
+        height: 38px;
+        padding: 0.375rem 0.75rem;
+        line-height: 2;
+        color: #495057;
+        content: "Browse";
+        background-color: #e9ecef;
+        border-left: inherit;
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+
+    .footer-link {
+        margin-top: 30px;
+    }
+
+    .list-content {
+        margin-bottom: 10px;
+    }
+
+    .list-content a {
+        padding: 10px 15px;
+        width: 100%;
+        display: inline-block;
+        background-color: #f5f5f5;
+        position: relative;
+        color: #565656;
+        font-weight: 400;
+        border-radius: 4px;
+    }
+
+    .list-content a[aria-expanded="true"] i {
+        transform: rotate(180deg);
+    }
+
+    .list-content a i {
+        text-align: right;
+        position: absolute;
+        top: 15px;
+        right: 10px;
+        transition: 0.5s;
+    }
+
+    .form-control[disabled],
+    .form-control[readonly],
+    fieldset[disabled] .form-control {
+        background-color: #fdfdfd;
+    }
+
+    .list-box {
+        padding: 10px;
+    }
+
+    .signup-logo-header .logo_area {
+        width: 200px;
+    }
+
+    .signup-logo-header .nav>li {
+        padding: 0;
+    }
+
+    .signup-logo-header .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .list-inline li {
+        display: inline-block;
+    }
+
+    .pull-right {
+        float: right;
+    }
+
+    @media (max-width: 767px) {
+        .sign-content h3 {
+            font-size: 40px;
+        }
+
+        .wizard .nav-tabs>li a i {
+            display: none;
+        }
+    }
+
+    .vertical-line {
+        border-left: 2px solid black;
+        height: auto;
+        min-height: 250px;
+        margin: 48px;
+        position: relative;
+    }
+
+    .verticalLineContainer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .verticalLineContainer input[type="text"] {
+        padding: 10px;
+        margin-top: 98px;
+        margin-left: -50px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 45px;
+        position: absolute;
+        bottom: -52px;
+        text-align: center;
+    }
+
+    .generated-div {
+        margin: 0px;
+    }
+
+    .generated-div input {
+        padding: 10px;
+        margin-left: -20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 45px;
+        position: relative;
+        left: -70px;
+        margin: 4px;
+        text-align: center;
+    }
+
+    .form-group select {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: #fff;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-group.active label {
+        top: 8px;
+        font-size: 12px;
+        color: #555;
+    }
+
+    .form-group.active::before {
+        border-top: 0;
+        border-bottom: 8px solid #555;
+    }
+
+    .form-group.select-open select {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .form-group.select-open::before {
+        border-top: 0;
+        border-bottom: 8px solid transparent;
+    }
+</style>
+{% endblock stylesheets %} {% block content %}
+
+<nav aria-label="breadcrumb" role="navigation">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/house_list">ハウス</a></li>
+        {% if show == 'true' %}
+        <li class="breadcrumb-item" aria-current="page">編集</li>
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">追加</li>
+        {% endif %}
+    </ol>
+</nav>
+<div class="card card-profile">
+    <section class="signup-step-container">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="col-12">
+                    <div class="wizard mb-5">
+                        <div class="connecting-line"></div>
+                        <ul class="nav nav-tabs align-items-center justify-content-around" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#step1" data-toggle="tab" aria-controls="step1" role="tab"
+                                    aria-expanded="true"><span class="round-tab">1 </span> <i>ハウス名登録 </i></a>
+                            </li>
+                            <li role="presentation" class="disabled">
+                                <a href="#step2" data-toggle="tab" aria-controls="step2" role="tab"
+                                    aria-expanded="false"><span class="round-tab">2</span> <i>レーン・ポール・LED追加</i></a>
+                            </li>
+                            <li role="presentation" class="disabled">
+                                <a href="#step3" data-toggle="tab" aria-controls="step3" role="tab"><span
+                                        class="round-tab">3</span> <i>確認</i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <form role="form" action="index.html" class="login-box">
+                        <div class="tab-content" id="main_form">
+                            <!-- ハウス名登録 -->
+                            <div class="tab-pane active" role="tabpanel" id="step1">
+                                <h4 class="text-center mt-3">ハウス名登録</h4>
+                                <div class="row text-left">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">ハウス名 *</label>
+                                            <input class="form-control" id="houseName" type="text" name="houseName"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-3">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">作物名 *</label>
+                                            <select name="plantName" class="form-control" id="plantName">
+                                                <option value="" selected="selected" disabled>
+                                                    選択してください
+                                                </option>
+                                                <option value="きゅうり">きゅうり</option>
+                                                <option value="りんご">りんご</option>
+                                                <option value="いちご">いちご</option>
+                                            </select>
+                                        </div>
+                                        <!-- <div class="form-group">
+                                            <label for="exampleFormControlSelect1">Example select</label>
+                                            <select class="form-control" id="exampleFormControlSelect1">
+                                              <option>1</option>
+                                              <option>2</option>
+                                              <option>3</option>
+                                              <option>4</option>
+                                              <option>5</option>
+                                            </select>
+                                          </div> -->
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating"
+                                                for="formControlTextarea">メモ</label>
+                                            <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <ul class="list-inline pull-right">
+                                    <li>
+                                        <button type="button" class="default-btn next-step">
+                                            次
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- レーン・ポール・LED追加 -->
+                            <div class="tab-pane" role="tabpanel" id="step2">
+                                <h4 class="text-center mt-3">レーン・ポール・LED追加</h4>
+                                <div class="row text-left" id="lineAddViewHide">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">レーンの数 *</label>
+                                            <input class="form-control" id="N-leanCount" type="text" name="leanCount"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">１レーンのポールの数 *</label>
+                                            <input class="form-control" id="N-poleCount" type="text"
+                                                name="laneCountPerPole" placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">1ポールのLEDの数 *</label>
+                                            <input class="form-control" type="text" id="N-LEDCount" name="LEDcount"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button id="lineAddViewBtn" type="button" class="btn btn-outline-success">
+                                            <span class="material-icons">add_circle</span>&nbsp;&nbsp;不規則の場合
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-center align-items-center" id="lineAddViewShow">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group text-left">
+                                            <label class="text-dark bmd-label-floating">レーンの数</label>
+                                            <input class="form-control" type="number" id="verticalCount"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-1.5"></div>
+                                    <div class="col-9 mt-4">
+                                        <div id="customVerticalLineContainer" class="verticalLineContainer">
+
+                                        </div>
+                                        <div id="customInputs" class="inputLayout"></div>
+
+                                    </div>
+                                    <div class="col-1.5"></div>
+                                </div>
+                                <ul class="list-inline pull-right">
+                                    <li>
+                                        <button type="button" id="lineBackBtn-1" class="default-btn prev-step">
+                                            戻る
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" id="lineBackBtn-2" class="btn btn-warning">
+                                            戻る
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="default-btn next-step">
+                                            次
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- 確認 -->
+                            <div class="tab-pane" role="tabpanel" id="step3">
+                                <h4 class="text-center mt-3"> 確認 </h4>
+                                <div class="row text-left">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3 mt-4">
+                                        <div class="form-group bmd-form-group is-focused">
+                                            <label class="text-dark bmd-label-floating">ハウス名</label>
+                                            <input class="form-control" type="text" id="houseNameReg"
+                                                name="houseNameReg" placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mt-4">
+                                        <div class="form-group bmd-form-group is-focused">
+                                            <label class="text-dark bmd-label-floating">作物名</label>
+                                            <input class="form-control" type="text" id="plantNameReg"
+                                                name="plantNameReg" placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">レーンの数</label>
+                                            <input class="form-control" type="text" name="laneCount" placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">１レーンのポールの数</label>
+                                            <input class="form-control" type="text" name="laneCountPerPole"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class="text-dark bmd-label-floating">1ポールのLEDの数</label>
+                                            <input class="form-control" type="text" name="houseName" placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <ul class="list-inline pull-right">
+                                    <li>
+                                        <button type="button" class="default-btn prev-step">
+                                            戻る
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" id="registerBtn" class="btn btn-success">
+                                            登録
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<!-- Add this script to your HTML file -->
+<script>
+    var poleInputValues = [];
+    $(document).ready(function () {
+        // Check if there is a last active tab stored
+        var lastActiveTab = localStorage.getItem("lastActiveTab");
+        if (lastActiveTab) {
+            $(".nav-tabs li").removeClass("active");
+            $('.nav-tabs a[href="' + lastActiveTab + '"]')
+                .parent()
+                .addClass("active");
+            $(".tab-pane").removeClass("active");
+            $(lastActiveTab).addClass("active");
+        }
+
+        // Event handler for tab changes
+        $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+            var target = $(e.target).attr("href");
+            localStorage.setItem("lastActiveTab", target);
+        });
+
+        $(".next-step").click(function (e) {
+            var active = $(".wizard .nav-tabs li.active");
+            active.next().removeClass("disabled");
+            nextTab(active);
+        });
+
+        $(".prev-step").click(function (e) {
+            var active = $(".wizard .nav-tabs li.active");
+            prevTab(active);
+        });
+    });
+    function nextTab(elem) {
+        $(elem).next().find('a[data-toggle="tab"]').click();
+    }
+
+    function prevTab(elem) {
+        $(elem).prev().find('a[data-toggle="tab"]').click();
+    }
+
+    $(".nav-tabs").on("click", "li", function () {
+        $(".nav-tabs li.active").removeClass("active");
+        $(this).addClass("active");
+    });
+    // lineAddView div hide/show
+    $('#lineAddViewShow').hide();
+    $('#lineBackBtn-2').hide();
+    $("#lineAddViewBtn").on("click", function (e) {
+        $("#lineAddViewHide").hide();
+        $("#lineAddViewShow").show();
+        $('#lineBackBtn-1').hide();
+        $('#lineBackBtn-2').show();
+    });
+    $("#lineBackBtn-2").on("click", function (e) {
+        $("#lineAddViewHide").show();
+        $("#lineAddViewShow").hide();
+        $('#lineBackBtn-1').show();
+        $('#lineBackBtn-2').hide();
+    });
+    // function getRandomColor() {
+    //     var letters = "0123456789ABCDEF";
+    //     var color = "#";
+    //     for (var i = 0; i < 6; i++) {
+    //         color += letters[Math.floor(Math.random() * 16)];
+    //     }
+    //     return color;
+    // }
+    $(document).ready(function () {
+        // var poleInputValues = []
+        // var sampleArray = []
+        // Load the value of #verticalCount from localStorage
+        var storedCount = localStorage.getItem('leanCount');
+        if (storedCount) {
+            $('#verticalCount').val(storedCount);
+            var lines = "";
+            for (var i = 0; i < storedCount; i++) {
+                lines += "<div class='vertical-line'><input value='' type='text' class='dynamic-input' placeholder='数'/></div>";
+            }
+            $("#customVerticalLineContainer").html(lines);
+            var savedValues = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
+            for (var i = 0; i < savedValues.length; i++) {
+                $(".dynamic-input").eq(i).val(savedValues[i]);
+            }
+            $(".vertical-line").each(function (index, element) {
+                var count = savedValues[index];
+                var childNode = $(element);
+                childNode.children('.generated-div').remove(); // Remove previously generated divs
+                if (count !== "") {
+                    for (var j = 0; j < parseInt(count); j++) {
+                        var newNode = $("<div class='generated-div'><input value='' type='number' placeholder='数'/></div>").css("background-color", 'white');
+                        childNode.append(newNode);
+                    }
+                }
+            });
+        }
+        //  initial stage of element
+        $("#verticalCount").keyup(function () {
+            var count = $(this).val();
+            localStorage.setItem('leanCount', count);
+            var lines = "";
+            for (var i = 0; i < count; i++) {
+                lines += "<div class='vertical-line'><input value='' type='text' class='dynamic-input' placeholder='数'/></div>";
+            }
+            $("#customVerticalLineContainer").html(lines);
+        });
+
+        $(document).on("input", ".dynamic-input", function () {
+            var inputValues = [];
+            $(".dynamic-input").each(function (index, element) {
+                inputValues.push($(element).val());
+            });
+            $(".vertical-line").each(function (index, element) {
+                var count = inputValues[index];
+                var childNode = $(element);
+                childNode.children('.generated-div').remove(); // Remove previously generated divs
+                if (count !== "") {
+                    for (var j = 0; j < parseInt(count); j++) {
+                        var newNode = $("<div class='generated-div'></div>").css("background-color", 'white');
+                        var inputNode = $("<input value='' class='poleInput' placeholder='数'/>");
+                        newNode.append(inputNode);
+                        childNode.append(newNode);
+                    }
+                }
+            });
+
+            localStorage.setItem("poleCountPerLine", JSON.stringify(inputValues));
+        });
+        var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
+
+        for (var i = 0; i < polePerLine.length; i++) {
+            var sampleArray = []; // create a new instance of sampleArray
+            for (let j = 0; j < polePerLine[i]; j++) {
+                sampleArray.push('');
+            }
+            poleInputValues.push(sampleArray);
+            // console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
+        }
+        // var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
+
+        //     for (var i = 0; i < polePerLine.length; i++) {
+        //         for (let j = 0; j < polePerLine[i]; j++) {
+        //             sampleArray.push('')
+        //         }
+        //         poleInputValues.push(sampleArray)
+        //         console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]',poleInputValues);
+        //     }
+        // working on this 
+        //         $(document).on("input", ".poleInput", function () {
+        //     $(".poleInput").each(function (index, element) {
+        //         console.log('index>>>>',index);
+        //         for (var i = 0; i < poleInputValues.length; i++) {
+        //             console.log('first loop values!!!!!!',poleInputValues[i]);
+        //             if (i === index) {
+        //         for (let j = 0; j < poleInputValues[i].length; j++) {
+        //                 poleInputValues[i][j]=$(this).val()
+        //                     // console.log('value of element >',$(this).val());
+        //                     // poleInputValues[i][j] = $(this).val(); // Update the value in poleInputValues based on the input value
+        //             //         // console.log('Yeah, you got it', poleInputValues[i][j]);
+        //                      console.log('This is the final value', poleInputValues);
+        //                      localStorage.setItem("LEDCount", JSON.stringify(poleInputValues)) 
+
+        //             //     }
+        //             }
+
+        //         }          
+        //         }
+        //     });
+        // });
+
+
+        $(document).on("input", ".poleInput", function () {
+            $(".poleInput").each(function (index, element) {
+                console.log('index>>>>', index);
+                for (var i = 0; i < poleInputValues.length; i++) {
+                    console.log('first loop values!!!!!!', poleInputValues[i]);
+                    if (i === index) {
+                        for (let j = 0; j < poleInputValues[i].length; j++) {
+                            poleInputValues[i][j] = (j === 0) ? $(this).val() : ''; // set value at 0th index and empty string for other indices
+                            console.log('This is the final value', poleInputValues);
+                            localStorage.setItem("LEDCount", JSON.stringify(poleInputValues));
+                        }
+                    }
+                }
+            });
+        });
+
+        // $(document).on("input", ".poleInput", function () { 
+
+        //     $(".poleInput").each(function (index, element) {
+        //         // console.log('input index:>>',index,'poleInputValues[index]>>>', poleInputValues[index]);
+        //         for (var i = 0; i < poleInputValues.length; i++) {
+        //             // [index] = $(this).val()
+        //             console.log(poleInputValues.length,'i',i,'index',index);
+        //             if(i==index){
+        //                 for (let j = 0; j < poleInputValues[i].length; j++) {
+        //                     console.log('Yeah, you got it',poleInputValues[i][j]=$(this).val());
+
+        //                     console.log('This is a final value',poleInputValues);
+        //                 }
+        //             }
+        //             // poleInputValues[i]
+        //             // console.log('poleInputValues[i]',poleInputValues[i],'ii',i);
+        //         }
+        //         // console.log('poleInputValues>>>',poleInputValues);
+        //     });
+        // });
+        // Load input values from localStorage
+        var savedValues = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
+        for (var i = 0; i < savedValues.length; i++) {
+            $(".dynamic-input").eq(i).val(savedValues[i]);
+            var count = savedValues[i];
+            var childNode = $(".vertical-line").eq(i);
+            childNode.children('.generated-div').remove(); // Remove previously generated divs
+            if (count !== "") {
+                for (var j = 0; j < parseInt(count); j++) {
+                    var newNode = $("<div class='generated-div'></div>").css("background-color", 'white');
+                    var inputNode = $("<input value='' class='poleInput' placeholder='数'/>");
+                    newNode.append(inputNode);
+                    childNode.append(newNode);
+                }
+            }
+        }
+        // registeration btn actions 
+        $('#registerBtn').click(function (e) {
+            localStorage.removeItem('lastActiveTab')
+            localStorage.removeItem('leanCount')
+            localStorage.removeItem('poleCountPerLine')
+            localStorage.removeItem('plantName')
+            localStorage.removeItem('houseName')
+            window.location.pathname = '/house_list'
+        })
+        // houseName value 
+        $('#houseName').on('input', function (e) {
+            let houseName = e.target.value
+            localStorage.setItem('houseName', houseName)
+            var storedHouseValue = localStorage.getItem('houseName')
+            $('#houseNameReg').val(storedHouseValue);
+        })
+        // plantName value 
+        $('#plantName').change(function (e) {
+            let plantName = e.target.value
+            localStorage.setItem('plantName', plantName)
+            var storedPlantValue = localStorage.getItem('plantName')
+            $('#plantNameReg').val(storedPlantValue);
+        })
+        var leanCount
+        var poleCount
+        var LEDCount
+        $('#N-leanCount, #N-poleCount, #N-LEDCount').on('keyup', function (e) {
+            leanCount = $("#N-leanCount").val()
+            poleCount = $("#N-poleCount").val()
+            LEDCount = $("#N-LEDCount").val()
+            if (leanCount && poleCount && LEDCount) {
+                let poleCountArray = []
+                let LEDCountArray = []
+                for (i = 1; i <= leanCount; i++) {
+                    poleCountArray.push(poleCount)
+                }
+                for (let j = 0; j < poleCountArray.length; j++) {
+                    let subArray = Array.from({ length: parseInt(poleCountArray[j], 10) }, () => LEDCount);
+                    LEDCountArray.push(subArray);
+                }
+                console.log('leanCount & poleCountArray & LEDCountArray', leanCount, poleCountArray, LEDCountArray);
+            }
+        })
+    });
+</script>
+
+{% endblock javascripts %}

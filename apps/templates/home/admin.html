@@ -1,0 +1,296 @@
+{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<style>
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #66bb6a;
+  }
+
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(16px);
+  }
+
+  input:checked+.slider+.toggle-text {
+    left: 35px;
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const colorToggles = document.querySelectorAll(".colorToggle");
+
+    colorToggles.forEach(function (toggle) {
+      const toggleText = toggle.nextElementSibling.nextElementSibling;
+
+      toggle.addEventListener("change", function () {
+        if (toggle.checked) {
+          toggle.nextElementSibling.style.backgroundColor = "#66bb6a";
+        } else {
+          toggle.nextElementSibling.style.backgroundColor = ""; // Reset to default color when unchecked
+        }
+      });
+    });
+  });
+  // user active/ disabled success message 
+  setTimeout(function () {
+    var successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+      successMessage.style.display = 'none';
+    }
+  }, 3000);
+
+  // Delete api and bootsratp modal open and close functions 
+  document.addEventListener("DOMContentLoaded", function () {
+    var deleteButton = document.getElementById("deleteButton");
+
+    $('#userDeleteModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget); // Button that triggered the modal
+      var userId = button.data('user-id'); // Extract info from data-* attributes
+      var userName = button.data('user-name');
+      var csrfToken = button.data('csrf-token');
+      var modal = $(this);
+      modal.find('#userNameSpan').text(userName);
+      console.log(userId);
+      deleteButton.addEventListener("click", function () {
+        // For now, let's log a message to the console
+        console.log("User with ID " + userId + " and name " + userName + " deleted" + "csrfToken" + csrfToken);
+
+        // Making a DELETE request to the API
+        fetch('/delete_user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({ 'user_id': userId })
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            var successMessage = document.getElementById('deleteSuccessMessage');
+            successMessage.innerHTML = "ユーザ" + userName + " が削除されました。";
+            $('#userDeleteModal').modal('hide');
+            // Redirect to user_list after 3 seconds
+            setTimeout(function () {
+              window.location.href = '/user_list';
+            }, 3000);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      });
+    });
+  });
+</script>
+
+<div class="flex-container">
+  <h3>管理者</h3>
+  <a href="/add_user"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+    </span>&nbsp;&nbsp;追加</button></a>
+</div>
+{% if success_message %}
+<div class=" text-center text-success" id="successMessage">
+        {{ success_message }}
+</div>
+{% endif %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="text-center text-success" id="successMessage">
+  {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+<div class=" text-center text-success" id="deleteSuccessMessage"></div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis table-success">
+              <th>ID</th>
+              <th>⽒名</th>
+              <th>メール</th>
+              <th>権限</th>
+              <th>ステイタス</th>
+              <th>アクション</th>
+            </thead>
+            {% if page.object_list|length > 0 %}
+            <tbody>
+              {% for user in page.object_list %}
+              {% if not user.isDeleted %}
+              <tr>
+                <td>{{ user.user_id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{% if user.role_id == 1 %} 管理者 {% else %} ユーザ {% endif %}</td>
+                <td>
+                  {% if user.role_id == 1 %}
+                  -
+                  {% else %}
+                  <form method="post" action="" autocomplete="off">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value={{user.user_id}}>
+                    {% if user.isActive %}
+                    <input type="hidden" name="is_active" value="False">
+                    {% else %}
+                    <input type="hidden" name="is_active" value="True">
+                    {% endif %}
+                    <label class="switch">
+                      <input type="checkbox" class="colorToggle" {% if user.isActive %}checked{% endif %}
+                        onchange="this.form.submit()" />
+                      <span class="slider round"></span>
+                    </label>
+                  </form>
+                  {% endif %}
+                </td>
+                <td class="text-warning">
+                  {% if user.role_id == 1 %}
+                  管理者
+                  {% else %}
+                  <a href="{% url 'update_user' user.user_id %}" style="color: #ff9800;"><span>編集</span></a>
+                  &nbsp; &nbsp;|&nbsp;&nbsp; 
+                  <a href="#" data-toggle="modal" class="text-danger"  data-target="#userDeleteModal" data-user-id="{{ user.user_id }}"
+                    data-csrf-token={{ csrf_token }} data-user-name="{{ user.username }}"
+                    ><span>削除</span></a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody> 
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-warning">データがありません</td>
+                <td></td>
+              </tr>
+            </tbody>
+            {% endif %}
+          </table>
+          <!-- if you need use it {% if page.object_list|length > 6 %}{% endif %} -->
+          <!-- Pagination Section  -->
+          <div class="flex-container">
+          <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
+          <nav aria-label="...">
+            <ul class="pagination justify-content-end">
+              <li class="page-item">
+                {% if page.has_previous %}
+                <a class="page-link" href="{% url 'user_list' %}?page={{ page.previous_page_number }}"
+                  tabindex="-1">前</a>
+                {% endif %}
+              </li>
+              {% for num_page in page.paginator.page_range %}
+              {% if page.number == num_page %}
+              <li class="page-item active">
+                <a class="page-link" href="{% url 'user_list' %}?page={{ num_page }}">{{ num_page }}<span
+                    class="sr-only">(current)</span></a>
+              </li>
+              {% else %}
+              <li class="page-item">
+                <a class="page-link" href="{% url 'user_list' %}?page={{ num_page }}">{{ num_page }}<span
+                    class="sr-only">(current)</span></a>
+              </li>
+              {% endif %}
+              {% endfor %}
+              <li class="page-item">
+                {% if page.has_next %}
+                <a class="page-link" href="{% url 'user_list' %}?page={{ page.next_page_number }}">次</a>
+                {% endif %}
+              </li>
+            </ul>
+          </nav>
+        </div>
+        
+          <!--Delete Modal -->
+          <div class="modal fade" id="userDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">削除</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  ユーザー<span id="userNameSpan"></span> を削除してもよろしいですか？
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                  <form id="deleteForm" action="" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="">
+                    <button type="button" id="deleteButton" class="btn btn-danger">削除</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

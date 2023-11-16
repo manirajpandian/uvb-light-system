@@ -1,0 +1,175 @@
+{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<style>
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #66bb6a;
+  }
+
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(16px);
+  }
+
+  input:checked+.slider+.toggle-text {
+    left: 35px;
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const colorToggles = document.querySelectorAll(".colorToggle");
+
+    colorToggles.forEach(function (toggle) {
+      const toggleText = toggle.nextElementSibling.nextElementSibling;
+
+      toggle.addEventListener("change", function () { });
+    });
+  });
+</script>
+<div class="flex-container">
+  <h3>光源設定</h3>
+  <button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+    </span>&nbsp;&nbsp;追加</button>
+</div>
+  <form method=" post">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="ハウス名" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="作物名" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="場所" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" name="search" class="btn btn-success">検索</button>
+        </div>
+      </div>
+      </form>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead class="text-primary-emphasis table-success">
+                    <th>LED No</th>
+                    <th>名称</th>
+                    <th>場所</th>
+                    <th>光源距離</th>
+                    <th>照射時間（日）</th>
+                    <th>備考</th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>いちご</td>
+                      <td>南相馬</td>
+                      <td>2m</td>
+                      <td>00:02:34</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>きゅうり</td>
+                      <td>南相馬</td>
+                      <td>1.5m</td>
+                      <td>00:02:34</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>3</td>
+                      <td>きゅうり</td>
+                      <td>南相馬</td>
+                      <td>1.5m</td>
+                      <td>00:02:34</td>
+                      <td></td>
+                  </tbody>
+                </table>
+                <nav aria-label="...">
+                  <ul class="pagination justify-content-end">
+                    <li class="page-item disabled">
+                      <a class="page-link" href="javascript:;" tabindex="-1">前</a>
+                    </li>
+                    <li class="page-item active">
+                      <a class="page-link" href="javascript:;">1 <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="javascript:;">2</a></li>
+                    <li class="page-item"><a class="page-link" href="javascript:;">3</a></li>
+                    <li class="page-item">
+                      <a class="page-link" href="javascript:;">次</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex-container" style="justify-content: flex-end;">
+        <button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+          </span>&nbsp;&nbsp;登録</button>
+      </div>
+      {% endblock content %}
+
+      <!-- Specific Page JS goes HERE  -->
+      {% block javascripts %}{% endblock javascripts %}
