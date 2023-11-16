@@ -16,7 +16,20 @@
 
 </style>
 {% endblock stylesheets %} {% block content %}
-<h3>ダッシュボード</h3>
+
+<div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
+  <h3>ダッシュボード - 農場1</h3>
+<div class="dropdown my-2">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   <span>農場フィルター</span>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">農場1</a>
+    <a class="dropdown-item" href="#">農場2</a>
+    <a class="dropdown-item" href="#">農場3</a>
+  </div>
+</div>
+</div>
 <div class="row">
   <div class="col-lg-3 col-md-6 col-sm-6">
     <a href="/house_lights">

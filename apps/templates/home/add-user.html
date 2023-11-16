@@ -12,8 +12,6 @@
   }
 </style>
 {% endblock stylesheets %}{% block content %}
-<h3>管理者</h3>
-
 <nav aria-label="breadcrumb" role="navigation">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="/user_list">管理者</a></li>
@@ -21,7 +19,7 @@
     <li class="breadcrumb-item" aria-current="page">編集</li>
     {% else %}
     <li class="breadcrumb-item active" aria-current="page">
-      ユーザ追加
+      管理者追加
     </li>
     {% endif %}
 
@@ -59,8 +57,11 @@
   </div>
   <div class="row">
     <div class="col-md-6 my-4">
+      <div class="form-group">
+        <label for="権限" class="bmd-label-floating">権限</label>
       {{ form.role_id }}
     </div>
+  </div>
   </div>
   <div class="center-container">
     <a href="/user_list">

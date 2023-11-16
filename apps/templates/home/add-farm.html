@@ -11,44 +11,94 @@
         justify-content: flex-end;
         align-items: center;
     }
+    .form-group select {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: #fff;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-group.active label {
+        top: 8px;
+        font-size: 12px;
+        color: #555;
+    }
+
+    .form-group.active::before {
+        border-top: 0;
+        border-bottom: 8px solid #555;
+    }
+
+    .form-group.select-open select {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .form-group.select-open::before {
+        border-top: 0;
+        border-bottom: 8px solid transparent;
+    }
 </style>
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/farm_manage">農家管理</a></li>
-        <li class="breadcrumb-item" aria-current="page">光源設定追加</li>
+        <li class="breadcrumb-item" aria-current="page">農家追加</li>
     </ol>
 </nav>
 <div class="card">
     <div class="card-body">
         <form>
+            <div class="row">
+                <div class="col-md-6 my-4">
             <div class="form-group">
                 <label class="bmd-label-floating" for="farmname">農家名</label>
                 <input type="text" class="form-control" id="farmname">
-
             </div>
-            <br>
-
-            <div class="form-group">
-                <label class="bmd-label-floating" for="Managerrole">担当者</label>
-                <input type="text" class="form-control" id="Managerrole">
-
-            </div>
-            <br>
+        </div>
+        <div class="col-md-6 my-4">
             <div class="form-group">
                 <label class="bmd-label-floating" for="Email1">メール</label>
                 <input type="email" class="form-control" id="Email1" aria-describedby="emailHelp">
 
             </div>
-            <br>
+        </div>
+        <div class="col-md-6 my-4">
+            <div class="form-group">
+                <label class="bmd-label-floating">担当者</label>
+                <select name="plantName" class="form-control" id="plantName">
+                    <option selected>ハウス</option>
+                    <option value="0">ハウスA</option>
+                    <option value="1">ハウスＢ</option>
+                </select>
+            </div>
+        </div>
+            
+        
+
+        <div class="col-md-6 my-4">
+            <div class="form-group">
+                <label class="bmd-label-floating">ステータス</label>
+                <select name="plantName" class="form-control" id="plantName">
+                    <option value="0">有効</option>
+                    <option value="1">無効</option>
+                </select>
+            </div>
+        </div>            
+        </div>
+        <div class="col-md-6 my-5">
             <div class="form-group">
                 <label class="bmd-label-floating" for="address">住所</label>
                 <input type="text" class="form-control" id="address">
             </div>
-            <div class="center-container">
-                <a href="/farm_manage">
-                    <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
-                <button type="submit" class="btn btn-success">追加</button>
-            </div>
+        </div>
+        <div class="center-container">
+            <a href="/farm_manage"><button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+            <button type="submit" class="btn btn-success">追加</button>
+        </div>
         </form>
     </div>
 </div>

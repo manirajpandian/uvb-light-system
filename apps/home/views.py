@@ -9,8 +9,8 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import UserAddForm
-from .models import User
+from .forms import UserAddForm,PlantForm
+from .models import User,Plant
 from django.core.paginator import Paginator
 import json
 from django.contrib import messages
@@ -33,15 +33,74 @@ def LED_control(request):
     return HttpResponse(html_template.render(context, request))
 
 def plant_setting(request):
-    context = {'segment':'plant_settings'}
-    html_template = loader.get_template('home/settings.html')
-    return HttpResponse(html_template.render(context, request))
+    try:
+        plant_list = Plant.objects.all().order_by('plant_id')
+        context = {'segment':'plant_settings', 'plant_list': plant_list}
+        # page = Paginator(user_list, 5)
+        # page_list = request.GET.get('page')
+        # page = page.get_page(page_list)
+        print(context)
+        if request.method == "GET":
+            print(plant_list)
+            # return render(request, 'home/settings.html', {'plant_list': plant_list})
+            html_template = loader.get_template('home/settings.html')
+            return HttpResponse(html_template.render(context, request))
+        # elif request.method == "POST":
+        #     user_id = request.POST['user_id']
+        #     is_active = request.POST['is_active']
+        #     user = get_object_or_404(User, pk=user_id)
+        #     user.isActive = is_active
+        #     user.save()
+        #     success_message = "ユーザーステータスの変更に成功しました"  # success message here
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
+    
+def update_plant(request,pk):
+    show = 'true'
+    plant = Plant.objects.get(plant_id=pk)
+    if request.method == 'POST':
+        form = PlantForm(request.POST, instance=plant)
+        if form.is_valid():
+            form.save()
+            update_success_message = '作物詳細の更新成功'
+            messages.success(request, update_success_message)
+            return redirect('/plant_setting')
+    else:
+        form = PlantForm(instance=plant)
+    context = {"form": form, "show": show}
+    return render(request, 'home/add-plant.html', context)
+
+# Add new user
+
+@login_required
+def add_user(request):
+    if request.method == "GET":
+        form = UserAddForm()
+        return render(request, 'home/add-user.html', {"form": form})
+    else:
+        form = UserAddForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            if User.objects.filter(email=email).exists():
+                error_message = "このメールはすでに存在します。別のメールをお試しください。"
+                return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})  # Redirect to the same page
+            else:
+                form.save()
+                add_success_message = "ユーザが正常に追加されました"
+                messages.success(request, add_success_message)
+                return redirect('/user_list')
+        else:
+            # Handle the case when the form is not valid
+            error_message = "無効なフォームデータです。フォームフィールドを確認して、もう一度やり直してください。"
+            return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message}) # Redirect to the same page
+
 
 # Get user list and Active/Disabled user
 
 def user_list(request):
     try:
-        user_list = User.objects.all().order_by('user_id')
+        user_list = User.objects.filter(isDeleted=False).order_by('user_id')
         page = Paginator(user_list, 5)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
@@ -59,43 +118,20 @@ def user_list(request):
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
 
-# Add new user
-
-
-@login_required
-def add_user(request):
-    if request.method == "GET":
-        form = UserAddForm()
-        return render(request, 'home/add-user.html', {"form": form})
-    else:
-        form = UserAddForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('email')
-            if User.objects.filter(email=email).exists():
-                error_message = "このメールはすでに存在します。別のメールをお試しください。"
-                return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})
-            else:
-                form.save()
-                return redirect('/user_list')
-        else:
-            # Handle the case when the form is not valid
-            error_message = "無効なフォームデータです。フォームフィールドを確認して、もう一度やり直してください。"
-            return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})
-
  # Update User
 
 def update_user(request, pk):
     show = 'true'
-    user = User.objects.get(id=pk)
+    user = User.objects.get(user_id=pk)
     if request.method == 'POST':
         form = UserAddForm(request.POST, instance=user)
         if form.is_valid():
             email = form.cleaned_data.get('email')
-            if User.objects.filter(email=email).exclude(id=pk).exists():
+            if User.objects.filter(email=email).exclude(user_id=pk).exists():
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
                 return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})
             form.save()
-            update_success_message = 'ユーザー詳細の更新成功'
+            update_success_message = 'ユーザー詳細が正常に更新されました'
             messages.success(request, update_success_message)
             return redirect('/user_list')
 
@@ -105,27 +141,24 @@ def update_user(request, pk):
     return render(request, 'home/add-user.html', context)
 
 
-# # Delete user api
-
-
-# @login_required
-# def delete_user(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         # Extract the user_id from the request data
-#         user_id = data.get('user_id')
-#         if user_id:
-#             # Assuming your model is named 'User'
-#             user = get_object_or_404(User, pk=user_id)
-#             user.isDeleted = True
-#             user.save()
-#             response_data = {'message': 'ユーザー削除成功されました。'}
-#             return JsonResponse(response_data, status=200)
-#         else:
-#             response_data = {'error': 'ユーザーIDが提供されていないです。'}
-#             return JsonResponse(response_data, status=400)
-#     else:
-#         return JsonResponse({'error': '無効なリクエストメソッド'}, status=400)
+# Delete user api
+def delete_user(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        # Extract the user_id from the request data
+        user_id = data.get('user_id')
+        if user_id:
+            # Assuming your model is named 'User'
+            user = get_object_or_404(User, pk=user_id)
+            user.isDeleted = True
+            user.save()
+            response_data = {'message': 'ユーザー削除成功されました。'}
+            return JsonResponse(response_data, status=200)
+        else:
+            response_data = {'error': 'ユーザーIDが提供されていないです。'}
+            return JsonResponse(response_data, status=400)
+    else:
+        return JsonResponse({'error': '無効なリクエストメソッド'}, status=400)
 
 
 @login_required(login_url="/login/")
@@ -172,3 +205,14 @@ def  reset_password (request):
     context={}
     html_template = loader.get_template('accounts/reset_password.html')
     return HttpResponse(html_template.render(context, request))
+
+
+def add_plant(request):
+    if request.method == "GET":
+        form = PlantForm()
+        return render(request, 'home/add-plant.html', {"form": form})
+    else:
+        form = PlantForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/plant_setting')  # Redirect to a success page or the desired URL
