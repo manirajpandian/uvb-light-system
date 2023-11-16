@@ -16,31 +16,39 @@
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/settings.html">作物設定</a></li>
-        <li class="breadcrumb-item" aria-current="page">作物設定追加</li>
+        {% if show == 'true' %}
+        <li class="breadcrumb-item" aria-current="page">作物の編集</li>
+        {% else %}
+        <li class="breadcrumb-item" aria-current="page">作物追加</li>
+        {% endif %}
     </ol>
 </nav>
 <div class="card">
     <div class="card-body">
-        <form>
+        {% if error_message %}
+        <p class="text-danger">{{ error_message }}</p>
+        {% endif %}
+        <form method="post" action=""　autocomplete="off">
+            {% csrf_token %}
             <div class="form-group">
                 <label class="bmd-label-floating" for="plantname">作物名</label>
-                <input type="text" class="form-control" id="plantname">
+                <input type="text" class="form-control" name="plant_name" required>
             </div>
             <br>
     
             <div class="form-group">
                 <label class="bmd-label-floating" for="distance">光源距離(cm)</label>
-                <input type="text" class="form-control" id="distance">
+                <input type="number" class="form-control" name="distance" required>
             </div>
             <br>
             <div class="row align-items-center"">
-                <div class="col-sm-2 ">
+                <div class="col-sm-2 text-secondary">
                     照射時間(hh:mm:ss)
                 </div>
                 <div class="col-1">
                     <div class="form-group">
                     <label class="bmd-label-floating" for="time">hh</label>
-                    <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" required>
+                    <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" max="99" required>
                     </div>
                 </div>
                 <div class="col-0.25">
@@ -62,6 +70,12 @@
                     </div>
                 </div>
             </div>
+            <input type="hidden" id="time_required" name="time_required" value="">
+            <br>
+            <div class="form-group">
+                <label class="bmd-label-floating" for="plantname">備考</label>
+                <input type="text" class="form-control" name="remarks">
+            </div>
             <div class="center-container">
                 <a href="/plant_setting">
                     <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
@@ -79,29 +93,14 @@
 
 {% block javascripts %}
 <script>
-// const input = document.querySelector('input[required]');
-// input.setCustomValidity('このフィールドを入力してください。');
-
-// // Listen for the form submit event
-// input.addEventListener('submit', () => {
-//   if (input.validity.valueMissing) {
-//     // Prevent the form from submitting
-//     event.preventDefault();
-
-//     // Display the validation message
-//     input.setCustomValidity('このフィールドを入力してください。');
-//   }
-// });
-var combinedTime ='';
 function validateAndCombine() {
         var hour = document.getElementById('hour').value;
         var minute = document.getElementById('minute').value;
         var second = document.getElementById('second').value;
 
         // Combine values into a single format
-        combinedTime = ('00' + hour).slice(-2) + ':' + ('00' + minute).slice(-2) + ':' + ('00' + second).slice(-2);
-
-        console.log('Combined time stored in variable:', combinedTime);
+        var combinedTime = ('00' + hour).slice(-2) + ':' + ('00' + minute).slice(-2) + ':' + ('00' + second).slice(-2);
+        document.getElementById('time_required').value = combinedTime;
     }
 </script>
 {% endblock javascripts %}

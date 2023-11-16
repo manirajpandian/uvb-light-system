@@ -40,3 +40,13 @@ class User(models.Model):
     updatedBy = models.IntegerField(default=1)
     updatedAt = models.DateTimeField(auto_now=True, null=True)
 
+class Plant(models.Model):
+    plant_id = models.BigAutoField(primary_key=True)
+    plant_name = models.CharField(max_length=255)
+    distance = models.DecimalField(max_digits=10, decimal_places=2)                  # Example for distance in centimeters
+    time_required = models.CharField(max_length=8)                                  # Time required in minutes
+    remarks = models.CharField(max_length=255)
+    createdBy = models.IntegerField(default=1)
+    createdAt = models.DateTimeField(auto_now_add=True, blank=True)
+    updatedBy = models.IntegerField(default=1)
+    updatedAt = models.DateTimeField(auto_now=True, null=True)
