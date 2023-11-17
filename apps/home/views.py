@@ -14,7 +14,10 @@ from .models import User,Plant
 from django.core.paginator import Paginator
 import json
 from django.contrib import messages
-
+from django.core.mail import send_mail
+from django.conf import settings
+import uuid
+from django.utils.html import format_html
 
 @login_required(login_url="/login/")
 def index(request):
@@ -87,6 +90,34 @@ def add_user(request):
                 return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})  # Redirect to the same page
             else:
                 form.save()
+                # Send email to the added user
+                # Generate a random farm ID
+                farm_id = str(uuid.uuid4())[:6].upper()
+                loading = True
+                link = format_html(f'''<a href="https://uvb-beamtec.mosaique.link/reset_password">パスワードの設定</a>''')
+                subject = '光防除システム管理サイトログイン'
+                message = f'''
+                光防除システム管理サイトログイン
+
+                光防除システム管理サイトへようこそ！
+                下記の「パスワードの設定」をクリックして進んでください。
+
+                {link}
+
+                ★！現段階ではまた登録は完了しておりません！★
+                ※ご本人様確認のため、上記URLへ「24時間以内」にアクセスしアカウントの本登録を完了いただけますようお願いいたします。
+
+                農場ID：{farm_id}
+                ID：{email}
+
+                ご不明な点がございましたら、このメールへご返信いただくか、
+                info@beam~ までご連絡ください。'''
+                
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [email]
+
+                send_mail(subject, message, from_email, recipient_list)
+
                 add_success_message = "ユーザが正常に追加されました"
                 messages.success(request, add_success_message)
                 return redirect('/user_list')

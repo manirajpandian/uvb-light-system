@@ -16,6 +16,12 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default="maniraj@mosaique.link")
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default="ihxonvfuwxuuclmh")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # load production server from .env
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]

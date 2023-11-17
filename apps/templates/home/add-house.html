@@ -332,10 +332,13 @@
 
     .vertical-line {
         border-left: 2px solid black;
-        /* height: auto; */
         min-height: 250px;
         margin: 48px;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .verticalLineContainer {
@@ -452,6 +455,15 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
+                                            <label class=" bmd-label-floating">農家名 *</label>
+                                            <input class="form-control" id="farmerName" type="text" name="farmerName"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
                                             <label class=" bmd-label-floating">ハウス名 *</label>
                                             <input class="form-control" id="houseName" type="text" name="houseName"
                                                 placeholder="" />
@@ -471,23 +483,12 @@
                                                 <option value="いちご">いちご</option>
                                             </select>
                                         </div>
-                                        <!-- <div class="form-group">
-                                            <label for="exampleFormControlSelect1">Example select</label>
-                                            <select class="form-control" id="exampleFormControlSelect1">
-                                              <option>1</option>
-                                              <option>2</option>
-                                              <option>3</option>
-                                              <option>4</option>
-                                              <option>5</option>
-                                            </select>
-                                          </div> -->
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating"
-                                                for="formControlTextarea">メモ</label>
+                                            <label class=" bmd-label-floating" for="formControlTextarea">メモ</label>
                                             <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
                                         </div>
                                     </div>
@@ -581,6 +582,15 @@
                                 <h4 class="text-center mt-3"> 確認 </h4>
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class=" bmd-label-floating">農家名</label>
+                                            <input class="form-control" id="farmerName" type="text" name="farmerName"
+                                                placeholder="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3"></div>
                                     <div class="col-md-3 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ハウス名</label>
@@ -625,8 +635,7 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating"
-                                                for="formControlTextarea">メモ</label>
+                                            <label class=" bmd-label-floating" for="formControlTextarea">メモ</label>
                                             <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
                                         </div>
                                     </div>
@@ -717,17 +726,7 @@
         $('#lineBackBtn-1').show();
         $('#lineBackBtn-2').hide();
     });
-    // function getRandomColor() {
-    //     var letters = "0123456789ABCDEF";
-    //     var color = "#";
-    //     for (var i = 0; i < 6; i++) {
-    //         color += letters[Math.floor(Math.random() * 16)];
-    //     }
-    //     return color;
-    // }
     $(document).ready(function () {
-        // var poleInputValues = []
-        // var sampleArray = []
         // Load the value of #verticalCount from localStorage
         var storedCount = localStorage.getItem('leanCount');
         if (storedCount) {
@@ -753,6 +752,7 @@
                 }
             });
         }
+
         //  initial stage of element
         $("#verticalCount").keyup(function () {
             var count = $(this).val();
@@ -765,6 +765,10 @@
         });
 
         $(document).on("input", ".dynamic-input", function () {
+            var contentDivs = document.querySelectorAll('.vertical-line');
+            contentDivs.forEach((node) => {
+                node.removeAttribute('style')
+            });
             var inputValues = [];
             $(".dynamic-input").each(function (index, element) {
                 inputValues.push($(element).val());
@@ -784,51 +788,35 @@
             });
 
             localStorage.setItem("poleCountPerLine", JSON.stringify(inputValues));
-
             var contentDivs = document.querySelectorAll('.vertical-line');
-            var _dynamicInput = document.querySelectorAll('.dynamic-input');
-            var _maxContentHeight = 250; // Use an underscore to indicate it's a private variable
+            var _maxContentHeight = 250;
 
             function setMaxContentHeight(newValue) {
                 if (newValue !== _maxContentHeight) {
-                    // console.log('newValue !== _maxContentHeight',newValue !== _maxContentHeight);
                     _maxContentHeight = newValue;
-                    console.log('_maxContentHeight',_maxContentHeight);
-                    // Call your additional function here
                     onMaxContentHeightChange();
                 }
             }
 
             function onMaxContentHeightChange() {
-                // This function will be called whenever maxContentHeight changes
-                // console.log('maxContentHeight changed to:', _maxContentHeight);
-                // console.log('contentDivs??????????',contentDivs);
                 contentDivs.forEach((node) => {
-                _dynamicInput.forEach((input) => {
-                    console.log('input value >>>', input.value); // Access the value property of the input element
-                    if (input.value !== null) {
-                        node.style.height = _maxContentHeight + 'px';
-                    }
+                    node.style.height = _maxContentHeight + 'px';
                 });
-            });
-
-                // You can add any additional actions you want to perform when maxContentHeight changes here
-                // For example, update the height of an element or trigger another function
             }
+
+            var maxHeight = 0;
 
             // Loop through content divs and find the maximum height
             contentDivs.forEach(function (contentDiv) {
-                // contentDivs.forEach((node) => {
-                //     node.removeAttribute('style');
-                // })
-                var height = contentDiv.clientHeight; // cause is this 
-                console.log('height actual>>',height);
-                // console.log('contentDiv.clientHeight;',height,'_maxContentHeight>>',_maxContentHeight);
-                if (height > _maxContentHeight) {
-                    // console.log('height > _maxContentHeight',height > _maxContentHeight);
-                    setMaxContentHeight(height);
+                var height = contentDiv.clientHeight;
+
+                if (height > maxHeight) {
+                    maxHeight = height;
                 }
             });
+
+            // Set the maximum height after finding it
+            setMaxContentHeight(maxHeight);
         });
 
         var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];

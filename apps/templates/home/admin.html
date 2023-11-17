@@ -76,14 +76,18 @@
 </div>
 {% if success_message %}
 <div class=" text-center text-success" id="successMessage">
-        {{ success_message }}
+      <div class="alert alert-info" role="alert">
+        <strong>{{ success_message }}</strong>
+      </div>
 </div>
 {% endif %}
 
 {% if messages %}
 {% for message in messages %}
-<div class="text-center text-success" id="successMessage">
-  {{ message }}
+<div class="text-center" id="successMessage">
+  <div class="alert alert-info" role="alert">
+    <strong>{{ message }}</strong>
+  </div>
 </div>
 {% endfor %}
 {% endif %}
@@ -132,8 +136,8 @@
                   </form>
                   {% endif %}
                 </td>
-                <td class="text-warning">
-                  {% if user.role_id == 1 %}
+                <td>
+                  {% if user.role_id == '1' %}
                   管理者
                   {% else %}
                   <a href="{% url 'update_user' user.user_id %}" style="color: #ff9800;"><span>編集</span></a>

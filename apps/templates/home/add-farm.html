@@ -68,17 +68,17 @@
         </div>
         <div class="col-md-6 my-4">
             <div class="form-group">
-                <label class="bmd-label-floating">担当者</label>
-                <select name="plantName" class="form-control" id="plantName">
-                    <option selected>ハウス</option>
-                    <option value="0">ハウスA</option>
-                    <option value="1">ハウスＢ</option>
-                </select>
+                <label class="bmd-label-floating" for="Email1">担当者</label>
+                <input type="manager" class="form-control" id="manager" aria-describedby="emailHelp">
             </div>
         </div>
             
-        
-
+        <div class="col-md-6 my-4">
+            <div class="form-group">
+                <label class="bmd-label-floating" for="address">住所</label>
+                <input type="text" class="form-control" id="address">
+            </div>
+        </div>
         <div class="col-md-6 my-4">
             <div class="form-group">
                 <label class="bmd-label-floating">ステータス</label>
@@ -87,14 +87,11 @@
                     <option value="1">無効</option>
                 </select>
             </div>
-        </div>            
+        </div> 
+
+                   
         </div>
-        <div class="col-md-6 my-5">
-            <div class="form-group">
-                <label class="bmd-label-floating" for="address">住所</label>
-                <input type="text" class="form-control" id="address">
-            </div>
-        </div>
+        
         <div class="center-container">
             <a href="/farm_manage"><button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
             <button type="submit" class="btn btn-success">追加</button>
