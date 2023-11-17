@@ -786,11 +786,14 @@
             localStorage.setItem("poleCountPerLine", JSON.stringify(inputValues));
 
             var contentDivs = document.querySelectorAll('.vertical-line');
+            var _dynamicInput = document.querySelectorAll('.dynamic-input');
             var _maxContentHeight = 250; // Use an underscore to indicate it's a private variable
 
             function setMaxContentHeight(newValue) {
                 if (newValue !== _maxContentHeight) {
+                    // console.log('newValue !== _maxContentHeight',newValue !== _maxContentHeight);
                     _maxContentHeight = newValue;
+                    console.log('_maxContentHeight',_maxContentHeight);
                     // Call your additional function here
                     onMaxContentHeightChange();
                 }
@@ -798,12 +801,16 @@
 
             function onMaxContentHeightChange() {
                 // This function will be called whenever maxContentHeight changes
-                console.log('maxContentHeight changed to:', _maxContentHeight);
+                // console.log('maxContentHeight changed to:', _maxContentHeight);
                 // console.log('contentDivs??????????',contentDivs);
                 contentDivs.forEach((node) => {
-                    console.log(node);
-                    node.style.height = _maxContentHeight+'px';
-                })
+                _dynamicInput.forEach((input) => {
+                    console.log('input value >>>', input.value); // Access the value property of the input element
+                    if (input.value !== null) {
+                        node.style.height = _maxContentHeight + 'px';
+                    }
+                });
+            });
 
                 // You can add any additional actions you want to perform when maxContentHeight changes here
                 // For example, update the height of an element or trigger another function
@@ -811,9 +818,14 @@
 
             // Loop through content divs and find the maximum height
             contentDivs.forEach(function (contentDiv) {
-                var height = contentDiv.clientHeight;
+                // contentDivs.forEach((node) => {
+                //     node.removeAttribute('style');
+                // })
+                var height = contentDiv.clientHeight; // cause is this 
+                console.log('height actual>>',height);
                 // console.log('contentDiv.clientHeight;',height,'_maxContentHeight>>',_maxContentHeight);
                 if (height > _maxContentHeight) {
+                    // console.log('height > _maxContentHeight',height > _maxContentHeight);
                     setMaxContentHeight(height);
                 }
             });
