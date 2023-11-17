@@ -43,8 +43,8 @@
   .slider:before {
     position: absolute;
     content: "";
-    height: 16px;
-    width: 16px;
+    height: 15px;
+    width: 15px;
     left: 4px;
     bottom: 2px;
     background-color: white;
@@ -124,11 +124,11 @@
                     {% else %}
                     <input type="hidden" name="is_active" value="True">
                     {% endif %}
-                    <label class="switch">
+                    無 <label class="switch">
                       <input type="checkbox" class="colorToggle" {% if user.isActive %}checked{% endif %}
                         onchange="this.form.submit()" />
                       <span class="slider round"></span>
-                    </label>
+                    </label> 有
                   </form>
                   {% endif %}
                 </td>

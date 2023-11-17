@@ -16,8 +16,8 @@
   .switch {
     position: relative;
     display: inline-block;
-    width: 56px;
-    height: 30px;
+    width: 38px;
+    height: 20px;
   }
 
   .switch input {
@@ -39,26 +39,23 @@
     border-radius: 34px;
   }
 
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .slider:before {
     position: absolute;
     content: "";
-    height: 23px;
-    width: 23px;
+    height: 15px;
+    width: 15px;
     left: 4px;
-    bottom: 4px;
+    bottom: 3px;
     background-color: white;
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 50%;
-  }
-
-  .toggle-text {
-    position: absolute;
-    top: 50%;
-    font-size: 10px;
-    transform: translateY(-50%);
-    left: 5px;
-    color: gray;
   }
 
   input:checked+.slider {
@@ -68,7 +65,7 @@
   input:checked+.slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
-    transform: translateX(26px);
+    transform: translateX(16px);
   }
 
   input:checked+.slider+.toggle-text {
@@ -190,13 +187,10 @@
                 <td>1</td>
                 <td>2m</td>
                 <td>00:02:34</td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
               </tr>
               <tr>
@@ -204,26 +198,20 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
               </tr>
               <tr>
                 <td>3</td>
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -232,13 +220,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -247,13 +232,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
                 </span></td>
@@ -263,13 +245,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
                 </span></td>
@@ -313,13 +292,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -330,13 +306,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -347,13 +320,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -364,13 +334,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -379,13 +346,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -396,13 +360,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -447,13 +408,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -464,13 +422,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -481,13 +436,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -498,13 +450,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -513,13 +462,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -530,13 +476,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -585,13 +528,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -600,13 +540,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -617,13 +554,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -634,13 +568,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -649,13 +580,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -666,13 +594,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -717,13 +642,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -734,13 +656,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -751,13 +670,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -768,13 +684,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
 
               </tr>
@@ -783,13 +696,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}
@@ -800,13 +710,10 @@
                 <td>2m</td>
                 <td>00:02:34</td>
 
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" class="colorToggle" />
-                    <span class="slider round"></span>
-                    <span class="toggle-text">OFF</span>
-                  </label>
-                </td>
+                <td> 無 <label class="switch">
+                  <input type="checkbox" class="colorToggle" />
+                  <span class="slider round"></span>
+                </label> 有 </td>
 
                 {% comment %} <td class="text-warning"><span class="material-icons" role="button">
                     text_snippet {% endcomment %}

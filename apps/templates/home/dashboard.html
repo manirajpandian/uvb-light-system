@@ -16,19 +16,8 @@
 </style>
 {% endblock stylesheets %} {% block content %}
 
-<div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
-  <h3>ダッシュボード - 農場1</h3>
-<div class="dropdown my-2">
-  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-   <span>農場フィルター</span>
-  </button>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" href="#">農場1</a>
-    <a class="dropdown-item" href="#">農場2</a>
-    <a class="dropdown-item" href="#">農場3</a>
-  </div>
-</div>
-</div>
+
+<h3>ダッシュボード</h3>
 <div class="row justify-content-around">
   <div class="col-lg-3 ">
     <div class="card text-center custom-card-height color1">
@@ -61,7 +50,20 @@
 
 </div>
 <br>
-<br>
+<div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
+  <h3>農場1</h3>
+  <div class="dropdown my-2">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+     <span>農場フィルター</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="#">農場1</a>
+      <a class="dropdown-item" href="#">農場2</a>
+      <a class="dropdown-item" href="#">農場3</a>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-lg-3 col-md-6 col-sm-6">
     <a href="/house_lights">
@@ -156,21 +158,6 @@
   </a>
   </div>
 </div>
-<nav aria-label="...">
-  <ul class="pagination justify-content-end">
-    <li class="page-item disabled">
-      <a class="page-link" href="javascript:;" tabindex="-1">前</a>
-    </li>
-    <li class="page-item active">
-      <a class="page-link" href="javascript:;">1 <span class="sr-only">(current)</span></a>
-    </li>
-    <li class="page-item"><a class="page-link" href="javascript:;">2</a></li>
-    <li class="page-item"><a class="page-link" href="javascript:;">3</a></li>
-    <li class="page-item">
-      <a class="page-link" href="javascript:;">次</a>
-    </li>
-  </ul>
-</nav>
 
 
 
@@ -178,13 +165,4 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}
-
-<script>
-  $(document).ready(function () {
-    // Javascript method's body can be found in assets/js/demos.js
-    md.initDashboardPageCharts();
-  });
-</script>
-
-{% endblock javascripts %}
+{% block javascripts %}{% endblock javascripts %}

@@ -45,14 +45,14 @@
     <div class="card" style="min-width: 364px;">
       {% comment %} <div class="card-avatar text-center">
         <div class="card-header card-header-primary">
-          <h4 class="card-title">ログイン</h4>
+          <h4 class="card-title">ãƒ­ã‚°ã‚¤ãƒ³</h4>
         </div>
       </div> {% endcomment %}
       <div class="card-body">
         {% comment %} <h6 class="card-category">
           {% if msg %}
           <span class="text-danger">{{ msg | safe }}</span>
-          {% else %} アカウントにログインしてください。 {% endif %}
+          {% else %} ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ãã ã•ã„ã€‚ {% endif %}
         </h6> {% endcomment %}
 
         <br />
@@ -62,7 +62,7 @@
           <div class="card-avatar text-center">
             <img class="img rounded-circle" src="/static/assets/img/company_logo1.png" id="profile-image" />
             <br>
-            <h4 class="card-title"><b>ログイン</b></h4>
+            <h4 class="card-title"><b>ãƒ­ã‚°ã‚¤ãƒ³</b></h4>
           </div>
 
           {% comment %} User ID {% endcomment %}
@@ -70,8 +70,8 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
-                <label class="bmd-label-floating">⽣産者ID</label>
-                {{ form.username }}
+                <label class="bmd-label-floating">â½£ç”£è€…ID</label>
+		 {{ form.username }}
               </div>
             </div>
           </div>
@@ -81,8 +81,8 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
-                <label class="bmd-label-floating">パスワード</label>
-                {{ form.password }}
+                <label class="bmd-label-floating">ãƒ¡ãƒ¼ãƒ«</label>
+		<input type="email" name="email" class="form-control" value="">
               </div>
             </div>
           </div>
@@ -91,8 +91,8 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
-                <label class="bmd-label-floating">ID3</label>
-                <input type="email" name="email" class="form-control" value="">
+                <label class="bmd-label-floating">ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰</label>
+		{{ form.password }}
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@
               <!-- Remember Me Checkbox -->
               <div class="form-check">
                 <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" name="remember" style="size:10px;"> ログイン状態を維持する
+                  <input class="form-check-input" type="checkbox" name="remember" style="size:10px;"> ãƒ­ã‚°ã‚¤ãƒ³çŠ¶æ…‹ã‚’ç¶­æŒã™ã‚‹
                   <span class="form-check-sign">
                     <span class="check custom-checkmark"></span>
                   </span>
@@ -116,7 +116,7 @@
               <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="ForgotModalLabel"> パスワードのリセット </h5>
+                    <h5 class="modal-title" id="ForgotModalLabel"> ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®ãƒªã‚»ãƒƒãƒˆ </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -124,14 +124,14 @@
                   <div class="modal-body">
                     <div class="col-md-12">
                       <div class="form-group">
-                        <label class="bmd-label-floating">メールを入力してください</label>
+                        <label class="bmd-label-floating">ãƒ¡ãƒ¼ãƒ«ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„</label>
                         <input type="email" name="email" class="form-control" value="">
                       </div>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                    <button type="button" class="btn btn-primary">送信</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">é–‰ã˜ã‚‹</button>
+                    <button type="button" class="btn btn-primary">é€ä¿¡</button>
                   </div>
                 </div>
               </div>
@@ -142,11 +142,11 @@
           <div class="row">
             <div class="col-12">
               <button type="submit" name="login" class="btn btn-primary pull-left w-100">
-                ログイン
+                ãƒ­ã‚°ã‚¤ãƒ³
               </button>
             </div>
             <div class="col-12 text-center mt-3">
-              <a class="text-primary" data-toggle="modal" data-target="#ForgotModal">パスワードをお忘れですか?</a>
+              <a class="text-primary" data-toggle="modal" data-target="#ForgotModal">ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ãŠå¿˜ã‚Œã§ã™ã‹?</a>
 
               <a href="/reset_password">
                 <span class="material-icons">
