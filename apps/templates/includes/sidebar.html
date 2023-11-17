@@ -25,7 +25,7 @@
           <p>ハウス管理</p>
         </a>
       </li>
-      <li class="nav-item {% if 'plant_settings' in segment or '/apps/templates/home/add-plant.html' in request.path %} active {% endif %}">
+      <li class="nav-item {% if 'plant_settings' in segment or 'add_plant' in request.path　or 'update_plant' in request.path %} active {% endif %}">
         <a class="nav-link" href="/plant_setting">
           <i class="material-icons">compost</i>
           <p>作物設定</p>
