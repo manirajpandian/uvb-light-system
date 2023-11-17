@@ -332,7 +332,7 @@
 
     .vertical-line {
         border-left: 2px solid black;
-        height: auto;
+        /* height: auto; */
         min-height: 250px;
         margin: 48px;
         position: relative;
@@ -621,7 +621,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
-                                    
+
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
@@ -784,7 +784,41 @@
             });
 
             localStorage.setItem("poleCountPerLine", JSON.stringify(inputValues));
+
+            var contentDivs = document.querySelectorAll('.vertical-line');
+            var _maxContentHeight = 250; // Use an underscore to indicate it's a private variable
+
+            function setMaxContentHeight(newValue) {
+                if (newValue !== _maxContentHeight) {
+                    _maxContentHeight = newValue;
+                    // Call your additional function here
+                    onMaxContentHeightChange();
+                }
+            }
+
+            function onMaxContentHeightChange() {
+                // This function will be called whenever maxContentHeight changes
+                console.log('maxContentHeight changed to:', _maxContentHeight);
+                // console.log('contentDivs??????????',contentDivs);
+                contentDivs.forEach((node) => {
+                    console.log(node);
+                    node.style.height = _maxContentHeight+'px';
+                })
+
+                // You can add any additional actions you want to perform when maxContentHeight changes here
+                // For example, update the height of an element or trigger another function
+            }
+
+            // Loop through content divs and find the maximum height
+            contentDivs.forEach(function (contentDiv) {
+                var height = contentDiv.clientHeight;
+                // console.log('contentDiv.clientHeight;',height,'_maxContentHeight>>',_maxContentHeight);
+                if (height > _maxContentHeight) {
+                    setMaxContentHeight(height);
+                }
+            });
         });
+
         var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
 
         for (var i = 0; i < polePerLine.length; i++) {
@@ -795,39 +829,6 @@
             poleInputValues.push(sampleArray);
             // console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
         }
-        // var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
-
-        //     for (var i = 0; i < polePerLine.length; i++) {
-        //         for (let j = 0; j < polePerLine[i]; j++) {
-        //             sampleArray.push('')
-        //         }
-        //         poleInputValues.push(sampleArray)
-        //         console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]',poleInputValues);
-        //     }
-        // working on this 
-        //         $(document).on("input", ".poleInput", function () {
-        //     $(".poleInput").each(function (index, element) {
-        //         console.log('index>>>>',index);
-        //         for (var i = 0; i < poleInputValues.length; i++) {
-        //             console.log('first loop values!!!!!!',poleInputValues[i]);
-        //             if (i === index) {
-        //         for (let j = 0; j < poleInputValues[i].length; j++) {
-        //                 poleInputValues[i][j]=$(this).val()
-        //                     // console.log('value of element >',$(this).val());
-        //                     // poleInputValues[i][j] = $(this).val(); // Update the value in poleInputValues based on the input value
-        //             //         // console.log('Yeah, you got it', poleInputValues[i][j]);
-        //                      console.log('This is the final value', poleInputValues);
-        //                      localStorage.setItem("LEDCount", JSON.stringify(poleInputValues)) 
-
-        //             //     }
-        //             }
-
-        //         }          
-        //         }
-        //     });
-        // });
-
-
         $(document).on("input", ".poleInput", function () {
             $(".poleInput").each(function (index, element) {
                 console.log('index>>>>', index);
@@ -843,27 +844,6 @@
                 }
             });
         });
-
-        // $(document).on("input", ".poleInput", function () { 
-
-        //     $(".poleInput").each(function (index, element) {
-        //         // console.log('input index:>>',index,'poleInputValues[index]>>>', poleInputValues[index]);
-        //         for (var i = 0; i < poleInputValues.length; i++) {
-        //             // [index] = $(this).val()
-        //             console.log(poleInputValues.length,'i',i,'index',index);
-        //             if(i==index){
-        //                 for (let j = 0; j < poleInputValues[i].length; j++) {
-        //                     console.log('Yeah, you got it',poleInputValues[i][j]=$(this).val());
-
-        //                     console.log('This is a final value',poleInputValues);
-        //                 }
-        //             }
-        //             // poleInputValues[i]
-        //             // console.log('poleInputValues[i]',poleInputValues[i],'ii',i);
-        //         }
-        //         // console.log('poleInputValues>>>',poleInputValues);
-        //     });
-        // });
         // Load input values from localStorage
         var savedValues = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
         for (var i = 0; i < savedValues.length; i++) {
