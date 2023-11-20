@@ -7,7 +7,8 @@ class UserAddForm(forms.ModelForm):
         super(UserAddForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({'placeholder': ''})
         self.fields['email'].widget.attrs.update({'placeholder': ''})
-        CHOICES = [(0, '権限を選択してください'), (1, '管理者'), (2, 'ユーザ')]
+        self.fields['mapped_under'].widget = forms.HiddenInput()
+        CHOICES = [(1, '管理者'), (2, 'ユーザ')]
         self.fields['role_id'] = forms.ChoiceField(choices=CHOICES, initial='option1', widget=forms.Select(attrs={'class': 'form-control'}), label="")
 
         for field in self.fields:
@@ -16,7 +17,7 @@ class UserAddForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'role_id')
+        fields = ('username', 'email', 'role_id', 'mapped_under')
 
 class PlantForm(forms.ModelForm):
     class Meta:

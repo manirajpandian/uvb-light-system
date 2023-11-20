@@ -6,27 +6,32 @@
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from .forms import LoginForm, SignUpForm
-
+from .forms import LoginForm
+from django.contrib.auth.models import User
+# from apps.home.models import User
 
 def login_view(request):
     form = LoginForm(request.POST or None)
-
     msg = None
-
+    # print('users>>>',User.objects.all())
     if request.method == "POST":
-
         if form.is_valid():
-            username = form.cleaned_data.get("username")
+            username = form.cleaned_data['username']
+            email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password")
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect("/")
+            print(username, email, password)
+            if User.objects.filter(email=email).exists():
+                user = authenticate(request,username=username, email=email, password=password)
+                if user is not None:
+                    # Login the user
+                    login(request, user)
+                    return redirect("/")
+                else:
+                    msg = '無効な認証'
             else:
-                msg = 'Invalid credentials'
+                msg = 'メールとユーザは存在しません'
         else:
-            msg = 'Error validating the form'
+            msg = 'バリデーションエラー'
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
@@ -50,7 +55,5 @@ def register_user(request):
 
         else:
             msg = 'Form is not valid'
-    else:
-        form = SignUpForm()
 
-    return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
+    return render(request, "accounts/register.html", { "msg": msg, "success": success})

@@ -10,6 +10,31 @@
     justify-content: flex-end;
     align-items: center;
   }
+  .info-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+      text-align: center;
+  }
+
+  .loader {
+    border: 0px solid #f3f3f3;
+    border-top: 4px solid #00cae3;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+    margin-right: 10px;
+  }
+  .loader-d{
+    display: none;
+  }
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
 </style>
 {% endblock stylesheets %}{% block content %}
 <nav aria-label="breadcrumb" role="navigation">
@@ -19,61 +44,79 @@
     <li class="breadcrumb-item" aria-current="page">編集</li>
     {% else %}
     <li class="breadcrumb-item active" aria-current="page">
-      管理者追加
+      追加
     </li>
     {% endif %}
 
   </ol>
 </nav>
-<div class="card">
-<div class="card-body">
-{% if error_message %}
-<p class="text-danger">{{ error_message }}</p>
-{% endif %}
-<form action="" method="post" autocomplete="off">
-  {% csrf_token %}
-  <div class="row">
-    <div class="col-md-6 my-4">
-      <div class="form-group">
-      <label for="userName" class="bmd-label-floating">⽒名</label>
-      {{ form.username }}
-    </div>
-    </div>
-    {% if show == 'true' %}
-    <div class="col-md-6 my-4">
-      <div class="form-group">
-        <label for="email" class="bmd-label-floating">メール</label>
-      {{ form.email }}
-      </div>
-    </div>
-    {% else %}
-    <div class="col-md-6 my-4">
-      <div class="form-group">
-        <label for="email" class="bmd-label-floating">メール</label>
-      {{ form.email }}
-    </div>
-    </div>
-    {% endif %}
-  </div>
-  <div class="row">
-    <div class="col-md-6 my-4">
-      <div class="form-group">
-        <label for="権限" class="bmd-label-floating">権限</label>
-      {{ form.role_id }}
-    </div>
-  </div>
-  </div>
-  <div class="center-container">
-    <a href="/user_list">
-      <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
-    {% if show == 'true' %}
-    <button type="submit" id="addBtn" class="btn btn-success">変更</button>
-    {% else %}
-    <button type="submit" id="addBtn" class="btn btn-success">追加</button>
-    {% endif %}
-  </div>
-</form>
+<span class="loader-d" id="loader">
+<div class="info-loader" >
+  <div class="loader"></div>
+  <p class="text-success">メール送信中...</p>
 </div>
+</span>
+<div class="card">
+  <div class="card-body">
+    {% if error_message %}
+    <p class="text-danger text-center">{{ error_message }}</p>
+    {% endif %}
+    <form action="" method="post" autocomplete="off">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6 my-4">
+          <div class="form-group">
+            <label for="userName" class="bmd-label-floating">⽒名</label>
+            {{ form.username }}
+          </div>
+        </div>
+        <div class="col-md-6 my-4">
+          <div class="form-group">
+            {% if show == 'true' %}
+            <label for="email" class="bmd-label-floating">メール</label>
+            <input type="text" id="email" class="form-control" name="email" value="{{ form.email.value }}" disabled>
+
+            {% else %}
+            <label for="email" class="bmd-label-floating">メール</label>
+            {{ form.email }}
+            {% endif %}
+          </div>
+          {% if form.email.errors %}
+          {% for error in form.email.errors %}
+            <span class="text-danger">このメールはすでに存在します。別のメールをお試しください。</span>
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 my-4">
+          <div class="form-group">
+            <label for="権限" class="bmd-label-floating">権限</label>
+            {{ form.role_id }}
+          </div>
+        </div>
+      </div>
+            {{ form.mapped_under }}
+      <div class="center-container">
+        <a href="/user_list">
+          <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+        {% if show == 'true' %}
+        <button type="submit" id="postBtn" class="btn btn-success">変更</button>
+        {% else %}
+        <button type="submit" id="addBtn" class="btn btn-success">追加</button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock content %}
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+    const btn = document.querySelector('#addBtn');  
+    const loader = document.getElementById('loader');
+    btn.addEventListener('click', function() {
+        loader.style.display = 'block';  // Show the loader when the button is clicked
+    });
+
+</script>
+{% endblock javascripts %}

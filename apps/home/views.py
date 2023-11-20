@@ -80,47 +80,52 @@ def update_plant(request,pk):
 def add_user(request):
     if request.method == "GET":
         form = UserAddForm()
-        return render(request, 'home/add-user.html', {"form": form})
+        form.fields['mapped_under'].initial = request.user.id 
+        context = {"form": form}
+        return render(request, 'home/add-user.html', context)
     else:
         form = UserAddForm(request.POST)
+        email = request.POST['email']
+        user_id = request.POST['mapped_under']
+        print('request>>>>>',request.POST['email'])
+        email = request.POST['email']
+        user_id = request.user.id
+        print('user_id',user_id)
         if form.is_valid():
-            email = form.cleaned_data.get('email')
             if User.objects.filter(email=email).exists():
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
-                return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message})  # Redirect to the same page
+                return render(request, 'home/add-user.html', {'form': form, 'error_message': error_message}) # Redirect to the same page
             else:
-                form.save()
-                # Send email to the added user
-                # Generate a random farm ID
-                farm_id = str(uuid.uuid4())[:6].upper()
-                loading = True
-                link = format_html(f'''<a href="https://uvb-beamtec.mosaique.link/reset_password">パスワードの設定</a>''')
-                subject = '光防除システム管理サイトログイン'
-                message = f'''
-                光防除システム管理サイトログイン
+                    form.save()
+                    farm_id = str(uuid.uuid4())[:6].upper()
+                    reset_token = str(uuid.uuid4())
+                    link = f'https://uvb-beamtec.mosaique.link/reset_password/{reset_token}'
+                    subject = 'パスワードの設定'
+                    message = f'''
+                    光防除システム管理サイトログイン
 
-                光防除システム管理サイトへようこそ！
-                下記の「パスワードの設定」をクリックして進んでください。
+                    光防除システム管理サイトへようこそ！
+                    下記の「パスワードの設定」をクリックして進んでください。
 
-                {link}
+                    パスワードの設定：{link}
 
-                ★！現段階ではまた登録は完了しておりません！★
-                ※ご本人様確認のため、上記URLへ「24時間以内」にアクセスしアカウントの本登録を完了いただけますようお願いいたします。
+                    ★！現段階ではまた登録は完了しておりません！★
+                    ※ご本人様確認のため、上記URLへ「24時間以内」にアクセスしアカウントの本登録を完了いただけますようお願いいたします。
 
-                農場ID：{farm_id}
-                ID：{email}
+                    農場ID：{farm_id}
+                    ID：{email}
 
-                ご不明な点がございましたら、このメールへご返信いただくか、
-                info@beam~ までご連絡ください。'''
-                
-                from_email = settings.EMAIL_HOST_USER
-                recipient_list = [email]
+                    ご不明な点がございましたら、このメールへご返信いただくか、
+                    info@beam~ までご連絡ください。'''
+                    
+                    from_email = settings.EMAIL_HOST_USER
+                    recipient_list = [email]
 
-                send_mail(subject, message, from_email, recipient_list)
+                    send_mail(subject, message, from_email, recipient_list)
 
-                add_success_message = "ユーザが正常に追加されました"
-                messages.success(request, add_success_message)
-                return redirect('/user_list')
+                    add_success_message = "ユーザが正常に追加されました"
+                    messages.success(request, add_success_message)
+                    return redirect('/user_list')
         else:
             # Handle the case when the form is not valid
             error_message = "無効なフォームデータです。フォームフィールドを確認して、もう一度やり直してください。"
@@ -181,8 +186,8 @@ def delete_user(request):
         if user_id:
             # Assuming your model is named 'User'
             user = get_object_or_404(User, pk=user_id)
-            user.isDeleted = True
-            user.save()
+            # user.isDeleted = True
+            user.delete()
             response_data = {'message': 'ユーザー削除成功されました。'}
             return JsonResponse(response_data, status=200)
         else:

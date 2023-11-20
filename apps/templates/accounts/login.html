@@ -49,20 +49,17 @@
         </div>
       </div> {% endcomment %}
       <div class="card-body">
-        {% comment %} <h6 class="card-category">
-          {% if msg %}
-          <span class="text-danger">{{ msg | safe }}</span>
-          {% else %} アカウントにログインしてください。 {% endif %}
-        </h6> {% endcomment %}
-
-        <br />
-
-        <form role="form" method="post" action="">
+       <form role="form" method="post" action="">
           {% comment %} Company Logo {% endcomment %}
           <div class="card-avatar text-center">
             <img class="img rounded-circle" src="/static/assets/img/company_logo1.png" id="profile-image" />
             <br>
             <h4 class="card-title"><b>ログイン</b></h4>
+            <h6 class="card-category">
+              {% if msg %}
+              <span class="text-danger">{{ msg | safe }}</span>
+              {% else %} アカウントにログインしてください。 {% endif %}
+            </h6> 
           </div>
 
           {% comment %} User ID {% endcomment %}
@@ -82,8 +79,13 @@
             <div class="col-md-12">
               <div class="form-group">
                 <label class="bmd-label-floating">メール</label>
-                <input type="email" name="email" class="form-control" value="">
+                {{ form.email }}
               </div>
+              {% if form.email.errors %}
+              {% for error in form.email.errors %}
+                <span class="text-danger">有効なメールアドレスを入力してください。</span>
+              {% endfor %}
+              {% endif %}
             </div>
           </div>
           <br />
@@ -110,38 +112,12 @@
                 </label>
               </div>
             </div>
-            <!--Forgot Modal -->
-            <div class="modal fade" id="ForgotModal" tabindex="-1" aria-labelledby="ForgotModalLabel"
-              aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="ForgotModalLabel"> パスワードのリセット </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <label class="bmd-label-floating">メールを入力してください</label>
-                        <input type="email" name="email" class="form-control" value="">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                    <button type="button" class="btn btn-primary">送信</button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
           <br>
           {% comment %} submit button {% endcomment %}
           <div class="row">
             <div class="col-12">
-              <button type="submit" name="login" class="btn btn-primary pull-left w-100">
+              <button type="submit" class="btn btn-primary pull-left w-100">
                 ログイン
               </button>
             </div>
@@ -162,6 +138,32 @@
               Don't have an account? <a href="{% url 'register' %}" class="text-primary">Create</a>
             </span> -->
         </form>
+         <!--Forgot Modal -->
+         <div class="modal fade" id="ForgotModal" tabindex="-1" aria-labelledby="ForgotModalLabel"
+         aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="ForgotModalLabel"> パスワードのリセット </h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+               </button>
+             </div>
+             <div class="modal-body">
+               <div class="col-md-12">
+                <div class="form-group">
+                  <label class="bmd-label-floating">メール</label>
+                  {{ form.email }}
+                </div>
+               </div>
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+               <button type="button" class="btn btn-primary">送信</button>
+             </div>
+           </div>
+         </div>
+       </div>
       </div>
     </div>
   </div>
