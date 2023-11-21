@@ -6,7 +6,9 @@
 import os
 from decouple import config
 from unipath import Path
+from django.db.models import BigAutoField
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

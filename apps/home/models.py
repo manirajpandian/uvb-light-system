@@ -5,11 +5,6 @@
 
 from django.db import models
 
-class Role(models.Model):
-    role_id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=50, unique=True)
-
-
 class User(models.Model):
     user_id = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=255)
