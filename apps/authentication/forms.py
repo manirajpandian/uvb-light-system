@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Profile
 
 
 class LoginForm(forms.Form):
@@ -27,7 +28,21 @@ class LoginForm(forms.Form):
             }
         ))
 
+class NewUserAddForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(NewUserAddForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'placeholder': ''})
+        self.fields['email'].widget.attrs.update({'placeholder': ''})
 
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})
+            self.fields[field].label = ''
+
+    class Meta:
+        model = Profile
+        fields = ('username', 'email')
+
+        
 # class SignUpForm(UserCreationForm):
 #     username = forms.CharField(
 #         widget=forms.TextInput(

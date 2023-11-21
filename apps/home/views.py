@@ -99,7 +99,7 @@ def add_user(request):
                     form.save()
                     farm_id = str(uuid.uuid4())[:6].upper()
                     reset_token = str(uuid.uuid4())
-                    link = f'https://uvb-beamtec.mosaique.link/reset_password/{reset_token}'
+                    link = f'https://uvb-beamtec.mosaique.link/reset_password{reset_token}'
                     subject = 'パスワードの設定'
                     message = f'''
                     光防除システム管理サイトログイン
@@ -123,8 +123,8 @@ def add_user(request):
 
                     send_mail(subject, message, from_email, recipient_list)
 
-                    add_success_message = "ユーザが正常に追加されました"
-                    messages.success(request, add_success_message)
+                    success_message = "ユーザが正常に追加されました"
+                    messages.success(request, success_message)
                     return redirect('/user_list')
         else:
             # Handle the case when the form is not valid
@@ -237,10 +237,10 @@ def  farm_manage (request):
     context={}
     html_template = loader.get_template('home/farm_manage.html')
     return HttpResponse(html_template.render(context, request))
-def  reset_password (request):
-    context={}
-    html_template = loader.get_template('accounts/reset_password.html')
-    return HttpResponse(html_template.render(context, request))
+# def  reset_password (request):
+#     context={}
+#     html_template = loader.get_template('accounts/reset_password.html')
+#     return HttpResponse(html_template.render(context, request))
 
 
 def add_plant(request):
