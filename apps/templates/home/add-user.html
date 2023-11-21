@@ -61,42 +61,42 @@
     {% if error_message %}
     <p class="text-danger text-center">{{ error_message }}</p>
     {% endif %}
-    <form action="" method="post" autocomplete="off">
+    <form action="" method="post" id="myForm" autocomplete="off">
       {% csrf_token %}
       <div class="row">
         <div class="col-md-6 my-4">
           <div class="form-group">
             <label for="userName" class="bmd-label-floating">⽒名</label>
-            {{ form.username }}
+            <input type="text" id="username" class="form-control" name="username">
           </div>
+          <span class="text-danger" id="userNameMsg"></span>
         </div>
         <div class="col-md-6 my-4">
           <div class="form-group">
             {% if show == 'true' %}
             <label for="email" class="bmd-label-floating">メール</label>
-            <input type="text" id="email" class="form-control" name="email" value="{{ form.email.value }}" disabled>
+            <input type="text"  class="form-control" name="email" value="{{ form.email.value }}" disabled>
 
             {% else %}
             <label for="email" class="bmd-label-floating">メール</label>
-            {{ form.email }}
+            <input type="email" id="email" class="form-control" name="email">
             {% endif %}
           </div>
-          {% if form.email.errors %}
-          {% for error in form.email.errors %}
-            <span class="text-danger">このメールはすでに存在します。別のメールをお試しください。</span>
-          {% endfor %}
-          {% endif %}
+          <span id="emailMsg" class="text-danger"></span>
         </div>
       </div>
       <div class="row">
         <div class="col-md-6 my-4">
           <div class="form-group">
-            <!-- <label for="権限" class="bmd-label-floating">権限</label> -->
-            {{ form.role_id }}
+            <label for="権限" class="bmd-label-floating">権限</label>
+            <select name="role_id" class="form-control" id="roleId">
+              <option value="1">管理者</option>
+              <option value="2">ユーザ</option>
+          </select>
           </div>
         </div>
       </div>
-            {{ form.mapped_under }}
+      <input type="hidden" class="form-control" name="mapped_under" value="{{ current_user_id }}">
       <div class="center-container">
         <a href="/user_list">
           <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
@@ -112,10 +112,31 @@
 {% endblock content %}
 {% block javascripts %}
 <script>
-    const btn = document.querySelector('#addBtn');  
     const loader = document.getElementById('loader');
-    btn.addEventListener('click', function() {
+
+    document.getElementById('myForm').addEventListener('submit', function(event) {
+        // Your validation logic goes here
+
+        // Example validation:
+        var userInput = document.getElementById('username').value;
+        var emailInput = document.getElementById('email').value;
+
+        // Clear previous error messages
+        document.getElementById('userNameMsg').innerText = '';
+        document.getElementById('emailMsg').innerText = '';
+
+        if (userInput === '') {
+            document.getElementById('userNameMsg').innerText = '氏名を入力してください。';
+            event.preventDefault(); // Prevent form submission
+        }
+
+        if (emailInput === '') {
+            document.getElementById('emailMsg').innerText = 'メールを入力してください。';
+            event.preventDefault(); // Prevent form submission
+        }
+        else
         loader.style.display = 'block';  // Show the loader when the button is clicked
+        // Additional validation logic can be added as needed
     });
 
 </script>

@@ -12,7 +12,7 @@ from django.contrib import messages
 import uuid
 from django.conf import settings
 from django.core.mail import send_mail
-from .forms import NewUserAddForm
+from .models import Profile
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -43,13 +43,62 @@ def login_view(request):
 def new_add_user(request):
     try:
         if request.method == "GET":
-            form = NewUserAddForm()
-            print('>>>>>>>>')
-            context = {"form": form}
+            current_user_id = request.user.id 
+            context = {'current_user_id':current_user_id}
             return render(request, 'home/add-user.html', context)
+        else:
+            username = request.POST['username']
+            email = request.POST['email']
+            role_id = request.POST['role_id']
+            user_id = request.POST['mapped_under']
+            if User.objects.filter(email=email).exists():
+                error_message = "このメールはすでに存在します。別のメールをお試しください。"
+                return render(request, 'home/add-user.html', {'error_message': error_message})
+
+            farm_id = str(uuid.uuid4())[:6].upper()
+            token = str(uuid.uuid4())
+            link = f'http://127.0.0.1:8000/reset_password/{token}'
+            subject = 'パスワードの設定'
+            message = f'''
+            光防除システム管理サイトログイン
+
+            光防除システム管理サイトへようこそ！
+            下記の「パスワードの設定」をクリックして進んでください。
+
+            パスワードの設定：{link}
+
+            ★！現段階ではまた登録は完了しておりません！★
+            ※ご本人様確認のため、上記URLへ「24時間以内」にアクセスしアカウントの本登録を完了いただけますようお願いいたします。
+
+            農場ID：{farm_id}
+            ID：{email}
+
+            ご不明な点がございましたら、このメールへご返信いただくか、
+            info@beam~ までご連絡ください。'''
+            
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [email]
+
+            send_mail(subject, message, from_email, recipient_list)
+
+            user_obj = User(username = username, email = email, is_active=False)
+            user_obj.set_password('Test@123')
+            user_obj.save()
+
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = user_id, forget_password_token = token)
+            profile_obj.save()
+
+            success_message = "ユーザが正常に追加されました"
+            messages.success(request, success_message)
+            return redirect('/user_list')
+        
     except Exception as e:
         print(e)
     return render(request, 'home/add-user.html')
+
+def  set_password (request):
+    context={}
+    return render(request, 'accounts/reset_password.html',{'context':context})
 
 
 def register_user(request):
