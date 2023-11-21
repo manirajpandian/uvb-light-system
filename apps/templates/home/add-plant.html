@@ -15,7 +15,7 @@
 {% block content %}
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/settings.html">作物設定</a></li>
+        <li class="breadcrumb-item"><a href="/plant_setting">作物設定</a></li>
         {% if show == 'true' %}
         <li class="breadcrumb-item" aria-current="page">作物の編集</li>
         {% else %}
@@ -32,13 +32,13 @@
             {% csrf_token %}
             <div class="form-group">
                 <label class="bmd-label-floating" for="plantname">作物名</label>
-                <input type="text" class="form-control" name="plant_name" required>
+                {{ form.plant_name }}
             </div>
             <br>
     
             <div class="form-group">
                 <label class="bmd-label-floating" for="distance">光源距離(cm)</label>
-                <input type="number" class="form-control" name="distance" required>
+                {{ form.distance }}
             </div>
             <br>
             <div class="row align-items-center"">
@@ -48,7 +48,7 @@
                 <div class="col-1">
                     <div class="form-group">
                     <label class="bmd-label-floating" for="time">hh</label>
-                    <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" max="99" required>
+                    <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" max="99">
                     </div>
                 </div>
                 <div class="col-0.25">
@@ -57,7 +57,7 @@
                 <div class="col-1">
                     <div class="form-group">
                         <label class="bmd-label-floating" for="time">mm</label>
-                        <input type="number" class="form-control time-input" id="minute" maxlength="2" max="59" required>
+                        <input type="number" class="form-control time-input" id="minute" maxlength="2" max="59">
                     </div>
                 </div>
                 <div class="col-0.25">
@@ -66,20 +66,24 @@
                 <div class="col-1">
                     <div class="form-group">
                         <label class="bmd-label-floating" for="time">ss</label>
-                        <input type="number" class="form-control time-input" id="second" maxlength="2" max="59" required>
+                        <input type="number" class="form-control time-input" id="second" maxlength="2" max="59">
                     </div>
                 </div>
             </div>
-            <input type="hidden" id="time_required" name="time_required" value="">
+            {{ form.time_required }}
             <br>
             <div class="form-group">
-                <label class="bmd-label-floating" for="plantname">備考</label>
-                <input type="text" class="form-control" name="remarks">
+                <label class="bmd-label-floating" for="remarks">備考</label>
+                {{ form.remarks }}
             </div>
             <div class="center-container">
                 <a href="/plant_setting">
                     <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+                    {% if show == 'true' %}
+    <button type="submit" id="addBtn" class="btn btn-success" onclick="validateAndCombine()">変更</button>
+    {% else %}
                 <button type="submit" class="btn btn-success" onclick="validateAndCombine()">追加</button>
+                {% endif %}
             </div>
         </form>
     </div>
@@ -97,10 +101,37 @@ function validateAndCombine() {
         var hour = document.getElementById('hour').value;
         var minute = document.getElementById('minute').value;
         var second = document.getElementById('second').value;
+        if (hour < 0 || hour > 99) {
+        alert('Invalid hour value. Please ensure that hour is between 0 and 99.');
+        return;
+    }
+
+    // Check if minute is within valid range
+    if (minute < 0 || minute > 59) {
+        alert('Invalid minute value. Please ensure that minute is between 0 and 59.');
+        return;
+    }
+
+    // Check if second is within valid range
+    if (second < 0 || second > 59) {
+        alert('Invalid second value. Please ensure that second is between 0 and 59.');
+        return;
+    }
 
         // Combine values into a single format
         var combinedTime = ('00' + hour).slice(-2) + ':' + ('00' + minute).slice(-2) + ':' + ('00' + second).slice(-2);
-        document.getElementById('time_required').value = combinedTime;
+        document.getElementById('id_time_required').value = combinedTime;
     }
+    document.addEventListener("DOMContentLoaded", function () {
+            var timeRequiredValue = document.getElementById('id_time_required').value;
+            if (timeRequiredValue) {
+                var parts = timeRequiredValue.split(":");
+                document.getElementById("hour").value = parseInt(parts[0]);
+                document.getElementById("minute").value = parseInt(parts[1]);
+                document.getElementById("second").value = parseInt(parts[2]);
+
+            }
+        });    
+
 </script>
 {% endblock javascripts %}

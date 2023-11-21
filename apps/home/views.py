@@ -38,41 +38,37 @@ def LED_control(request):
 def plant_setting(request):
     try:
         plant_list = Plant.objects.all().order_by('plant_id')
-        context = {'segment':'plant_settings', 'plant_list': plant_list}
-        # page = Paginator(user_list, 5)
-        # page_list = request.GET.get('page')
-        # page = page.get_page(page_list)
-        print(context)
+        page = Paginator(plant_list, 5)
+        page_list = request.GET.get('page')
+        page = page.get_page(page_list)
+        context = {'segment':'plant_settings', 'plant_list': plant_list,'page': page}
+        print('context>>>>',context)
         if request.method == "GET":
-            print(plant_list)
-            # return render(request, 'home/settings.html', {'plant_list': plant_list})
             html_template = loader.get_template('home/settings.html')
             return HttpResponse(html_template.render(context, request))
-        # elif request.method == "POST":
-        #     user_id = request.POST['user_id']
-        #     is_active = request.POST['is_active']
-        #     user = get_object_or_404(User, pk=user_id)
-        #     user.isActive = is_active
-        #     user.save()
-        #     success_message = "ユーザーステータスの変更に成功しました"  # success message here
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
-    
+
+    # Edit option (Updating the plant details)
 def update_plant(request,pk):
-    show = 'true'
-    plant = Plant.objects.get(plant_id=pk)
-    if request.method == 'POST':
-        form = PlantForm(request.POST, instance=plant)
-        if form.is_valid():
-            form.save()
-            update_success_message = '作物詳細の更新成功'
-            messages.success(request, update_success_message)
-            return redirect('/plant_setting')
-    else:
-        form = PlantForm(instance=plant)
-    context = {"form": form, "show": show}
-    return render(request, 'home/add-plant.html', context)
+    try:
+        show = 'true'
+        plant = Plant.objects.get(plant_id=pk)
+        if request.method == 'POST':
+            form = PlantForm(request.POST, instance=plant)
+            if form.is_valid():
+                form.save()
+                plant_success_msg = '作物詳細の更新成功しました。'  #Successfully updated of crop details
+                messages.success(request, plant_success_msg)
+                return redirect('/plant_setting')
+        else:
+            form = PlantForm(instance=plant)
+        context = {"form": form, "show": show}
+        return render(request, 'home/add-plant.html', context)
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
 
 # Add new user
 
@@ -242,13 +238,37 @@ def  farm_manage (request):
 #     html_template = loader.get_template('accounts/reset_password.html')
 #     return HttpResponse(html_template.render(context, request))
 
-
+# Add New Plant 
 def add_plant(request):
-    if request.method == "GET":
-        form = PlantForm()
-        return render(request, 'home/add-plant.html', {"form": form})
-    else:
-        form = PlantForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/plant_setting')  # Redirect to a success page or the desired URL
+    try: 
+        if request.method == "GET":
+            form = PlantForm()
+            return render(request, 'home/add-plant.html', {"form": form})
+        else:
+            form = PlantForm(request.POST)
+            if form.is_valid():
+                form.save()
+                plant_success_msg = '新しい植物の詳細が追加されました'  #New plant details has been added
+                messages.success(request, plant_success_msg)
+                return redirect('/plant_setting')  
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
+
+# Delete the existing plant details
+def delete_plant(request, plant_id):
+    try: 
+        if request.method == 'POST':
+            if plant_id:
+                plant = get_object_or_404(Plant, pk=plant_id)
+                plant.delete()
+                plant_success_msg = '作物が正常に削除されました。'     #Crop successfully deleted
+                messages.success(request, plant_success_msg)
+                return redirect('/plant_setting')
+            else:
+                plant_success_msg = '作物が提供されていないです。'     #Crop was not in the list.
+                messages.success(request, plant_success_msg)
+                return redirect('/plant_setting')
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
