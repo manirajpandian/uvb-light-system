@@ -20,17 +20,6 @@ class UserAddForm(forms.ModelForm):
         fields = ('username', 'email', 'role_id', 'mapped_under')
 
 class PlantForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(PlantForm, self).__init__(*args, **kwargs)
-        self.fields['plant_name'].widget.attrs.update({'placeholder': ''})
-        self.fields['distance'].widget.attrs.update({'placeholder': ''})
-        self.fields['remarks'].widget.attrs.update({'placeholder': ''})
-        
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({'class': 'form-control'})
-            self.fields[field].label = ''
-            
-        self.fields['time_required'].widget = forms.HiddenInput()
     class Meta:
         model = Plant
         fields = ['plant_name', 'distance', 'time_required','remarks']

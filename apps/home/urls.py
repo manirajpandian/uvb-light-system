@@ -22,8 +22,7 @@ urlpatterns = [
     path('LED_control',views.LED_control, name='LED_control'),
     path('plant_setting',views.plant_setting, name='plant_setting'),
     path('add_plant',views.add_plant, name='add_plant'),
-    path('update_plant/<int:pk>',views.update_plant,name='update_plant'),
-    path('delete_plant/<int:plant_id>/', views.delete_plant, name='delete_plant'),
+    path('update_plant/<str:pk>',views.update_plant,name='update_plant'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
