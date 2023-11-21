@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
+{% extends "layouts/base.html" %} {% block title %} 管理者 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
@@ -107,66 +107,37 @@
               <th>ステイタス</th>
               <th>アクション</th>
             </thead>
-            {% if page.object_list|length > 0 %}
             <tbody>
-              {% for user in page.object_list %}
-              {% if not user.isDeleted %}
+              {% for user, profile in user_profile_list %}
               <tr>
-                <td>{{ user.user_id }}</td>
+                <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
-                <td>{% if user.role_id == '1' %} 管理者 {% else %} ユーザ {% endif %}</td>
+                <td>{% if profile.role_id == '1' %} 管理者 {% else %} ユーザ {% endif %}</td>
                 <td>
-                  {% if user.role_id == '1' %}
-                  -
-                  {% else %}
                   <form method="post" action="" autocomplete="off">
                     {% csrf_token %}
-                    <input type="hidden" name="user_id" value={{user.user_id}}>
-                    {% if user.isActive %}
+                    <input type="hidden" name="user_id" value={{user.id}}>
+                    {% if user.is_active %}
                     <input type="hidden" name="is_active" value="False">
                     {% else %}
                     <input type="hidden" name="is_active" value="True">
                     {% endif %}
                     無 <label class="switch">
-                      <input type="checkbox" class="colorToggle" {% if user.isActive %}checked{% endif %}
+                      <input type="checkbox" class="colorToggle" {% if user.is_active %}checked{% endif %}
                         onchange="this.form.submit()" />
                       <span class="slider round"></span>
                     </label> 有
                   </form>
-                  {% endif %}
                 </td>
-                <td>
-                  {% if user.role_id == '1' %}
-                  管理者
-                  {% else %}
-                  <a href="{% url 'update_user' user.user_id %}" style="color: #ff9800;"><span>編集</span></a>
-                  &nbsp; &nbsp;|&nbsp;&nbsp;
-                  <a href="#" data-toggle="modal" class="text-danger" data-target="#userDeleteModal"
-                    data-user-id="{{ user.user_id }}" data-csrf-token={{ csrf_token }}
-                    data-user-name="{{ user.username }}"><span>削除</span></a>
-                  {% endif %}
-                </td>
+                <td>action </td>
               </tr>
-              {% endif %}
               {% endfor %}
             </tbody>
-            {% else %}
-            <tbody>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="text-warning">データがありません</td>
-                <td></td>
-              </tr>
-            </tbody>
-            {% endif %}
           </table>
           <!-- if you need use it {% if page.object_list|length > 6 %}{% endif %} -->
           <!-- Pagination Section  -->
-          <div class="flex-container">
+          <!-- <div class="flex-container">
             <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
             <nav aria-label="...">
               <ul class="pagination justify-content-end">
@@ -196,10 +167,10 @@
                 </li>
               </ul>
             </nav>
-          </div>
+          </div> -->
 
           <!--Delete Modal -->
-          <div class="modal fade" id="userDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          <!-- <div class="modal fade" id="userDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -222,7 +193,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -256,44 +227,44 @@
     }
   }, 5000);
 
-  // Delete api and bootsratp modal open and close functions 
-  document.addEventListener("DOMContentLoaded", function () {
-    var deleteButton = document.getElementById("deleteButton");
+  // // Delete api and bootsratp modal open and close functions 
+  // document.addEventListener("DOMContentLoaded", function () {
+  //   var deleteButton = document.getElementById("deleteButton");
 
-    $('#userDeleteModal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget); // Button that triggered the modal
-      var userId = button.data('user-id'); // Extract info from data-* attributes
-      var userName = button.data('user-name');
-      var csrfToken = button.data('csrf-token');
-      var modal = $(this);
-      modal.find('#userNameSpan').text(userName);
-      console.log(userId);
-      deleteButton.addEventListener("click", function () {
-        // Making a DELETE request to the API
-        fetch('/delete_user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-          },
-          body: JSON.stringify({ 'user_id': userId })
-        })
-          // .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            $('#userDeleteModal').modal('hide');
-            // Redirect to user_list after 3 seconds
-            setTimeout(function () {
-              window.location.href = '/user_list';
-            }, 1500);
-            var successMessage = document.getElementById('deleteSuccessMessage');
-            successMessage.innerHTML = "ユーザ" + userName + " が削除されました。";
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
-      });
-    });
-  });
+  //   $('#userDeleteModal').on('show.bs.modal', function (event) {
+  //     var button = $(event.relatedTarget); // Button that triggered the modal
+  //     var userId = button.data('user-id'); // Extract info from data-* attributes
+  //     var userName = button.data('user-name');
+  //     var csrfToken = button.data('csrf-token');
+  //     var modal = $(this);
+  //     modal.find('#userNameSpan').text(userName);
+  //     console.log(userId);
+  //     deleteButton.addEventListener("click", function () {
+  //       // Making a DELETE request to the API
+  //       fetch('/delete_user', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'X-CSRFToken': csrfToken
+  //         },
+  //         body: JSON.stringify({ 'user_id': userId })
+  //       })
+  //         // .then(response => response.json())
+  //         .then(data => {
+  //           console.log(data);
+  //           $('#userDeleteModal').modal('hide');
+  //           // Redirect to user_list after 3 seconds
+  //           setTimeout(function () {
+  //             window.location.href = '/user_list';
+  //           }, 1500);
+  //           var successMessage = document.getElementById('deleteSuccessMessage');
+  //           successMessage.innerHTML = "ユーザ" + userName + " が削除されました。";
+  //         })
+  //         .catch((error) => {
+  //           console.error('Error:', error);
+  //         });
+  //     });
+  //   });
+  // });
 </script>
 {% endblock javascripts %}

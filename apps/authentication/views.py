@@ -4,7 +4,7 @@
 """
 
 # Create your views here.
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm
 from django.contrib.auth.models import User
@@ -13,11 +13,11 @@ import uuid
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import Profile
+from django.core.paginator import Paginator
 
 def login_view(request):
     form = LoginForm(request.POST or None)
     msg = None
-    # print('users>>>',User.objects.all())
     if request.method == "POST":
         if form.is_valid():
             username = form.cleaned_data['username']
@@ -39,6 +39,29 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
+# user list and active/disable function 
+
+def admin_list(request):
+    try:
+        user_list = User.objects.all()
+        profile_list = Profile.objects.filter(user__in=user_list)
+
+        context = {'user_profile_list': zip(user_list, profile_list),}
+        if request.method == "POST":
+            user_id = request.POST['user_id']
+            is_active = request.POST['is_active']
+            print(user_id,'<<<<<<')
+            print(is_active,'is_active')
+            user = get_object_or_404(User, pk=user_id)
+            print('user>>>>>',user)
+            user.is_active = is_active
+            print('user.is_active>>>>>',user.is_active)
+            user.save()
+            success_message = "ユーザーステータスの変更に成功しました"  # success message here
+            return render(request, 'home/admin.html', context,{'success_message': success_message})
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+    return render(request, 'home/admin.html', context)
 
 def new_add_user(request):
     try:
@@ -51,13 +74,14 @@ def new_add_user(request):
             email = request.POST['email']
             role_id = request.POST['role_id']
             user_id = request.POST['mapped_under']
+            base_url = settings.BASE_URL
             if User.objects.filter(email=email).exists():
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
                 return render(request, 'home/add-user.html', {'error_message': error_message})
 
             farm_id = str(uuid.uuid4())[:6].upper()
             token = str(uuid.uuid4())
-            link = f'http://127.0.0.1:8000/reset_password/{token}'
+            link = f'{base_url}change_password/{token}'
             subject = 'パスワードの設定'
             message = f'''
             光防除システム管理サイトログイン
@@ -81,7 +105,7 @@ def new_add_user(request):
 
             send_mail(subject, message, from_email, recipient_list)
 
-            user_obj = User(username = username, email = email, is_active=False)
+            user_obj = User(username = farm_id, first_name = username, email = email, is_active=False)
             user_obj.set_password('Test@123')
             user_obj.save()
 
@@ -96,9 +120,30 @@ def new_add_user(request):
         print(e)
     return render(request, 'home/add-user.html')
 
-def  set_password (request):
+
+def change_password (request, token):
     context={}
-    return render(request, 'accounts/reset_password.html',{'context':context})
+    try:
+        profile_obj = Profile.objects.filter(forget_password_token = token).first()
+        context={ 'is_change_password_view': True, 'user_id': profile_obj.user.id }
+
+        if request.method == 'POST':
+            password = request.POST['password']
+            confirm_password = request.POST['confirm_password']
+            user_id = request.POST['user_id']
+
+            if password != confirm_password:
+                messages.success(request, 'password error')
+                return redirect(f'/change_password/{token}')
+            
+            user_obj = User.objects.get(id=user_id)
+            user_obj.set_password(password)
+            user_obj.save()
+
+            return redirect ('/login/')
+    except Exception as e:
+        print(e)
+    return render(request, 'accounts/change_password.html',{'context':context})
 
 
 def register_user(request):
@@ -115,8 +160,6 @@ def register_user(request):
 
             msg = 'User created - please <a href="/login">login</a>.'
             success = True
-
-            # return redirect("/login/")
 
         else:
             msg = 'Form is not valid'
