@@ -252,16 +252,3 @@ def add_plant(request):
         if form.is_valid():
             form.save()
             return redirect('/plant_setting')  # Redirect to a success page or the desired URL
-        
-def delete_plant(request, plant_id):
-    if request.method == 'POST':
-        if plant_id:
-            plant = get_object_or_404(Plant, pk=plant_id)
-            plant.delete()
-            success_message = '作物削除成功されました。'
-            messages.success(request, success_message)
-            return redirect('/plant_setting')
-        else:
-            success_message = '作物が提供されていないです。'
-            messages.success(request, success_message)
-            return redirect('/plant_setting')

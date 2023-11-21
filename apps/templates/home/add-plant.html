@@ -15,7 +15,7 @@
 {% block content %}
 <nav aria-label="breadcrumb" role="navigation">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/plant_setting">作物設定</a></li>
+        <li class="breadcrumb-item"><a href="/settings.html">作物設定</a></li>
         {% if show == 'true' %}
         <li class="breadcrumb-item" aria-current="page">作物の編集</li>
         {% else %}
@@ -32,13 +32,13 @@
             {% csrf_token %}
             <div class="form-group">
                 <label class="bmd-label-floating" for="plantname">作物名</label>
-                {{ form.plant_name }}
+                <input type="text" class="form-control" name="plant_name" required>
             </div>
             <br>
     
             <div class="form-group">
                 <label class="bmd-label-floating" for="distance">光源距離(cm)</label>
-                {{ form.distance }}
+                <input type="number" class="form-control" name="distance" required>
             </div>
             <br>
             <div class="row align-items-center"">
@@ -70,20 +70,16 @@
                     </div>
                 </div>
             </div>
-            {{ form.time_required }}
+            <input type="hidden" id="time_required" name="time_required" value="">
             <br>
             <div class="form-group">
-                <label class="bmd-label-floating" for="remarks">備考</label>
-                {{ form.remarks }}
+                <label class="bmd-label-floating" for="plantname">備考</label>
+                <input type="text" class="form-control" name="remarks">
             </div>
             <div class="center-container">
                 <a href="/plant_setting">
                     <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
-                    {% if show == 'true' %}
-    <button type="submit" id="addBtn" class="btn btn-success">変更</button>
-    {% else %}
                 <button type="submit" class="btn btn-success" onclick="validateAndCombine()">追加</button>
-                {% endif %}
             </div>
         </form>
     </div>
@@ -104,17 +100,7 @@ function validateAndCombine() {
 
         // Combine values into a single format
         var combinedTime = ('00' + hour).slice(-2) + ':' + ('00' + minute).slice(-2) + ':' + ('00' + second).slice(-2);
-        document.getElementById('id_time_required').value = combinedTime;
+        document.getElementById('time_required').value = combinedTime;
     }
-    document.addEventListener("DOMContentLoaded", function () {
-            var timeRequiredValue = document.getElementById('id_time_required').value;
-            if (timeRequiredValue) {
-                var parts = timeRequiredValue.split(":");
-                document.getElementById("hour").value = parseInt(parts[0]);
-                document.getElementById("minute").value = parseInt(parts[1]);
-                document.getElementById("second").value = parseInt(parts[2]);
-                
-            }
-        });    
 </script>
 {% endblock javascripts %}
