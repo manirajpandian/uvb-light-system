@@ -35,6 +35,7 @@ def LED_control(request):
     html_template = loader.get_template('home/LED-control.html')
     return HttpResponse(html_template.render(context, request))
 
+    #List of plant (settings.html)
 def plant_setting(request):
     try:
         plant_list = Plant.objects.all().order_by('plant_id')
@@ -42,7 +43,6 @@ def plant_setting(request):
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
         context = {'segment':'plant_settings', 'plant_list': plant_list,'page': page}
-        print('context>>>>',context)
         if request.method == "GET":
             html_template = loader.get_template('home/settings.html')
             return HttpResponse(html_template.render(context, request))

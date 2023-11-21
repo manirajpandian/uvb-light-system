@@ -65,7 +65,7 @@ $
 $ # Create tables
 $ python manage.py makemigrations
 $ python manage.py migrate
-$
+$ #python manage.py migrate --run-syncdb for recreating the database
 $ # Start the application (development mode)
 $ python manage.py runserver # default port 8000
 $
