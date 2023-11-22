@@ -96,8 +96,10 @@
             </div>
         </div>
     </div>    
-    {% if show != 'true' %}
+    {% if show == 'true' %}
     <input type="hidden" class="form-control" name="mapped_under" value="{{ current_user_id }}">
+    {% else %}
+    <input type="hidden" class="form-control" name="mapped_under" value="{{ context.user_id }}">
     {% endif %}
       <div class="center-container">
         <a href="/user_list">

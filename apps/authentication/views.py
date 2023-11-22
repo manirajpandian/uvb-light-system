@@ -14,6 +14,9 @@ from django.conf import settings
 from django.core.mail import send_mail
 from .models import Profile
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+from .helpers import send_forgot_password_mail
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -40,7 +43,7 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
 # user list and active/disable
-
+@login_required
 def user_list(request):
     try:
         user_list = User.objects.all().order_by('id')
@@ -71,7 +74,7 @@ def user_list(request):
 
 
 # update/edit user 
-
+@login_required
 def update_user(request, pk):
     try:
         user_obj = get_object_or_404(User, id=pk)
@@ -105,25 +108,28 @@ def update_user(request, pk):
         return redirect('/user_list')
 
 # add a new user 
-
+@login_required
 def add_user(request):
+    current_user_id = request.user.id 
     try:
         if request.method == "GET":
-            current_user_id = request.user.id 
             context = {'current_user_id':current_user_id}
             return render(request, 'home/add-user.html', context)
         else:
             first_name = request.POST['first_name']
             email = request.POST['email']
             role_id = request.POST['role_id']
-            user_id = request.POST['mapped_under']
+            user_id = request.user.id
             base_url = settings.BASE_URL
+
             if User.objects.filter(email=email).exists():
                 context = {
                     'first_name': first_name,
                     'email': email,
                     'role_id': role_id,
+                    'user_id':user_id
                 }
+
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
                 return render(request, 'home/add-user.html', {'error_message': error_message,"context":context})
 
@@ -169,6 +175,7 @@ def add_user(request):
     return render(request, 'home/add-user.html')
 
 # delete user 
+@login_required
 def delete_user(request, user_id):
     try:
         if request.method == 'POST':
@@ -195,19 +202,24 @@ def change_password (request, token):
     context={}
     try:
         profile_obj = Profile.objects.filter(forget_password_token = token).first()
-        context={ 'is_change_password_view': True, 'user_id': profile_obj.user.id }
+        context={ 'is_change_password': True, 'user_id': profile_obj.user.id }
 
         if request.method == 'POST':
             password = request.POST['password']
             confirm_password = request.POST['confirm_password']
             user_id = request.POST['user_id']
 
+            if user_id is None:
+                messages.success(request, 'no user id found')
+                return redirect(f'/change_password/{token}')
+            
             if password != confirm_password:
                 messages.success(request, 'password error')
                 return redirect(f'/change_password/{token}')
             
             user_obj = User.objects.get(id=user_id)
             user_obj.set_password(password)
+            user_obj.is_active = True
             user_obj.save()
 
             return redirect ('/login/')
@@ -237,23 +249,41 @@ def register_user(request):
     return render(request, "accounts/register.html", { "msg": msg, "success": success})
 
 
-def ForgetPassword(request):
+from django.contrib import messages
+
+
+from django.core.exceptions import ObjectDoesNotExist
+
+def forgot_password(request):
     try:
         if request.method == 'POST':
-            email = request.POST.get("email")
-            if not User.objects.filter(email=email).first():
-                messages.error(request,"Email does not exist.")
-                return redirect('/forget_password')
-            user_obj = User.objects.get(email=email)
-            reset_token = str(uuid.uuid4())
-            link = f'https://uvb-beamtec.mosaique.link/reset_password{reset_token}'
-            subject = 'パスワードの設定'
-            message = f"こちらから新しいパスワードを設定できます。\n{link}"
-            from_email = settings.EMAIL_HOST_USER
-            recipient_list = [email]
+            csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            if not csrf_token or not request.META.get('CSRF_COOKIE'):
+                return render(request, 'error_page.html', {'error_message': 'CSRF token is missing or invalid'})
 
-            send_mail(subject, message, from_email, recipient_list)
-            return True
+            email = request.POST.get("email")
+            print('email>>>>', email)
+
+            if not User.objects.filter(email=email).first():
+                messages.success(request, 'No user found')
+                return redirect('/login')
+            
+            user_obj = User.objects.get(email=email)
+            token = str(uuid.uuid4())
+            profile_obj = Profile.objects.get(user = user_obj)
+            profile_obj.forget_password_token = token
+            profile_obj.save()
+            send_forgot_password_mail(user_obj.email, token)
+            messages.success(request, 'Email was send to your acc')
+            return redirect('/login')
+
+
+            return redirect('/login')
+
     except Exception as e:
-        print('Error',e)
-    return render(request, 'accounts/reset_password.html')
+        print('Error', e)
+
+    return redirect('/login')
+
+
+

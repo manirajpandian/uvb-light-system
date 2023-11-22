@@ -4,7 +4,7 @@
 """
 
 from django.urls import path
-from .views import login_view, register_user, add_user, change_password, user_list, update_user, delete_user
+from .views import login_view, register_user, add_user, change_password, user_list, update_user, delete_user, forgot_password
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
@@ -15,5 +15,6 @@ urlpatterns = [
     path('user_list', user_list, name='user_list'),
     path('update_user/<str:pk>',update_user,name='update_user'), 
     path('delete_user/<str:user_id>/', delete_user, name='delete_user'),
-    path('change_password/<str:token>/', change_password, name="change_password")
+    path('forgot_password', forgot_password, name="forgot_password"),
+    path('change_password/<str:token>', change_password, name="change_password")
 ]
