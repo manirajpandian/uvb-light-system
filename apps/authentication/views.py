@@ -39,45 +39,93 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
-# user list and active/disable function 
+# user list and active/disable
 
-def admin_list(request):
+def user_list(request):
     try:
-        user_list = User.objects.all()
+        user_list = User.objects.all().order_by('id')
         profile_list = Profile.objects.filter(user__in=user_list)
+        user_profile_list = list(zip(user_list, profile_list))
 
-        context = {'user_profile_list': zip(user_list, profile_list),}
+        paginator = Paginator(user_profile_list, 5)
+        page_number = request.GET.get('page')
+        page = paginator.get_page(page_number)
+
+        context = {'page': page, 'user_profile_list': user_profile_list}
+
         if request.method == "POST":
-            user_id = request.POST['user_id']
-            is_active = request.POST['is_active']
-            print(user_id,'<<<<<<')
-            print(is_active,'is_active')
-            user = get_object_or_404(User, pk=user_id)
-            print('user>>>>>',user)
-            user.is_active = is_active
-            print('user.is_active>>>>>',user.is_active)
-            user.save()
-            success_message = "ユーザーステータスの変更に成功しました"  # success message here
-            return render(request, 'home/admin.html', context,{'success_message': success_message})
+            user_id = request.POST.get('user_id')
+            is_active = request.POST.get('is_active')
+            user_obj = User.objects.get(id=user_id)
+            user_obj.is_active = is_active
+            user_obj.save()
+            success_message = "ユーザーステータスの変更に成功しました"
+            context.update({'user_profile_list': user_profile_list, 'success_message': success_message})
+            return render(request, 'home/admin.html', context)
+
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
+
     return render(request, 'home/admin.html', context)
 
-def new_add_user(request):
+
+
+# update/edit user 
+
+def update_user(request, pk):
+    try:
+        user_obj = get_object_or_404(User, id=pk)
+        profile_obj = get_object_or_404(Profile, user_id=pk)
+
+        if request.method == 'POST':
+            # Update user data
+            user_obj.first_name = request.POST.get('first_name')
+            user_obj.save()
+
+            # Update profile data
+            profile_obj.role_id = request.POST.get('role_id')
+            profile_obj.save()
+
+            update_success_message = 'ユーザー詳細が正常に更新されました'
+            messages.success(request, update_success_message)
+            return redirect('/user_list')
+
+        context = {
+            'user_obj': user_obj,
+            'show': 'true',
+            'first_name': user_obj.first_name,
+            'role_id': profile_obj.role_id,
+        }
+        return render(request, 'home/add-user.html', context)
+
+    except Exception as e:
+        # Handle the exception
+        error_message = f'An error occurred: {str(e)}'
+        messages.error(request, error_message)
+        return redirect('/user_list')
+
+# add a new user 
+
+def add_user(request):
     try:
         if request.method == "GET":
             current_user_id = request.user.id 
             context = {'current_user_id':current_user_id}
             return render(request, 'home/add-user.html', context)
         else:
-            username = request.POST['username']
+            first_name = request.POST['first_name']
             email = request.POST['email']
             role_id = request.POST['role_id']
             user_id = request.POST['mapped_under']
             base_url = settings.BASE_URL
             if User.objects.filter(email=email).exists():
+                context = {
+                    'first_name': first_name,
+                    'email': email,
+                    'role_id': role_id,
+                }
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
-                return render(request, 'home/add-user.html', {'error_message': error_message})
+                return render(request, 'home/add-user.html', {'error_message': error_message,"context":context})
 
             farm_id = str(uuid.uuid4())[:6].upper()
             token = str(uuid.uuid4())
@@ -105,7 +153,7 @@ def new_add_user(request):
 
             send_mail(subject, message, from_email, recipient_list)
 
-            user_obj = User(username = farm_id, first_name = username, email = email, is_active=False)
+            user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False)
             user_obj.set_password('Test@123')
             user_obj.save()
 
@@ -120,6 +168,28 @@ def new_add_user(request):
         print(e)
     return render(request, 'home/add-user.html')
 
+# delete user 
+def delete_user(request, user_id):
+    try:
+        if request.method == 'POST':
+            user_obj = get_object_or_404(User, id=user_id)
+            profile_obj = get_object_or_404(Profile, user=user_obj)
+
+            user_obj.delete()
+            profile_obj.delete()
+            user_delete_success = 'ユーザーが正常に削除されました。' 
+            messages.success(request, user_delete_success)
+            return redirect('/user_list')
+        else:
+            user_delete_success = 'ユーザーが提供されていないです。'  
+            messages.success(request, user_delete_success)
+            return redirect('/user_list')
+
+    except Exception as e:
+        print(e)
+    return redirect('/user_list')
+
+# change password 
 
 def change_password (request, token):
     context={}
