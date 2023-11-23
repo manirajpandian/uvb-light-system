@@ -462,7 +462,7 @@
                                                     選択してください
                                                 </option>
                                                 {% for user in choice_user %}
-                                                 <option value="{{ user.user_id }}">{{ user.username }}</option>
+                                                 <option value="{{ user.id }}">{{ user.first_name }}</option>
                                                  {% endfor %}
                                             </select>
                                         </div>
@@ -682,7 +682,7 @@
                                         </button>
                                     </li>
                                     <li>
-                                        <button type="button" id="registerBtn" class="btn btn-success">
+                                        <button type="submit" id="registerBtn" class="btn btn-success">
                                             登録
                                         </button>
                                     </li>
