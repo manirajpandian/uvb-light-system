@@ -19,10 +19,12 @@ urlpatterns = [
     path('farm_manage',views.farm_manage, name="farm_manage"),
     path('house_lights',views.house_lights, name='house_lights'),
     path('LED_control',views.LED_control, name='LED_control'),
+    path('LED_control/<int:farm_id>/', views.LED_control, name='LED_control_farm_id'),
     path('plant_setting',views.plant_setting, name='plant_setting'),
     path('add_plant',views.add_plant, name='add_plant'),
     path('update_plant/<str:pk>',views.update_plant,name='update_plant'),
     path('delete_plant/<int:plant_id>/', views.delete_plant, name='delete_plant'),
+   
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

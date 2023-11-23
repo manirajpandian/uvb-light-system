@@ -10,9 +10,12 @@ from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PlantForm
-from .models import Plant
+from .models import Plant, Farm, House, Line, Pole, LED
 from django.core.paginator import Paginator
 from django.contrib import messages
+from apps.authentication.models import Profile
+from django.contrib.auth.models import User
+
 
 @login_required(login_url="/login/")
 def index(request):
@@ -25,10 +28,25 @@ def house_lights(request):
     html_template = loader.get_template('home/house-lights.html')
     return HttpResponse(html_template.render(context, request))
 
-def LED_control(request):
-    context = {'segment' : 'LED_control'}
-    html_template = loader.get_template('home/LED-control.html')
-    return HttpResponse(html_template.render(context, request))
+def LED_control(request,farm_id=None):
+    choice_farm = Farm.objects.all()
+    selected_farm_name = None
+    if request.method == 'POST':
+        farm_id = request.POST.get('selected_farm')
+    else:
+        farm_id = choice_farm.first().farm_id
+    
+    if farm_id:
+            houses = House.objects.filter(farm_id=farm_id)
+            selected_farm = Farm.objects.get(pk=farm_id)
+            selected_farm_name = selected_farm.farm_name   
+    
+    context = {'segment': 'LED_control', 'choice_farm': choice_farm, 'houses': houses,'selected_farm_name': selected_farm_name, 'farm_id': farm_id}
+
+    return render(request, 'home/LED-control.html', context)
+
+
+
 
     #List of plant (settings.html)
 def plant_setting(request):
@@ -98,9 +116,69 @@ def house_list(request):
     return HttpResponse(html_template.render(context, request))
 
 def add_house(request):
-    context={}
-    html_template = loader.get_template('home/add-house.html')
-    return HttpResponse(html_template.render(context, request))
+    choice_plant = Plant.objects.all()
+    choice_farm = Farm.objects.all()
+    if request.user.is_authenticated:
+        current_user_id = request.user.id
+        mapped_profiles = Profile.objects.filter(mapped_under=current_user_id)
+        
+    choice_user = [profile.user for profile in mapped_profiles]
+    # print("----------->",choice_user.user.id)
+    context = {'segment':'add_house', 'choice_plant': choice_plant, 'choice_farm': choice_farm, 'choice_user': choice_user}
+    if request.method == "GET":
+        html_template = loader.get_template('home/add-house.html')
+        return HttpResponse(html_template.render(context, request))
+    else:
+        user_id = request.POST.get("farmerName")
+        house_name = request.POST.get("houseNameReg")
+        plant_id = request.POST.get("plantNameReg")
+        farm_id = request.POST.get("farmNameReg")
+        memo = request.POST.get("memoReg")
+        # lane_count = request.POST.get("laneCount")
+        # pole_count_per_lane = request.POST.get("laneCountPerPole")
+        # led_count_per_pole = request.POST.get("ledCountPerpole")
+        lane_count = int(request.POST.get("laneCount"))
+        pole_counts = [int(count) for count in request.POST.get("laneCountPerPole").split(",")]
+        led_counts = [int(count) for count in request.POST.get("ledCountPerpole").split(",")]
+
+        print("------------",user_id,house_name,plant_id,farm_id,memo,lane_count, pole_counts,led_counts)
+        house = House(
+            house_name=house_name,
+            memo=memo
+        )
+        if user_id:
+            user = User.objects.get(pk=user_id)
+            house.user = user
+        if plant_id:
+            house.plant_id = plant_id
+        if farm_id:
+            farm_id
+            house.farm_id = farm_id
+        house.save()
+
+        for i in range(1, lane_count + 1):
+            line = Line(
+                house=house,
+                pole_count=pole_counts[i - 1]
+            )
+            line.save()
+
+            # Create Pole and LED instances
+            for j in range(1, pole_counts[i - 1] + 1):
+                pole = Pole(
+                    line=line,
+                    led_count=led_counts.pop(0)
+                )
+                pole.save()
+
+                # Create LED instances
+                for k in range(1, pole.led_count + 1):
+                    led = LED(
+                        pole=pole
+                    )
+                    led.save()
+
+        return redirect('/house_list')
 
 def  farm_manage (request):
     context={}
