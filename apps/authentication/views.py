@@ -39,8 +39,11 @@ def login_view(request):
                 msg = 'メールとユーザは存在しません'
         else:
             msg = 'バリデーションエラー'
-
-    return render(request, "accounts/login.html", {"form": form, "msg": msg})
+    forgot_password_message = request.session.pop('forgot_password_message', None)
+    forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
+    email = request.session.pop('email',None)
+    print('forgot_password_message',forgot_password_message)
+    return render(request, "accounts/login.html", {"form": form, "msg": msg,'forgot_password_message': forgot_password_message, 'forgot_password_success_msg':forgot_password_success_msg, 'email':email})
 
 # user list and active/disable
 @login_required
@@ -210,11 +213,11 @@ def change_password (request, token):
             user_id = request.POST['user_id']
 
             if user_id is None:
-                messages.success(request, 'no user id found')
+                messages.error(request, 'no user id found')
                 return redirect(f'/change_password/{token}')
             
             if password != confirm_password:
-                messages.success(request, 'password error')
+                messages.error(request, 'password error')
                 return redirect(f'/change_password/{token}')
             
             user_obj = User.objects.get(id=user_id)
@@ -249,41 +252,86 @@ def register_user(request):
     return render(request, "accounts/register.html", { "msg": msg, "success": success})
 
 
-from django.contrib import messages
-
-
-from django.core.exceptions import ObjectDoesNotExist
+# forgot password 
 
 def forgot_password(request):
     try:
         if request.method == 'POST':
             csrf_token = request.POST.get('csrfmiddlewaretoken', '')
             if not csrf_token or not request.META.get('CSRF_COOKIE'):
+                request.session['forgot_password_message'] = 'CSRF token is missing or invalid'
                 return render(request, 'error_page.html', {'error_message': 'CSRF token is missing or invalid'})
 
             email = request.POST.get("email")
-            print('email>>>>', email)
 
             if not User.objects.filter(email=email).first():
-                messages.success(request, 'No user found')
-                return redirect('/login')
+                request.session['email'] = email
+                request.session['forgot_password_message'] = 'メールが存在しません'
+                return redirect('/forgot_password/')
             
             user_obj = User.objects.get(email=email)
             token = str(uuid.uuid4())
-            profile_obj = Profile.objects.get(user = user_obj)
+            profile_obj = Profile.objects.get(user=user_obj)
             profile_obj.forget_password_token = token
             profile_obj.save()
             send_forgot_password_mail(user_obj.email, token)
-            messages.success(request, 'Email was send to your acc')
-            return redirect('/login')
+            request.session['forgot_password_success_msg'] = '入力したメールアドレスにメールが送信されました。'
+            
+            return redirect('/login/')
+
+    except Exception as e:
+        print('Error', e)
+        request.session['forgot_password_message'] = 'エラーが発生しました。もう一度お試しください。'
+
+    return redirect('/login/')
 
 
-            return redirect('/login')
+def user_profile(request):
+    try:
+        current_user_id = request.user.id
+        user_obj = get_object_or_404(User, id=current_user_id)
+        profile_obj, created = Profile.objects.get_or_create(user_id=current_user_id)
+        
+        role_mapping = {
+            '0': 'BEAM TECH スーパー管理者',
+            '1': '管理者',
+        }
+        role_id = role_mapping.get(profile_obj.role_id, 'ユーザー')
+
+        context = {
+            'first_name': user_obj.first_name,
+            'id': user_obj.username,
+            'email': user_obj.email,
+            'role_id': role_id,
+            'profile_image': profile_obj.image or None,
+        }
+
+        if request.method == 'POST':
+            image = request.FILES.get('profile_image')
+            username = request.POST.get('first_name')
+            password = request.POST.get('password')
+            
+            if not username:
+                update_message = '氏名は空であってはならない'
+                messages.error(request, update_message)
+                return redirect('/user_profile')
+            elif not password:
+                user_obj.username = username
+            elif username and password:
+                user_obj.username = username
+                user_obj.set_password(password)
+            user_obj.save()
+
+            if image:
+                profile_obj.image = image
+                profile_obj.save()
+                request.session['image_path'] = profile_obj.image.url
+            update_message = 'プロフィールの更新に成功しました！'
+            messages.success(request, update_message)
+            return redirect('/user_profile')
 
     except Exception as e:
         print('Error', e)
 
-    return redirect('/login')
-
-
+    return render(request, 'home/page-user.html', {'context': context})
 

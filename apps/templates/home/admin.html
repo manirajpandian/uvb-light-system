@@ -266,8 +266,6 @@
       button.addEventListener("click", function () {
         currentUserId = this.getAttribute("data-user-id");
         const userName = this.getAttribute("data-first-name");
-        console.log(userName, '>>>>', currentUserId);
-        // userInput = currentUserId
         userNameSpan.innerHTML = userName;
         $("#userDeleteModal").modal("show");
       });
