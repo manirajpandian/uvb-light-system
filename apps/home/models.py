@@ -4,6 +4,8 @@
 """
 
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 
 
@@ -17,6 +19,16 @@ class Plant(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True, blank=True)
     updatedBy = models.IntegerField(default=1)
     updatedAt = models.DateTimeField(auto_now=True, null=True)
+    
+    def delete(self, *args, **kwargs):
+        # Update related House's is_active field to False
+        self.house_set.update(is_active=False)
+        super().delete(*args, **kwargs)
+
+@receiver(pre_delete, sender=Plant)
+def delete_related_house(sender, instance, **kwargs):
+    # Update related House's is_active field to False
+    instance.house_set.update(is_active=False)
 
 class Farm(models.Model):
     farm_id=models.BigAutoField(primary_key=True)
@@ -27,9 +39,14 @@ class House(models.Model):
     house_id = models.CharField(max_length=10, primary_key=True)
     house_name = models.CharField(max_length=255)
     farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='houses')
-    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+    plant = models.ForeignKey(Plant, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     memo = models.CharField(max_length=255,null=True, blank=True)
+    total_line_count = models.IntegerField(default=0)
+    total_pole_count = models.IntegerField(default=0)
+    total_leds = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
     def save(self, *args, **kwargs):
         if not self.house_id:
             last_instance = House.objects.last()
@@ -38,7 +55,7 @@ class House(models.Model):
                 new_number = last_number + 1
             else:
                 new_number = 1
-            self.house_id = f'h{new_number}'
+            self.house_id = f'H{new_number}'
         super().save(*args, **kwargs)
     def __str__(self):
         return f"{self.house_name} ({self.house_id})"
@@ -54,7 +71,7 @@ class Line(models.Model):
                 new_number = last_number + 1
             else:
                 new_number = 1
-            self.line_id = f'{self.house.house_id}l{new_number}'
+            self.line_id = f'{self.house.house_id}L{new_number}'
         super().save(*args, **kwargs)
 class Pole(models.Model):
     pole_id = models.CharField(max_length=20, primary_key=True)
@@ -68,7 +85,7 @@ class Pole(models.Model):
                 new_number = last_number + 1
             else:
                 new_number = 1
-            self.pole_id = f'{self.line.line_id}p{new_number}'
+            self.pole_id = f'{self.line.line_id}P{new_number}'
         super().save(*args, **kwargs)
 class LED(models.Model):
     led_id = models.CharField(max_length=25, primary_key=True)
@@ -82,7 +99,7 @@ class LED(models.Model):
                 new_number = last_number + 1
             else:
                 new_number = 1
-            self.led_id = f'{self.pole.pole_id}b{new_number}'
+            self.led_id = f'{self.pole.pole_id}B{new_number}'
         super().save(*args, **kwargs)
 
 
