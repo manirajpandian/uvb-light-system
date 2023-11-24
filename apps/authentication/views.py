@@ -334,24 +334,24 @@ def user_profile(request):
 
         if request.method == 'POST':
             image = request.FILES.get('profile_image')
-            username = request.POST.get('first_name')
+            first_name = request.POST.get('first_name')
             password = request.POST.get('password')
             
-            if not username:
+            if not first_name:
                 update_message = '氏名は空であってはならない'
                 messages.error(request, update_message)
                 return redirect('/user_profile')
             elif not password:
-                user_obj.username = username
-            elif username and password:
-                user_obj.username = username
+                user_obj.first_name = first_name
+            elif first_name and password:
+                user_obj.first_name = first_name
                 user_obj.set_password(password)
             user_obj.save()
 
             if image:
                 profile_obj.image = image
                 profile_obj.save()
-                request.session['image_path'] = profile_obj.image.url
+                request.session['user_profile_image'] = profile_obj.image.url
             update_message = 'プロフィールの更新に成功しました！'
             messages.success(request, update_message)
             return redirect('/user_profile')

@@ -101,6 +101,7 @@
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span>農場フィルター</span>
         </button>
+        
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             {% for farm in farms %}
                 <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
@@ -201,6 +202,7 @@
     </div>
   </div>
 </div>
+
 
 {% endblock content %}
 

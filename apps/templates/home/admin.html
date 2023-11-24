@@ -114,10 +114,12 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.first_name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{% if profile.role_id == '1' %}管理者{% else %}ユーザ{% endif %}</td>
+                <td>{% if user.is_superuser %} BEAM TECH スーパー管理者
+                  {% elif profile.role_id == "1" %} 管理者
+                  {% else %} ユーザー {% endif %}</td>
                 <td>
                   {% if user.is_superuser %}
-                  管理者
+                  スーパー
                   {% else %}
                   <form method="POST" action="" autocomplete="off">
                     {% csrf_token %}
@@ -137,7 +139,7 @@
                 </td>
                 <td>
                   {% if user.is_superuser %}
-                  管理者
+                  スーパー
                   {% else %}
                   <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
                   &nbsp; &nbsp;|&nbsp;&nbsp;

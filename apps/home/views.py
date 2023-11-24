@@ -45,50 +45,58 @@ def LED_control(request,farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         farms = Farm.objects.all()
-        selected_farm_id = request.GET.get('farm_id') or farm_id
-        if selected_farm_id:
-            houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
-            selected_farm = Farm.objects.get(pk=selected_farm_id)
-            selected_farm_name = selected_farm.farm_name  
-        else:
-            default_farm = Farm.objects.first()
-            houses = House.objects.filter(farm=default_farm).select_related('plant')
-            selected_farm = default_farm
-            selected_farm_name = selected_farm.farm_name
-        context = {
-            'segment': 'LED_control',
-            'farms': farms,
-            'houses': houses,
-            'selected_farm_name': selected_farm_name,
-            'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
-             }
-        if request.method == "GET":
-            html_template = loader.get_template('home/LED-control.html')
-            return HttpResponse(html_template.render(context, request))
-    
-        elif request.method == "POST":
-            led_id = request.POST.get('led_id')
-            farm_id = request.POST.get('farm_id')
-
-            if led_id:
-                led = LED.objects.get(pk=led_id)
-
-                if led.is_on:  
-                    led.is_on = False  # Set to False
-                    led.save()
-                    led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
-                    messages.success(request, led_success_msg)
+        if len(farms) > 0:
+            selected_farm_id = request.GET.get('farm_id') or farm_id
+            if selected_farm_id:
+                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
+                selected_farm = Farm.objects.get(pk=selected_farm_id)
+                selected_farm_name = selected_farm.farm_name  
+            else:
+                default_farm = Farm.objects.first()
+                houses = House.objects.filter(farm=default_farm).select_related('plant')
+                selected_farm = default_farm
+                selected_farm_name = selected_farm.farm_name
+            context = {
+                'segment': 'LED_control',
+                'farms': farms,
+                'houses': houses,
+                'selected_farm_name': selected_farm_name,
+                'user_profile_image': user_profile_image,
+                'user_role_id':user_role_id
+                }
+            if request.method == "GET":
+                html_template = loader.get_template('home/LED-control.html')
+                return HttpResponse(html_template.render(context, request))
         
-                else:
-                    led.is_on = True  # Set to True
-                    led.save()
-                    led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
-                    messages.success(request, led_success_msg)
+            elif request.method == "POST":
+                led_id = request.POST.get('led_id')
+                farm_id = request.POST.get('farm_id')
 
-            return redirect('LED_control_farm_id', farm_id=farm_id)
+                if led_id:
+                    led = LED.objects.get(pk=led_id)
 
-        return redirect('LED_control')
+                    if led.is_on:  
+                        led.is_on = False  # Set to False
+                        led.save()
+                        led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
+                        messages.success(request, led_success_msg)
+            
+                    else:
+                        led.is_on = True  # Set to True
+                        led.save()
+                        led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
+                        messages.success(request, led_success_msg)
+
+                return redirect('LED_control_farm_id', farm_id=farm_id)
+
+            return redirect('LED_control')
+        else:
+            context = {
+                'segment': 'LED_control',
+                'user_profile_image': user_profile_image,
+                'user_role_id':user_role_id
+                }
+            return render(request,'home/LED-control.html', context)
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
@@ -165,57 +173,64 @@ def house_list(request, farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         farms = Farm.objects.all()
-        selected_farm_id = request.GET.get('farm_id') or farm_id
-        if selected_farm_id:
-            houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
-            selected_farm = Farm.objects.get(pk=selected_farm_id)
-            selected_farm_name = selected_farm.farm_name  
+        if len(farms) > 0:
+            selected_farm_id = request.GET.get('farm_id') or farm_id
+            if selected_farm_id:
+                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
+                selected_farm = Farm.objects.get(pk=selected_farm_id)
+                selected_farm_name = selected_farm.farm_name  
+            else:
+                default_farm = Farm.objects.first()
+                houses = House.objects.filter(farm=default_farm).select_related('plant')
+                selected_farm = default_farm
+                selected_farm_name = selected_farm.farm_name
+            page = Paginator(houses, 5)
+            page_list = request.GET.get('page')
+            page = page.get_page(page_list) 
+            context = {
+                'farms': farms,
+                'houses': houses,
+                'selected_farm_name': selected_farm_name,
+                'page': page,
+                'selected_farm_id': selected_farm_id,
+                'user_profile_image': user_profile_image,
+                'user_role_id':user_role_id
+                }
+            if request.method == "GET":
+                html_template = loader.get_template('home/house-list.html')
+                return HttpResponse(html_template.render(context, request))
+
+            elif request.method == "POST":
+                house_id = request.POST.get('house_id')
+                farm_id = request.POST.get('farm_id')
+
+                if house_id and farm_id:
+                    house = House.objects.get(pk=house_id, farm_id=farm_id)
+
+                    if house.is_active:  
+                        house.is_active = False  # Set to False
+                        house.save()
+
+                        LED.objects.filter(pole__line__house_id=house.house_id).update(is_on=False)
+                        house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
+                        messages.success(request, house_success_msg)
+            
+                    else:
+                        house.is_active = True  # Set to True
+                        house.save()
+                        house_success_msg = f"{house.house_name} ハウスが活性化されました。"        #House Status is set to ON
+                        messages.success(request, house_success_msg)            
+
+                return redirect('house_list_with_farm', farm_id=farm_id)
+
+            return redirect('house_list')
         else:
-            default_farm = Farm.objects.first()
-            houses = House.objects.filter(farm=default_farm).select_related('plant')
-            selected_farm = default_farm
-            selected_farm_name = selected_farm.farm_name
-
-        page = Paginator(houses, 5)
-        page_list = request.GET.get('page')
-        page = page.get_page(page_list) 
-        context = {
-            'farms': farms,
-            'houses': houses,
-            'selected_farm_name': selected_farm_name,
-            'page': page,
-            'selected_farm_id': selected_farm_id,
-            'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
-            }
-        if request.method == "GET":
-            html_template = loader.get_template('home/house-list.html')
-            return HttpResponse(html_template.render(context, request))
-
-        elif request.method == "POST":
-            house_id = request.POST.get('house_id')
-            farm_id = request.POST.get('farm_id')
-
-            if house_id and farm_id:
-                house = House.objects.get(pk=house_id, farm_id=farm_id)
-
-                if house.is_active:  
-                    house.is_active = False  # Set to False
-                    house.save()
-
-                    LED.objects.filter(pole__line__house_id=house.house_id).update(is_on=False)
-                    house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
-                    messages.success(request, house_success_msg)
+            context = {
+                'user_profile_image': user_profile_image,
+                'user_role_id':user_role_id
+                }
+            return render(request,'home/house-list.html',context)
         
-                else:
-                    house.is_active = True  # Set to True
-                    house.save()
-                    house_success_msg = f"{house.house_name} ハウスが活性化されました。"        #House Status is set to ON
-                    messages.success(request, house_success_msg)            
-
-            return redirect('house_list_with_farm', farm_id=farm_id)
-
-        return redirect('house_list')
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
