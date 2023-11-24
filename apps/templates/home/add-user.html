@@ -59,7 +59,7 @@
 <div class="card">
   <div class="card-body">
     {% if error_message %}
-    <p class="text-danger text-center">{{ error_message }}</p>
+    <p id="successMessage" class="text-danger text-center">{{ error_message }}</p>
     {% endif %}
     <form action="" method="post" id="myForm" autocomplete="off">
       {% csrf_token %}
@@ -67,7 +67,7 @@
         <div class="col-md-6 my-4">
           <div class="form-group">
             <label for="userName" class="bmd-label-floating">⽒名</label>
-            <input type="text" id="username" class="form-control" name="username">
+            <input type="text" id="username" class="form-control" name="first_name" {% if show == 'true' %}value="{{ user_obj.first_name }}" {% else %} value="{{ context.first_name }}" {% endif %}>
           </div>
           <span class="text-danger" id="userNameMsg"></span>
         </div>
@@ -75,11 +75,11 @@
           <div class="form-group">
             {% if show == 'true' %}
             <label for="email" class="bmd-label-floating">メール</label>
-            <input type="text"  class="form-control" name="email" value="{{ form.email.value }}" disabled>
+            <input type="text"  class="form-control" name="email" value="{{ user_obj.email }}" disabled>
 
             {% else %}
             <label for="email" class="bmd-label-floating">メール</label>
-            <input type="email" id="email" class="form-control" name="email">
+            <input type="email" id="email" class="form-control" name="email" value="{{ context.email }}">
             {% endif %}
           </div>
           <span id="emailMsg" class="text-danger"></span>
@@ -87,16 +87,20 @@
       </div>
       <div class="row">
         <div class="col-md-6 my-4">
-          <div class="form-group">
-            <label for="権限" class="bmd-label-floating">権限</label>
-            <select name="role_id" class="form-control" id="roleId">
-              <option value="1">管理者</option>
-              <option value="2">ユーザ</option>
-          </select>
-          </div>
+            <div class="form-group">
+                <label for="権限" class="bmd-label-floating">権限</label>
+                <select name="role_id" class="form-control" id="roleId">
+                    <option value="1" {% if role_id == '1' %}selected{% endif %}>管理者</option>
+                    <option value="2" {% if role_id == '2' %}selected{% endif %}>ユーザ</option>
+                </select>
+            </div>
         </div>
-      </div>
-      <input type="hidden" class="form-control" name="mapped_under" value="{{ current_user_id }}">
+    </div>    
+    {% if show == 'true' %}
+    <input type="hidden" class="form-control" name="mapped_under" value="{{ current_user_id }}">
+    {% else %}
+    <input type="hidden" class="form-control" name="mapped_under" value="{{ context.user_id }}">
+    {% endif %}
       <div class="center-container">
         <a href="/user_list">
           <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
@@ -112,10 +116,20 @@
 {% endblock content %}
 {% block javascripts %}
 <script>
+    setTimeout(function () {
+    var successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+      successMessage.style.display = 'none';
+    }
+  }, 5000);
     const loader = document.getElementById('loader');
-
+    document.getElementById('username').addEventListener('input', function() {
+      document.getElementById('userNameMsg').innerText = '';
+      });
+      document.getElementById('email').addEventListener('input', function() {
+      document.getElementById('emailMsg').innerText = '';
+      });
     document.getElementById('myForm').addEventListener('submit', function(event) {
-        // Your validation logic goes here
 
         // Example validation:
         var userInput = document.getElementById('username').value;

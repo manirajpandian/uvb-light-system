@@ -10,6 +10,10 @@
     width: 200px;
     height: 200px;
   }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
 </style>
 {% endblock stylesheets %}
 {% block content %}
@@ -18,54 +22,70 @@
   <div class="col-md-8 offset-md-2">
     <div class="card">
       <div class="card-body">
+        {% if messages %}
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <p class="text-success text-center" id="successMessage">{{ message }}</p>
+            {% elif message.tags == 'error' %}
+              <p class="text-danger text-center" id="successMessage">{{ message }}</p>
+            {% else %}
+              <p>{{ message }}</p>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
         <div class="card-avatar text-center">
-          <a href="#">
-            <img class="img rounded-circle" src="/static/assets/img/faces/marc.jpg" id="profile-image" />
-            <div class="camera-icon m-3">
-              <i id="upload-icon" class="material-icons">camera_alt</i>
-            </div>
-          </a>
-          <!-- Hidden file input -->
-          <input type="file" id="image-upload" style="display: none;" accept="image/*">
+          {% if context.profile_image %}
+            <img class="img rounded-circle" id="profile-image" src="{{ context.profile_image.url }}" alt="Profile Image">
+        {% else %}
+            <img class="img rounded-circle" id="profile-image" src="/static/assets/img/default.png" alt="Default Image">
+        {% endif %}
+          <div class="camera-icon m-3">
+            <i id="upload-icon" class="material-icons cursor-pointer text-primary">camera_alt</i>
+          </div>
         </div>
 
-
         <div class="text-center">
-          <h6 class="text-gray">
-            XXXXXXX
+          <h6 class="">
+            <b class="text-gray">ID: </b><span>{{ context.id }}</span>
           </h6>
         </div>
         <!-- Form for getting the input fields  -->
-        <form>
+        <form method="post" id="userProfileForm" role="form" enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- Hidden file input -->
+          <input type="file" name="profile_image" id="image-upload" class="d-none" accept="image/*">
           <div class="row">
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">氏名</label>
-                <input type="text" name="name" class="form-control" value="{{ current_user.username }}">
+                <input type="text" name="first_name" id="firstName" class="form-control"
+                  value="{{ context.first_name }}">
               </div>
+              <span id="FNspan"></span>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">メール</label>
-                <input type="email" name="email" class="form-control" value="{{ current_user.email }}">
+                <input type="email" name="email" class="form-control" value="{{ context.email }}" disabled>
               </div>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">役割</label>
-                <input type="text" name="role" class="form-control">
+                <input type="text" name="role_id" class="form-control" value="{{ context.role_id }}" disabled>
               </div>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">パスワード</label>
-                <input type="text" name="password" class="form-control">
+                <input type="password" name="password" class="form-control">
               </div>
             </div>
           </div>
           <!-- submit button -->
           <div class="d-flex justify-content-end col-12 m-2">
-            <button type="submit" class="btn btn-primary pull-right">プロフィール更新</button>
+            <button type="submit" id="updateButton" class="btn btn-primary pull-right">プロフィール更新</button>
           </div>
         </form>
       </div>
@@ -77,6 +97,12 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
+  setTimeout(function () {
+    var successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+      successMessage.style.display = 'none';
+    }
+  }, 5000);
   //Profile-Image Upload (image-click function)
   document.getElementById('profile-image').addEventListener('click', function () {
     document.getElementById('image-upload').click();
@@ -88,7 +114,6 @@
 
   document.getElementById('image-upload').addEventListener('change', function (event) {
     const file = event.target.files[0];
-
     if (file) {
       const reader = new FileReader();
       reader.onload = function (e) {
