@@ -228,8 +228,14 @@ def add_house(request):
         mapped_profiles = Profile.objects.filter(mapped_under=current_user_id)
         
     choice_user = [profile.user for profile in mapped_profiles]
-    # print("----------->",choice_user.user.id)
-    context = {'segment':'add_house', 'choice_plant': choice_plant, 'choice_farm': choice_farm, 'choice_user': choice_user}
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context = {'segment':'add_house', 
+            'choice_plant': choice_plant, 
+            'choice_farm': choice_farm, 
+            'choice_user': choice_user, 
+            'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id}
     if request.method == "GET":
         html_template = loader.get_template('home/add-house.html')
         return HttpResponse(html_template.render(context, request))
@@ -243,7 +249,6 @@ def add_house(request):
         pole_counts = [int(count) for count in request.POST.get("laneCountPerPole").split(",")]
         led_counts = [int(count) for count in request.POST.get("ledCountPerpole").split(",")]
 
-        print("------------",user_id,house_name,plant_id,farm_id,memo,lane_count, pole_counts,led_counts)
         house = House(
             house_name=house_name,
             memo=memo,
