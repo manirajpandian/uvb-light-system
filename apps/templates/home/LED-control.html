@@ -58,18 +58,14 @@
     border-radius: 50%;
   }
 
-  input:checked+.slider {
+  .switch input:checked+.slider {
     background-color: #66bb6a;
   }
 
-  input:checked+.slider:before {
+  .switch input:checked+.slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(16px);
-  }
-
-  input:checked+.slider+.toggle-text {
-    left: 35px;
   }
 
   #rotateScreenMessage {
@@ -106,21 +102,7 @@
   }
 </style>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const colorToggles = document.querySelectorAll(".colorToggle");
-
-    colorToggles.forEach(function (toggle) {
-      const toggleText = toggle.nextElementSibling.nextElementSibling;
-
-      toggle.addEventListener("change", function () {
-        if (toggle.checked) {
-          toggleText.innerText = "ON";
-        } else {
-          toggleText.innerText = "OFF";
-        }
-      });
-    });
-  });
+  
   window.addEventListener("orientationchange", function () {
     var orientation = window.orientation;
     if (orientation === 0 || orientation === 180) {
@@ -133,36 +115,26 @@
   });
 
 </script>
-</script>
+
 <div id="rotateScreenMessage">
   <h1>画面を回転してください</h1>
   <p>このアプリケーションは横向きモードで最適に動作します。</p>
 </div>
 <div id="mainContainer">
   <h3>LED管理</h3>
-
-
   <div class="d-flex align-items-center justify-content-end justify-content-between">
-    <h4 class="my-2"></h4>
-    
+    <h3 class="my-2">{{ selected_farm_name }}</h3>
     <div class="dropdown my-2">
-        <form id="farmForm" method="post" action='{% url "LED_control" %}'>
-            {% csrf_token %}
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span>農場フィルター</span>
-            </button>
-            
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                {% for farm in choice_farm %}
-                    <a class="dropdown-item" href="#" onclick="selectFarm('{{ farm.farm_id }}')">
-                        {{ farm.farm_name }}
-                    </a>
-                {% endfor %}
-            </div>
-            <input type="hidden" id="selected_farm" name="selected_farm" value="">
-        </form>
-    </div>
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span>農場フィルター</span>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          {% for farm in farms %}
+              <a class="dropdown-item" href="{% url 'LED_control_farm_id' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
+          {% endfor %}
+      </div>
+  </div>
 </div>
 {% if led_success_msg %}
 <div class=" text-center text-success" id="successMessage">
@@ -182,27 +154,24 @@
 {% endfor %}
 {% endif %}
 
-{% if selected_farm_name %}
-        <h1 class="mt-4">{{ selected_farm_name }}</h1>
-    {% endif %}
   <div class="accordion mt-4" id="accordionExample">
     {% if houses|length > 0 %}
       {% for house in houses %}
-      
       <h4 class="mt-4">{{ house.house_name }}</h4>
       <div class="accordion" id="accordionExample">
           {% for line in house.lines.all %}
               <div class="accordion-item">
                   <h2 class="accordion-header" id="heading{{ line.line_id }}">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                              data-bs-target="#collapse{{ line.line_id }}" aria-expanded="false"
-                              aria-controls="collapse{{ line.line_id }}">
-                          <h4 class="card-title">レーン{{ line.line_id }}</h4>
-      
-                          <!-- Other header content -->
-                      </button>
+                    <button class="{% if house == houses.0 and line == house.lines.all.0 %}accordion-button{% else %}accordion-button collapsed{% endif %}"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ line.line_id }}"
+                    aria-expanded="{% if house == houses.0 and line == house.lines.all.0 %}true{% else %}false{% endif %}"
+                    aria-controls="collapse{{ line.line_id }}">
+                <h4 class="card-title">レーン{{ line.line_id }}</h4>
+            </button>
                   </h2>
-                  <div id="collapse{{ line.line_id }}" class="accordion-collapse collapse"
+                  <div id="collapse{{ line.line_id }}" class="{% if house == houses.0 and line == house.lines.all.0 %}accordion-collapse collapse show{% else %}accordion-collapse collapse{% endif %}"
                 aria-labelledby="heading{{ line.line_id }}" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
                     <table class="table table-striped">
@@ -220,10 +189,15 @@
                                         <td>{{ pole.light_distance }}</td>
                                         <td>{{ pole.illumination_time }}</td>
                                         <td>
-                                          無 <label class="switch">
-                                            <input type="checkbox" class="colorToggle" />
-                                            <span class="slider round"></span>
-                                        </label> 有 </td>
+                                          <form method="post" action="{% if farm and farm.farm_id %}{% url 'LED_control_farm_id' farm_id=farm.farm_id %}{% else %}{% url 'LED_control' %}{% endif %}" class="status-form" id="status-form-{{ led.led_id }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="led_id" value="{{ led.led_id }}">
+                                            <input type="hidden" name="farm_id" value="{{ house.farm.farm_id }}">
+                                            無 &nbsp; <label class="switch">
+                                              <input type="checkbox" class="colorToggle" {% if led.is_on %}checked{% endif %} >
+                                              <span class="slider round"></span>
+                                            </label> &nbsp;有
+                                          </form>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}
@@ -233,21 +207,15 @@
             </div>
         </div>
     {% endfor %}
-</div>
-                  
+</div>        
           {% endfor %}
       </div>
-      
-    
-  
       {% else %}
-      
       <div class="text-center">
         <h4 class="text-warning">ハウスがありません</h4>
     </div>
   </div>
       {% endif %}
-   
 </div>
 {% endblock content %}
 
@@ -255,13 +223,20 @@
 {% block javascripts %}
 <script>
 
-function selectFarm(farmId) {
+  setTimeout(function () {
+    var successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+      successMessage.style.display = 'none';
+    }
+  }, 5000);
 
-  var farmForm = document.getElementById('farmForm');
-    farmForm.action = '/LED_control/' + farmId + '/';
-    document.getElementById('selected_farm').value = farmId;
-    farmForm.submit();
-}
+  document.querySelectorAll('.colorToggle').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+        var form = this.closest('form');
+        form.submit();
+    });
+});
+
 
 </script>
 {% endblock javascripts %}
