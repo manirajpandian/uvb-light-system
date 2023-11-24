@@ -13,9 +13,10 @@ class Role(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    forget_password_token = models.CharField(max_length=100)
-    role_id = models.CharField(max_length=100)
-    mapped_under = models.IntegerField(default=0)
+    forget_password_token = models.CharField(max_length=100, null=True)
+    role_id = models.CharField(max_length=100, null=True)
+    mapped_under = models.IntegerField(default=0,null=True)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_created=True, default=timezone.now)
 
     def __str__(self):

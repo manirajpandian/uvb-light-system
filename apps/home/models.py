@@ -4,21 +4,8 @@
 """
 
 from django.db import models
+from django.contrib.auth.models import User
 
-class User(models.Model):
-    user_id = models.BigAutoField(primary_key=True)
-    username = models.CharField(max_length=255)
-    email = models.EmailField(max_length=100, unique=True)
-    password = models.CharField(max_length=128,null=True, default='null')
-    isActive = models.BooleanField(default=True, null=True)
-    isDeleted = models.BooleanField(default=False, null=True)
-    isEmailSend = models.BooleanField(default=False, null=False)
-    mapped_under = models.IntegerField(default=0)
-    role_id = models.CharField(max_length=100)
-    createdBy = models.IntegerField(default=1)
-    createdAt = models.DateTimeField(auto_now_add=True, blank=True)
-    updatedBy = models.IntegerField(default=1)
-    updatedAt = models.DateTimeField(auto_now=True, null=True)
 
 class Plant(models.Model):
     plant_id = models.BigAutoField(primary_key=True)
@@ -30,5 +17,82 @@ class Plant(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True, blank=True)
     updatedBy = models.IntegerField(default=1)
     updatedAt = models.DateTimeField(auto_now=True, null=True)
-    
-    
+
+class Farm(models.Model):
+    farm_id=models.BigAutoField(primary_key=True)
+    farm_name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='farms')
+class House(models.Model):
+    house_id = models.CharField(max_length=10, primary_key=True)
+    house_name = models.CharField(max_length=255)
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='houses')
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    memo = models.CharField(max_length=255,null=True, blank=True)
+    def save(self, *args, **kwargs):
+        if not self.house_id:
+            last_instance = House.objects.last()
+            if last_instance:
+                last_number = int(last_instance.house_id[1:])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+            self.house_id = f'h{new_number}'
+        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"{self.house_name} ({self.house_id})"
+class Line(models.Model):
+    line_id = models.CharField(max_length=15, primary_key=True)
+    house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='lines')
+    pole_count = models.PositiveIntegerField(default=0)  # Added field
+    def save(self, *args, **kwargs):
+        if not self.line_id:
+            last_instance = Line.objects.filter(house=self.house).last()
+            if last_instance:
+                last_number = int(last_instance.line_id[-1])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+            self.line_id = f'{self.house.house_id}l{new_number}'
+        super().save(*args, **kwargs)
+class Pole(models.Model):
+    pole_id = models.CharField(max_length=20, primary_key=True)
+    line = models.ForeignKey(Line, on_delete=models.CASCADE, related_name='poles')
+    led_count = models.PositiveIntegerField(default=0)  # Added field
+    def save(self, *args, **kwargs):
+        if not self.pole_id:
+            last_instance = Pole.objects.filter(line=self.line).last()
+            if last_instance:
+                last_number = int(last_instance.pole_id[-1])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+            self.pole_id = f'{self.line.line_id}p{new_number}'
+        super().save(*args, **kwargs)
+class LED(models.Model):
+    led_id = models.CharField(max_length=25, primary_key=True)
+    pole = models.ForeignKey(Pole, on_delete=models.CASCADE, related_name='leds')
+    is_on = models.BooleanField(default=False)
+    def save(self, *args, **kwargs):
+        if not self.led_id:
+            last_instance = LED.objects.filter(pole=self.pole).last()
+            if last_instance:
+                last_number = int(last_instance.led_id[-1])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+            self.led_id = f'{self.pole.pole_id}b{new_number}'
+        super().save(*args, **kwargs)
+
+
+
+
+
+
+
+
+
+
+
+

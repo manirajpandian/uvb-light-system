@@ -31,27 +31,28 @@
 </head>
 
 <body>
-  <div {% if request.path != '/login/' and request.path != '/reset_password' %} class="wrapper" {% endif %} class="wrapper d-flex justify-content-center align-items-center" >
-    {% if request.path != '/login/' and request.path != '/reset_password' %}
-    {% include 'includes/sidebar.html' %}
+  <div {% if request.path != '/login/' and not context.is_change_password %} class="wrapper" {% endif %} class="wrapper d-flex justify-content-center align-items-center">
+    {% if request.path != '/login/' and not context.is_change_password %}
+        {% include 'includes/sidebar.html' %}
     {% endif %}
-    <div  {% if request.path != '/login/' and request.path != '/reset_password' %}class="main-panel"{% endif %} >
+    <div {% if request.path != '/login/' and not context.is_change_password %}class="main-panel"{% endif %}>
 
-      {% include 'includes/navigation.html' %}
+        {% include 'includes/navigation.html' %}
 
-      <!-- End Navbar -->
-      <div class="content">
-        <div class="container-fluid">
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
 
-          {% block content %}{% endblock content %}
+                {% block content %}{% endblock content %}
 
+            </div>
         </div>
-      </div>
-      {% if request.path != '/login/' and request.path != '/reset_password' %}
-      {% include 'includes/footer.html' %}
-      {% endif %}
+        {% if request.path != '/login/' and not context.is_change_password %}
+            {% include 'includes/footer.html' %}
+        {% endif %}
     </div>
-  </div>
+</div>
+
 
   {% include 'includes/fixed-plugin.html' %}
 

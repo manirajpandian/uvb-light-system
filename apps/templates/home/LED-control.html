@@ -121,8 +121,6 @@
       });
     });
   });
-
-
   window.addEventListener("orientationchange", function () {
     var orientation = window.orientation;
     if (orientation === 0 || orientation === 180) {
@@ -141,733 +139,129 @@
   <p>このアプリケーションは横向きモードで最適に動作します。</p>
 </div>
 <div id="mainContainer">
-  <h3>LED管理 - 農場1</h3>
+  <h3>LED管理</h3>
+
+
   <div class="d-flex align-items-center justify-content-end justify-content-between">
     <h4 class="my-2"></h4>
-  <div class="dropdown my-2">
-    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-     <span>農場フィルター</span>
-    </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item" href="#">農場1</a>
-      <a class="dropdown-item" href="#">農場2</a>
-      <a class="dropdown-item" href="#">農場3</a>
-      <!-- Add more dropdown items if needed -->
+    
+    <div class="dropdown my-2">
+        <form id="farmForm" method="post" action='{% url "LED_control" %}'>
+            {% csrf_token %}
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span>農場フィルター</span>
+            </button>
+            
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for farm in choice_farm %}
+                    <a class="dropdown-item" href="#" onclick="selectFarm('{{ farm.farm_id }}')">
+                        {{ farm.farm_name }}
+                    </a>
+                {% endfor %}
+            </div>
+            <input type="hidden" id="selected_farm" name="selected_farm" value="">
+        </form>
     </div>
+</div>
+{% if led_success_msg %}
+<div class=" text-center text-success" id="successMessage">
+      <div class="alert alert-info" role="alert">
+        <strong>{{ led_success_msg }}</strong>
+      </div>
+</div>
+{% endif %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="text-center" id="successMessage">
+  <div class="alert alert-info" role="alert">
+    <strong>{{ message }}</strong>
   </div>
 </div>
-  <h4>ハウス A</h4>
-  <div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-          aria-expanded="true" aria-controls="collapseOne">
-          <h4 class="card-title">レーン1</h4>
+{% endfor %}
+{% endif %}
 
-          <i class="material-icons text-danger" style="margin-left: 20px">device_thermostat</i>
-          <span style="margin-left: 4px">18°C</span>
-          <i class="material-icons text-info" style="margin-left: 20px">opacity</i>
-          <span style="margin-left: 4px">32%</span>
-          <i class="material-icons text-success" style="margin-left: 20px">grass</i>
-          <span style="margin-left: 10px">60%</span>
-          <span class="material-icons" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-            style="margin-left: 20px">sim_card_download</span>
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-        data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>LED No</th>
-              <th>光源距離</th>
-              <th>照射時間</th>
-              <th>照射</th>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-                </span></td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-                </span></td>
-              </tr>
-            </tbody>
-          </table>
+{% if selected_farm_name %}
+        <h1 class="mt-4">{{ selected_farm_name }}</h1>
+    {% endif %}
+  <div class="accordion mt-4" id="accordionExample">
+    {% if houses|length > 0 %}
+      {% for house in houses %}
+      
+      <h4 class="mt-4">{{ house.house_name }}</h4>
+      <div class="accordion" id="accordionExample">
+          {% for line in house.lines.all %}
+              <div class="accordion-item">
+                  <h2 class="accordion-header" id="heading{{ line.line_id }}">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                              data-bs-target="#collapse{{ line.line_id }}" aria-expanded="false"
+                              aria-controls="collapse{{ line.line_id }}">
+                          <h4 class="card-title">レーン{{ line.line_id }}</h4>
+      
+                          <!-- Other header content -->
+                      </button>
+                  </h2>
+                  <div id="collapse{{ line.line_id }}" class="accordion-collapse collapse"
+                aria-labelledby="heading{{ line.line_id }}" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <table class="table table-striped">
+                        <thead class="text-primary-emphasis">
+                            <th>LED No</th>
+                            <th>光源距離</th>
+                            <th>照射時間</th>
+                            <th>照射</th>
+                        </thead>
+                        <tbody>
+                            {% for pole in line.poles.all|dictsort:"pole_id" %}
+                                {% for led in pole.leds.all|dictsort:"led_id" %}
+                                    <tr>
+                                        <td>{{ led.led_id }}</td>
+                                        <td>{{ pole.light_distance }}</td>
+                                        <td>{{ pole.illumination_time }}</td>
+                                        <td>
+                                          無 <label class="switch">
+                                            <input type="checkbox" class="colorToggle" />
+                                            <span class="slider round"></span>
+                                        </label> 有 </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+    {% endfor %}
+</div>
+                  
+          {% endfor %}
       </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingTwo">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-          aria-expanded="false" aria-controls="collapseTwo">
-          <h4 class="card-title">レーン2</h4>
-          <i class="material-icons text-danger" style="margin-left: 20px">device_thermostat</i>
-          <span style="margin-left: 4px">18°C</span>
-          <i class="material-icons text-info" style="margin-left: 20px">opacity</i>
-          <span style="margin-left: 4px">32%</span>
-          <i class="material-icons text-success" style="margin-left: 20px">grass</i>
-          <span style="margin-left: 10px">60%</span>
-          <span class="material-icons" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-            style="margin-left: 20px">sim_card_download</span>
-        </button>
-      </h2>
-      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-        data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>LED No</th>
-              <th>光源距離</th>
-              <th>照射時間</th>
-
-              <th>照射</th>
-
-              {% comment %} <th>記入</th> {% endcomment %}
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingThree">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-          data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          <h4 class="card-title">レーン3</h4>
-          <i class="material-icons text-danger" style="margin-left: 20px">device_thermostat</i>
-          <span style="margin-left: 4px">18°C</span>
-          <i class="material-icons text-info" style="margin-left: 20px">opacity</i>
-          <span style="margin-left: 4px">32%</span>
-          <i class="material-icons text-success" style="margin-left: 20px">grass</i>
-          <span style="margin-left: 10px">60%</span>
-          <span class="material-icons" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-            style="margin-left: 20px">sim_card_download</span>
-        </button>
-      </h2>
-      <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-        data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>LED No</th>
-              <th>光源距離</th>
-              <th>照射時間</th>
-
-              <th>照射</th>
-
-              {% comment %} <th>記入</th> {% endcomment %}
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      
+    
+  
+      {% else %}
+      
+      <div class="text-center">
+        <h4 class="text-warning">ハウスがありません</h4>
     </div>
   </div>
-
-  <h4 class="mt-4">ハウス B</h4>
-  <div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-          data-bs-target="#collapseOne1" aria-expanded="false" aria-controls="collapseOne1">
-          <h4 class="card-title">レーン1</h4>
-          <i class="material-icons text-danger" style="margin-left: 20px">device_thermostat</i>
-          <span style="margin-left: 4px">18°C</span>
-          <i class="material-icons text-info" style="margin-left: 20px">opacity</i>
-          <span style="margin-left: 4px">32%</span>
-          <i class="material-icons text-success" style="margin-left: 20px">grass</i>
-          <span style="margin-left: 10px">60%</span>
-          <span class="material-icons" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-            style="margin-left: 20px">sim_card_download</span>
-        </button>
-      </h2>
-      <div id="collapseOne1" class="accordion-collapse collapse" aria-labelledby="headingOne"
-        data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>LED No</th>
-              <th>光源距離</th>
-              <th>照射時間</th>
-
-              <th>照射</th>
-
-              {% comment %} <th>記入</th> {% endcomment %}
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingTwo">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-          data-bs-target="#collapseTwo2" aria-expanded="false" aria-controls="collapseTwo2">
-          <h4 class="card-title">レーン2</h4>
-          <i class="material-icons text-danger" style="margin-left: 20px">device_thermostat</i>
-          <span style="margin-left: 4px">18°C</span>
-          <i class="material-icons text-info" style="margin-left: 20px">opacity</i>
-          <span style="margin-left: 4px">32%</span>
-          <i class="material-icons text-success" style="margin-left: 20px">grass</i>
-          <span style="margin-left: 10px">60%</span>
-          <span class="material-icons" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-            style="margin-left: 20px">sim_card_download</span>
-        </button>
-      </h2>
-      <div id="collapseTwo2" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-        data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>LED No</th>
-              <th>光源距離</th>
-              <th>照射時間</th>
-
-              <th>照射</th>
-
-              {% comment %} <th>記入</th> {% endcomment %}
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>2m</td>
-                <td>00:02:34</td>
-
-                <td> 無 <label class="switch">
-                  <input type="checkbox" class="colorToggle" />
-                  <span class="slider round"></span>
-                </label> 有 </td>
-
-                {% comment %} <td class="text-warning"><span class="material-icons" role="button">
-                    text_snippet {% endcomment %}
-                  </span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="overflow-y: auto;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">ハウスA</h1>
-          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
-          <span role="button" class="material-icons">sim_card_download</span>
-        </div>
-
-        <div class="modal-body">
-          <div class="mt-4 mb-2">レーン１ 　LED１　光源距離　2m</div>
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>日付</th>
-              <th>時間</th>
-              <th>照射時間</th>
-              <th>照射</th>
-
-            </thead>
-            <tbody>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-danger">
-                  OFF
-                </td>
-                
-              </tr>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-success">
-                  ON
-                </td>
-                
-              </tr>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-danger">
-                  OFF
-                </td>
-                
-              </tr>
-
-            </tbody>
-          </table>
-          <div class="mt-4 mb-2">レーン１ 　LED2　光源距離　2m</div>
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>日付</th>
-              <th>時間</th>
-              <th>照射時間</th>
-              <th>照射</th>
-
-            </thead>
-            <tbody>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-danger">
-                  OFF
-                </td>
-                
-              </tr>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-success">
-                  ON
-                </td>
-                
-              </tr>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-danger">
-                  OFF
-                </td>
-                
-              </tr>
-
-            </tbody>
-          </table>
-          <div class="mt-4 mb-2">レーン１ 　LED3　光源距離　2m</div>
-          <table class="table table-striped">
-            <thead class="text-primary-emphasis">
-              <th>日付</th>
-              <th>時間</th>
-              <th>照射時間</th>
-              <th>照射</th>
-
-            </thead>
-            <tbody>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-danger">
-                  OFF
-                </td>
-                
-              </tr>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-success">
-                  ON
-                </td>
-                
-              </tr>
-              <tr>
-                <td>9/30</td>
-                <td>10:30:24</td>
-                <td>00:02:34</td>
-                <td class="text-danger">
-                  OFF
-                </td>
-                
-              </tr>
-
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">戻る</button>
-        </div>
-      </div>
-    </div>
-  </div>
+      {% endif %}
+   
 </div>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+
+function selectFarm(farmId) {
+
+  var farmForm = document.getElementById('farmForm');
+    farmForm.action = '/LED_control/' + farmId + '/';
+    document.getElementById('selected_farm').value = farmId;
+    farmForm.submit();
+}
+
+</script>
+{% endblock javascripts %}

@@ -8,6 +8,8 @@
       justify-content: flex-end;
       align-items: center;
     }
+
+
   </style>
 {% endblock stylesheets %} 
 
@@ -28,17 +30,19 @@
         {% if error_message %}
         <p class="text-danger">{{ error_message }}</p>
         {% endif %}
-        <form method="post" action=""　autocomplete="off">
+        <form id="plantForm" method="post" action=""　autocomplete="off">
             {% csrf_token %}
             <div class="form-group">
-                <label class="bmd-label-floating" for="plantname">作物名</label>
+                <label class="bmd-label-floating" for="plant_name">作物名</label>
                 {{ form.plant_name }}
+                <span class="text-danger" id="plantNameMsg"></span>
             </div>
             <br>
     
             <div class="form-group">
                 <label class="bmd-label-floating" for="distance">光源距離(cm)</label>
                 {{ form.distance }}
+                <span class="text-danger" id="distanceMsg"></span>
             </div>
             <br>
             <div class="row align-items-center"">
@@ -47,8 +51,8 @@
                 </div>
                 <div class="col-1">
                     <div class="form-group">
-                    <label class="bmd-label-floating" for="time">hh</label>
-                    <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" max="99">
+                    <label class="bmd-label-floating" for="hour">hh</label>
+                    <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" >
                     </div>
                 </div>
                 <div class="col-0.25">
@@ -56,8 +60,8 @@
                 </div>
                 <div class="col-1">
                     <div class="form-group">
-                        <label class="bmd-label-floating" for="time">mm</label>
-                        <input type="number" class="form-control time-input" id="minute" maxlength="2" max="59">
+                        <label class="bmd-label-floating" for="minute">mm</label>
+                        <input type="number" class="form-control time-input" id="minute" maxlength="2" >
                     </div>
                 </div>
                 <div class="col-0.25">
@@ -65,12 +69,14 @@
                 </div>
                 <div class="col-1">
                     <div class="form-group">
-                        <label class="bmd-label-floating" for="time">ss</label>
-                        <input type="number" class="form-control time-input" id="second" maxlength="2" max="59">
+                        <label class="bmd-label-floating" for="second">ss</label>
+                        <input type="number" class="form-control time-input" id="second" maxlength="2">
                     </div>
                 </div>
             </div>
+            <span class="text-danger" id="timeMsg"></span>
             {{ form.time_required }}
+            <br>
             <br>
             <div class="form-group">
                 <label class="bmd-label-floating" for="remarks">備考</label>
@@ -80,9 +86,9 @@
                 <a href="/plant_setting">
                     <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
                     {% if show == 'true' %}
-    <button type="submit" id="addBtn" class="btn btn-success" onclick="validateAndCombine()">変更</button>
+    <button type="submit" id="updateBtn" class="btn btn-success" >変更</button>
     {% else %}
-                <button type="submit" class="btn btn-success" onclick="validateAndCombine()">追加</button>
+                <button type="submit" id="addBtn" class="btn btn-success" >追加</button>
                 {% endif %}
             </div>
         </form>
@@ -96,42 +102,91 @@
      
 
 {% block javascripts %}
+
+
 <script>
-function validateAndCombine() {
-        var hour = document.getElementById('hour').value;
-        var minute = document.getElementById('minute').value;
-        var second = document.getElementById('second').value;
-        if (hour < 0 || hour > 99) {
-        alert('Invalid hour value. Please ensure that hour is between 0 and 99.');
-        return;
+document.getElementById('id_plant_name').addEventListener('input', function() {
+    document.getElementById('plantNameMsg').innerText = '';
+});
+
+document.getElementById('id_distance').addEventListener('input', function() {
+    document.getElementById('distanceMsg').innerText = '';
+});
+
+document.getElementById('hour').addEventListener('input', function() {
+    document.getElementById('timeMsg').innerText = '';
+});
+
+document.getElementById('minute').addEventListener('input', function() {
+    document.getElementById('timeMsg').innerText = '';
+});
+
+document.getElementById('second').addEventListener('input', function() {
+    document.getElementById('timeMsg').innerText = '';
+});
+document.getElementById('plantForm').addEventListener('submit', function(event) {
+    var plantInput = document.getElementById('id_plant_name').value;
+    var distanceInput = document.getElementById('id_distance').value;
+    var hour = document.getElementById('hour').value;
+    var minute = document.getElementById('minute').value;
+    var second = document.getElementById('second').value;
+
+
+    document.getElementById('plantNameMsg').innerText = '';
+    document.getElementById('distanceMsg').innerText = '';
+    document.getElementById('timeMsg').innerText = '';
+
+    if (plantInput === '') {
+            document.getElementById('plantNameMsg').innerText = '作物名を入力してください。';
+            event.preventDefault(); 
+        }
+    
+    if (distanceInput === '' ) {
+        document.getElementById('distanceMsg').innerText = '距離を入力してください。';
+        event.preventDefault();
+        } else if (distanceInput <= 0){
+            document.getElementById('distanceMsg').innerText = '距離は0より大きくなければなりません。';
+            event.preventDefault();
+        }
+    
+    if (hour < 0 ){
+        document.getElementById('timeMsg').innerText = '時間はマイナスであってはなりません。';
+        event.preventDefault(); 
+    }else if(hour > 99 ){
+        document.getElementById('timeMsg').innerText = '時間は 99 を超えてはなりません。';
+        event.preventDefault();
+    }else if(minute > 59 ){
+        document.getElementById('timeMsg').innerText = '分は 59 を超えてはなりません。';
+        event.preventDefault();
+    }else if(minute < 0 ){
+        document.getElementById('timeMsg').innerText = '分は 59 を超えてはなりません。';
+        event.preventDefault();
+    }else if(second > 59 ){
+        document.getElementById('timeMsg').innerText = '秒は 59 を超えてはなりません。';
+        event.preventDefault();
+    }else if(second < 0 ){
+        document.getElementById('timeMsg').innerText = '秒は 59 を超えてはなりません。';
+        event.preventDefault();
     }
 
-    // Check if minute is within valid range
-    if (minute < 0 || minute > 59) {
-        alert('Invalid minute value. Please ensure that minute is between 0 and 59.');
-        return;
+    var combinedTime = ('00' + hour).slice(-2) + ':' + ('00' + minute).slice(-2) + ':' + ('00' + second).slice(-2);
+    document.getElementById('id_time_required').value = combinedTime;
+    
+    if (combinedTime === '00:00:00'){
+        document.getElementById('timeMsg').innerText = '時間を入力してください。';
+        event.preventDefault(); 
     }
+});
 
-    // Check if second is within valid range
-    if (second < 0 || second > 59) {
-        alert('Invalid second value. Please ensure that second is between 0 and 59.');
-        return;
+document.addEventListener("DOMContentLoaded", function () {
+    var timeRequiredValue = document.getElementById('id_time_required').value;
+    if (timeRequiredValue) {
+        var parts = timeRequiredValue.split(":");
+        document.getElementById("hour").value = parseInt(parts[0]);
+        document.getElementById("minute").value = parseInt(parts[1]);
+        document.getElementById("second").value = parseInt(parts[2]);
     }
-
-        // Combine values into a single format
-        var combinedTime = ('00' + hour).slice(-2) + ':' + ('00' + minute).slice(-2) + ':' + ('00' + second).slice(-2);
-        document.getElementById('id_time_required').value = combinedTime;
-    }
-    document.addEventListener("DOMContentLoaded", function () {
-            var timeRequiredValue = document.getElementById('id_time_required').value;
-            if (timeRequiredValue) {
-                var parts = timeRequiredValue.split(":");
-                document.getElementById("hour").value = parseInt(parts[0]);
-                document.getElementById("minute").value = parseInt(parts[1]);
-                document.getElementById("second").value = parseInt(parts[2]);
-
-            }
-        });    
+});
 
 </script>
 {% endblock javascripts %}

@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
+{% extends "layouts/base.html" %} {% block title %} 管理者 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
@@ -71,14 +71,14 @@
 {% block content %}
 <div class="flex-container">
   <h3>管理者</h3>
-  <a href="/new_add_user"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+  <a href="/add_user"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
 </div>
 {% if success_message %}
 <div class=" text-center text-success" id="successMessage">
-      <div class="alert alert-info" role="alert">
-        <strong>{{ success_message }}</strong>
-      </div>
+        <div class="alert alert-info" role="alert">
+          <strong>{{ success_message }}</strong>
+        </div>
 </div>
 {% endif %}
 
@@ -109,27 +109,26 @@
             </thead>
             {% if page.object_list|length > 0 %}
             <tbody>
-              {% for user in page.object_list %}
-              {% if not user.isDeleted %}
+              {% for user, profile in page.object_list %}
               <tr>
-                <td>{{ user.user_id }}</td>
-                <td>{{ user.username }}</td>
+                <td>{{ user.id }}</td>
+                <td>{{ user.first_name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{% if user.role_id == '1' %} 管理者 {% else %} ユーザ {% endif %}</td>
+                <td>{% if profile.role_id == '1' %}管理者{% else %}ユーザ{% endif %}</td>
                 <td>
-                  {% if user.role_id == '1' %}
-                  -
+                  {% if user.is_superuser %}
+                  管理者
                   {% else %}
-                  <form method="post" action="" autocomplete="off">
+                  <form method="POST" action="" autocomplete="off">
                     {% csrf_token %}
-                    <input type="hidden" name="user_id" value={{user.user_id}}>
-                    {% if user.isActive %}
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    {% if user.is_active %}
                     <input type="hidden" name="is_active" value="False">
                     {% else %}
                     <input type="hidden" name="is_active" value="True">
                     {% endif %}
                     無 <label class="switch">
-                      <input type="checkbox" class="colorToggle" {% if user.isActive %}checked{% endif %}
+                      <input type="checkbox" class="colorToggle" {% if user.is_active %}checked{% endif %}
                         onchange="this.form.submit()" />
                       <span class="slider round"></span>
                     </label> 有
@@ -137,18 +136,17 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% if user.role_id == '1' %}
+                  {% if user.is_superuser %}
                   管理者
                   {% else %}
-                  <a href="{% url 'update_user' user.user_id %}" style="color: #ff9800;"><span>編集</span></a>
+                  <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
                   &nbsp; &nbsp;|&nbsp;&nbsp;
-                  <a href="#" data-toggle="modal" class="text-danger" data-target="#userDeleteModal"
-                    data-user-id="{{ user.user_id }}" data-csrf-token={{ csrf_token }}
-                    data-user-name="{{ user.username }}"><span>削除</span></a>
+                  <a href="#" data-toggle="modal" class="text-danger deleteButton" data-target="#userDeleteModal"
+                    data-user-id="{{ user.id }}" data-csrf-token="{{ csrf_token }}"
+                    data-first-name="{{ user.first_name }}"><span>削除</span></a>
                   {% endif %}
                 </td>
               </tr>
-              {% endif %}
               {% endfor %}
             </tbody>
             {% else %}
@@ -156,15 +154,14 @@
               <tr>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td></td>
                 <td class="text-warning">データがありません</td>
+                <td></td>
                 <td></td>
               </tr>
             </tbody>
             {% endif %}
           </table>
-          <!-- if you need use it {% if page.object_list|length > 6 %}{% endif %} -->
+
           <!-- Pagination Section  -->
           <div class="flex-container">
             <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
@@ -172,51 +169,56 @@
               <ul class="pagination justify-content-end">
                 <li class="page-item">
                   {% if page.has_previous %}
-                  <a class="page-link" href="{% url 'user_list' %}?page={{ page.previous_page_number }}"
-                    tabindex="-1">前</a>
+                  <a class="page-link" href="?page=1" tabindex="-1">最初</a>
+                  {% endif %}
+                </li>
+                <li class="page-item">
+                  {% if page.has_previous %}
+                  <a class="page-link" href="?page={{ page.previous_page_number }}">前</a>
                   {% endif %}
                 </li>
                 {% for num_page in page.paginator.page_range %}
                 {% if page.number == num_page %}
                 <li class="page-item active">
-                  <a class="page-link" href="{% url 'user_list' %}?page={{ num_page }}">{{ num_page }}<span
-                      class="sr-only">(current)</span></a>
+                  <span class="page-link">{{ num_page }}<span class="sr-only">(current)</span></span>
                 </li>
                 {% else %}
                 <li class="page-item">
-                  <a class="page-link" href="{% url 'user_list' %}?page={{ num_page }}">{{ num_page }}<span
-                      class="sr-only">(current)</span></a>
+                  <a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a>
                 </li>
                 {% endif %}
                 {% endfor %}
                 <li class="page-item">
                   {% if page.has_next %}
-                  <a class="page-link" href="{% url 'user_list' %}?page={{ page.next_page_number }}">次</a>
+                  <a class="page-link" href="?page={{ page.next_page_number }}">次</a>
+                  {% endif %}
+                </li>
+                <li class="page-item">
+                  {% if page.has_next %}
+                  <a class="page-link" href="?page={{ page.paginator.num_pages }}">最後</a>
                   {% endif %}
                 </li>
               </ul>
             </nav>
           </div>
-
           <!--Delete Modal -->
           <div class="modal fade" id="userDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">削除</h5>
+                  <h5 class="modal-title" id="exampleModalLabel"><span class="text-danger" id="userNameSpan"></span> - 削除</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  ユーザー<span id="userNameSpan"></span> を削除してもよろしいですか？
+                  ユーザー<span class="text-danger" id="userNameSpan"></span> を削除してもよろしいですか？
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
-                  <form id="deleteForm" action="" method="POST">
+                  <form id="deleteForm" method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="user_id" value="">
                     <button type="button" id="deleteButton" class="btn btn-danger">削除</button>
                   </form>
                 </div>
@@ -255,44 +257,23 @@
       successMessage.style.display = 'none';
     }
   }, 5000);
-
-  // Delete api and bootsratp modal open and close functions 
   document.addEventListener("DOMContentLoaded", function () {
-    var deleteButton = document.getElementById("deleteButton");
+    const deleteButtons = document.querySelectorAll(".deleteButton");
+    const deleteForm = document.getElementById("deleteForm");
+    const userNameSpan = document.getElementById("userNameSpan");
 
-    $('#userDeleteModal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget); // Button that triggered the modal
-      var userId = button.data('user-id'); // Extract info from data-* attributes
-      var userName = button.data('user-name');
-      var csrfToken = button.data('csrf-token');
-      var modal = $(this);
-      modal.find('#userNameSpan').text(userName);
-      console.log(userId);
-      deleteButton.addEventListener("click", function () {
-        // Making a DELETE request to the API
-        fetch('/delete_user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-          },
-          body: JSON.stringify({ 'user_id': userId })
-        })
-          // .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            $('#userDeleteModal').modal('hide');
-            // Redirect to user_list after 3 seconds
-            setTimeout(function () {
-              window.location.href = '/user_list';
-            }, 1500);
-            var successMessage = document.getElementById('deleteSuccessMessage');
-            successMessage.innerHTML = "ユーザ" + userName + " が削除されました。";
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
+    deleteButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        currentUserId = this.getAttribute("data-user-id");
+        const userName = this.getAttribute("data-first-name");
+        userNameSpan.innerHTML = userName;
+        $("#userDeleteModal").modal("show");
       });
+    });
+
+    document.getElementById("deleteButton").addEventListener("click", function () {
+      deleteForm.action = `/delete_user/${currentUserId}/`;
+      deleteForm.submit();
     });
   });
 </script>

@@ -39,27 +39,24 @@
   }
 </style>
 {% endblock stylesheets %} {% block content %}
-
+<div class="loader"></div>
 <div class="row justify-content-center align-items-center">
   <div class="col-12">
     <div class="card" style="min-width: 364px;">
-      {% comment %} <div class="card-avatar text-center">
-        <div class="card-header card-header-primary">
-          <h4 class="card-title">ログイン</h4>
-        </div>
-      </div> {% endcomment %}
       <div class="card-body">
-       <form role="form" method="post" action="">
+        <form role="form" method="post" action="">
           {% comment %} Company Logo {% endcomment %}
           <div class="card-avatar text-center">
             <img class="img rounded-circle" src="/static/assets/img/company_logo1.png" id="profile-image" />
             <br>
             <h4 class="card-title"><b>ログイン</b></h4>
             <h6 class="card-category">
-              {% if msg %}
-              <span class="text-danger">{{ msg | safe }}</span>
-              {% else %} アカウントにログインしてください。 {% endif %}
-            </h6> 
+              {% if forgot_password_success_msg %}
+              <div class="text-center">
+                <span id="forgot_password_message" class="text-success"> {{ forgot_password_success_msg }}</span>
+              </div>
+              {% endif %}
+            </h6>
           </div>
 
           {% comment %} User ID {% endcomment %}
@@ -83,7 +80,7 @@
               </div>
               {% if form.email.errors %}
               {% for error in form.email.errors %}
-                <span class="text-danger">有効なメールアドレスを入力してください。</span>
+              <span class="text-danger">有効なメールアドレスを入力してください。</span>
               {% endfor %}
               {% endif %}
             </div>
@@ -122,48 +119,45 @@
               </button>
             </div>
             <div class="col-12 text-center mt-3">
-              <a class="text-primary" data-toggle="modal" data-target="#ForgotModal">パスワードをお忘れですか?</a>
-
-              <a href="/reset_password">
-                <span class="material-icons">
-                  lock_reset
-                </span>
-              </a>
-
+              <a class="text-primary" id="forgotModal" data-toggle="modal" data-target="#ForgotModal">パスワードをお忘れですか?</a>
             </div>
-
           </div>
-          <!-- &nbsp; &nbsp; 
-            <span class="pull-right">
-              Don't have an account? <a href="{% url 'register' %}" class="text-primary">Create</a>
-            </span> -->
         </form>
-         <!--Forgot Modal -->
-         <div class="modal fade" id="ForgotModal" tabindex="-1" aria-labelledby="ForgotModalLabel"
-         aria-hidden="true">
-         <div class="modal-dialog modal-dialog-centered">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h5 class="modal-title" id="ForgotModalLabel"> パスワードのリセット </h5>
-               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                 <span aria-hidden="true">&times;</span>
-               </button>
-             </div>
-             <div class="modal-body">
-               <div class="col-md-12">
-                <div class="form-group">
-                  <label class="bmd-label-floating">メール</label>
-                  {{ form.email }}
+        <!--Forgot Modal -->
+        <div class="modal fade" id="ForgotModal" tabindex="-1" aria-labelledby="ForgotModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ForgotModalLabel"> パスワードのリセット </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {% if forgot_password_message %}
+                <div class="text-center">
+                  <span id="forgot_password_message" class="text-danger">{{ forgot_password_message }}</span>
                 </div>
-               </div>
-             </div>
-             <div class="modal-footer">
-               <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-               <button type="button" class="btn btn-primary">送信</button>
-             </div>
-           </div>
-         </div>
-       </div>
+                {% endif %}
+                <form action="" method="POST" role="form" id="forgotForm">
+                  {% csrf_token %}
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label class="bmd-label-floating">メール</label>
+                      <input type="email" name="email" class="form-control" id="FPEmail" {% if email %}
+                        value="{{ email }}" {% endif %}required>
+                    </div>
+                    <span class="text-danger" id="emailErrorSpan"></span>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                <button type="button" id="emailSendBtn" class="btn btn-primary">送信</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -172,4 +166,47 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    var forgotPasswordMessage = "{{ forgot_password_message }}";
+    $(document).ready(function () {
+      if (forgotPasswordMessage != 'None') {
+        // Show the modal
+        console.log('forgotPasswordMessage>>>', forgotPasswordMessage);
+        $("#ForgotModal").modal("show");
+      }
+    });
+
+    const forgotButton = document.getElementById("forgotModal");
+    const forgotForm = document.getElementById("forgotForm");
+    const emailInput = document.getElementById('FPEmail');
+    const emailSpan = document.getElementById('emailErrorSpan')
+
+    forgotButton.addEventListener("click", function () {
+      $("#ForgotModal").modal("show");
+    });
+    document.getElementById('FPEmail').addEventListener('input', function () {
+      emailSpan.innerText = '';
+      forgot_password_messageSpan = document.getElementById('forgot_password_message')
+      if (forgot_password_messageSpan.innerText) {
+        forgot_password_messageSpan.innerText = ''
+      }
+    });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    document.getElementById("emailSendBtn").addEventListener("click", function () {
+      if (!emailInput.value) {
+        emailSpan.innerText = 'メールアドレスを入力してください。';
+        $("#ForgotModal").modal("show");
+      } else if (!emailRegex.test(emailInput.value)) {
+        emailSpan.innerText = '有効なメールアドレスを入力してください。';
+        $("#ForgotModal").modal("show");
+      } else {
+        forgotForm.action = '/forgot_password';
+        forgotForm.submit();
+      }
+    });
+  });
+</script>
+{% endblock javascripts %}
