@@ -446,8 +446,7 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <!-- <form role="form" action="" class="login-box" method="" id = "wholeform"> -->
-                        
+                    <form role="form" action="index.html" class="login-box">
                         <div class="tab-content" id="main_form">
                             <!-- ハウス名登録 -->
                             <div class="tab-pane active" role="tabpanel" id="step1">
@@ -456,63 +455,41 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">農家名</label>
-                                            <select name="userName" class="form-control" id="user_name">
-                                                <option value="" selected="selected" disabled>
-                                                    選択してください
-                                                </option>
-                                                {% for user in choice_user %}
-                                                 <option value="{{ user.id }}">{{ user.first_name }}</option>
-                                                 {% endfor %}
-                                            </select>
+                                            <label class=" bmd-label-floating">農家名 *</label>
+                                            <input class="form-control" id="farmerName" type="text" name="farmerName"
+                                                placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">ハウス名 <span class="text-danger">*</span></label>
+                                            <label class=" bmd-label-floating">ハウス名 *</label>
                                             <input class="form-control" id="houseName" type="text" name="houseName"
                                                 placeholder="" />
                                         </div>
                                     </div>
-                                    
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
-
-                                     <div class="col-md-3 mt-4"> 
+                                    <div class="col-md-6 mt-3">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">作物名 <span class="text-danger">*</span></label>
+                                            <label class=" bmd-label-floating">作物名 *</label>
                                             <select name="plantName" class="form-control" id="plantName">
                                                 <option value="" selected="selected" disabled>
                                                     選択してください
                                                 </option>
-                                                {% for plant in choice_plant %}
-                                                 <option value="{{ plant.plant_id }}">{{ plant.plant_name }}</option>
-                                                 {% endfor %}
+                                                <option value="きゅうり">きゅうり</option>
+                                                <option value="りんご">りんご</option>
+                                                <option value="いちご">いちご</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 mt-4">
-                                        <div class="form-group">
-                                            <label class=" bmd-label-floating">農場名 <span class="text-danger">*</span></label>
-                                            <select name="farmName" class="form-control" id="farmName">
-                                                <option value="" selected="selected" disabled>
-                                                    選択してください
-                                                </option>
-                                                {% for farm in choice_farm %}
-                                                 <option value="{{ farm.farm_id }}">{{ farm.farm_name }}</option>
-                                                 {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                               
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating" for="memo">メモ</label>
-                                            <textarea name = "memo" class="form-control" id="memo" rows="3"></textarea>
+                                            <label class=" bmd-label-floating" for="formControlTextarea">メモ</label>
+                                            <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -532,7 +509,7 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">レーンの数 <span class="text-danger">*</span></label>
+                                            <label class=" bmd-label-floating">レーンの数 *</label>
                                             <input class="form-control" id="N-leanCount" type="text" name="leanCount"
                                                 placeholder="" />
                                         </div>
@@ -541,7 +518,7 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">１レーンのポールの数 <span class="text-danger">*</span></label>
+                                            <label class=" bmd-label-floating">１レーンのポールの数 *</label>
                                             <input class="form-control" id="N-poleCount" type="text"
                                                 name="laneCountPerPole" placeholder="" />
                                         </div>
@@ -550,7 +527,7 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">1ポールのLEDの数 <span class="text-danger">*</span></label>
+                                            <label class=" bmd-label-floating">1ポールのLEDの数 *</label>
                                             <input class="form-control" type="text" id="N-LEDCount" name="LEDcount"
                                                 placeholder="" />
                                         </div>
@@ -601,26 +578,15 @@
                                 </ul>
                             </div>
                             <!-- 確認 -->
-                            
                             <div class="tab-pane" role="tabpanel" id="step3">
-                                
                                 <h4 class="text-center mt-3"> 確認 </h4>
-                                <form action="" method="post" id="" role="form" autocomplete="off">
-                                    {% csrf_token %}
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-3 mt-4">
-                                        <div class="form-group bmd-form-group is-focused">
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
                                             <label class=" bmd-label-floating">農家名</label>
                                             <input class="form-control" id="farmerName" type="text" name="farmerName"
                                                 placeholder="" />
-                                        </div>
-                                    </div>
-                                        <div class="col-md-3 mt-4">
-                                        <div class="form-group bmd-form-group is-focused">
-                                            <label class=" bmd-label-floating">農場名</label>
-                                            <input class="form-control" type="text" id="farmNameReg"
-                                                name="farmNameReg" placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -642,35 +608,35 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
-                                        <div class="form-group bmd-form-group is-focused">
+                                        <div class="form-group">
                                             <label class=" bmd-label-floating">レーンの数</label>
-                                            <input class="form-control" type="text" id="laneCountReg" name="laneCount" placeholder="" />
+                                            <input class="form-control" type="text" name="laneCount" placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
-                                        <div class="form-group bmd-form-group is-focused">
+                                        <div class="form-group">
                                             <label class=" bmd-label-floating">１レーンのポールの数</label>
-                                            <input class="form-control" type="text" name="laneCountPerPole" id="polePLC"
+                                            <input class="form-control" type="text" name="laneCountPerPole"
                                                 placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
-                                        <div class="form-group bmd-form-group is-focused">
+                                        <div class="form-group">
                                             <label class=" bmd-label-floating">1ポールのLEDの数</label>
-                                            <input class="form-control" type="text" name="ledCountPerpole" id="ledPPC" placeholder="" />
+                                            <input class="form-control" type="text" name="houseName" placeholder="" />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
 
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
-                                        <div class="form-group bmd-form-group is-focused">
-                                            <label class=" bmd-label-floating" for="memoReg">メモ</label>
-                                            <textarea name = "memoReg" class="form-control" id="memoReg" rows="3"></textarea>
+                                        <div class="form-group">
+                                            <label class=" bmd-label-floating" for="formControlTextarea">メモ</label>
+                                            <textarea class="form-control" id="formControlTextarea" rows="3"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -682,18 +648,15 @@
                                         </button>
                                     </li>
                                     <li>
-                                        <button type="submit" id="registerBtn" class="btn btn-success">
+                                        <button type="button" id="registerBtn" class="btn btn-success">
                                             登録
                                         </button>
                                     </li>
                                 </ul>
                             </div>
-                        </form>
                             <div class="clearfix"></div>
                         </div>
-
-                    
-                    <!-- </form> -->
+                    </form>
 
                 </div>
             </div>
@@ -904,9 +867,6 @@
             localStorage.removeItem('poleCountPerLine')
             localStorage.removeItem('plantName')
             localStorage.removeItem('houseName')
-            localStorage.removeItem('memo')
-            localStorage.removeItem('user_name')
-            localStorage.removeItem('farmName')
             window.location.pathname = '/house_list'
         })
         // houseName value 
@@ -941,39 +901,9 @@
                     LEDCountArray.push(subArray);
                 }
                 console.log('leanCount & poleCountArray & LEDCountArray', leanCount, poleCountArray, LEDCountArray);
-
-                let laneCountDisplay = document.getElementById('laneCountReg')
-                laneCountDisplay.value = leanCount 
-                let poleCountDisplay = document.getElementById('polePLC')
-                poleCountDisplay.value = poleCountArray 
-                let ledCountDisplay = document.getElementById('ledPPC')
-                ledCountDisplay.value = LEDCountArray 
-                
             }
         })
-        //memo
-        $('#memo').change(function (e) {
-            let memo = e.target.value
-            localStorage.setItem('memo', memo)
-            var storedMemoValue = localStorage.getItem('memo')
-            $('#memoReg').val(storedMemoValue);
-        })
-        //farmerName
-        $('#user_name').change(function (e) {
-            let farmerName = e.target.value
-            localStorage.setItem('user_name', farmerName)
-            var storedMemoValue = localStorage.getItem('user_name')
-            $('#farmerName').val(storedMemoValue);
-        })
-        //farmName
-        $('#farmName').change(function (e) {
-            let farmName = e.target.value
-            localStorage.setItem('farmName', farmName)
-            var storedMemoValue = localStorage.getItem('farmName')
-            $('#farmNameReg').val(storedMemoValue);
-        })
     });
-    
 </script>
 
 {% endblock javascripts %}
