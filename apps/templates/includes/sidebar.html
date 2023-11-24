@@ -13,12 +13,15 @@
           <p>ダッシュボード</p>
         </a>
       </li>
+      {% if user_role_id == '1' or user_role_id == '2'  %}
       <li class="nav-item {% if 'LED_control' in segment %} active {% endif %}">
         <a class="nav-link" href="/LED_control">
             <i class="material-icons">wb_incandescent</i>
           <p>LED管理</p>
         </a>
       </li>
+      {% endif %}
+      {% if user_role_id == '1' %}
       <li class="nav-item {% if 'house_list' in request.path or 'add_house' in request.path  %} active {% endif %}">
         <a class="nav-link" href="/house_list">
           <i class="material-icons">warehouse</i>
@@ -38,12 +41,15 @@
           <p>農家管理</p>
         </a>
       </li>
+      {% endif %}
+      {% if user_role_id == '0' or  user_role_id == '1' %}
       <li class="nav-item {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} active {% endif %}">
         <a class="nav-link" href="/user_list">
             <i class="material-icons">manage_accounts</i>
             <p>管理者</p>
         </a>
     </li>
+    {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">
           <i class="material-icons">logout</i>

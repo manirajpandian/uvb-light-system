@@ -21,11 +21,13 @@
       {% endif %}
       {% if request.path != '/login/' %}
       <ul class="navbar-nav">
+        <!-- {{ user_role_id }}  -->
+        <p class="text-center">{{ user.first_name }}</p> 
         <li class="nav-item dropdown">
           <a class="nav-link d-flex align-items-center justify-content-center" href="#" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false">
-            {% if context.profile_image.url  %}
-            <img class="img rounded-circle" src="{{ context.profile_image.url }}" alt="Profile Image" width="40"
+            {% if user_profile_image  %}
+            <img class="img rounded-circle" src="{{ user_profile_image }}" alt="Profile Image" width="40"
               height="40">
             {% else %}
             <img class="img rounded-circle" src="/static/assets/img/default.png" alt="Default Image" width="40"

@@ -35,8 +35,8 @@
         {% endif %}
 
         <div class="card-avatar text-center">
-          {% if context.profile_image %}
-            <img class="img rounded-circle" id="profile-image" src="{{ context.profile_image.url }}" alt="Profile Image">
+          {% if profile_image %}
+            <img class="img rounded-circle" id="profile-image" src="{{ profile_image.url }}" alt="Profile Image">
         {% else %}
             <img class="img rounded-circle" id="profile-image" src="/static/assets/img/default.png" alt="Default Image">
         {% endif %}
@@ -47,7 +47,7 @@
 
         <div class="text-center">
           <h6 class="">
-            <b class="text-gray">ID: </b><span>{{ context.id }}</span>
+            <b class="text-gray">ID: </b><span>{{ id }}</span>
           </h6>
         </div>
         <!-- Form for getting the input fields  -->
@@ -60,21 +60,24 @@
               <div class="form-group">
                 <label class="bmd-label-floating">氏名</label>
                 <input type="text" name="first_name" id="firstName" class="form-control"
-                  value="{{ context.first_name }}">
+                  value="{{ first_name }}">
               </div>
               <span id="FNspan"></span>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">メール</label>
-                <input type="email" name="email" class="form-control" value="{{ context.email }}" disabled>
+                <input type="email" name="email" class="form-control" value="{{ email }}" disabled>
               </div>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">役割</label>
-                <input type="text" name="role_id" class="form-control" value="{{ context.role_id }}" disabled>
-              </div>
+                <input type="text" name="role_id" class="form-control" 
+                  {% if user_role_id == "0" %} value="BEAM TECH スーパー管理者" 
+                  {% elif user_role_id == "1" %} value="管理者" 
+                  {% else %} value="ユーザー" {% endif %} disabled>
+            </div>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">

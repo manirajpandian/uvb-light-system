@@ -19,7 +19,18 @@ from django.contrib.auth.models import User
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'dashboard'}
+    print('request.user.id',request.user.id)
+    current_user_id = request.user.id
+    session_profile_obj, created = Profile.objects.get_or_create(user_id=current_user_id)
+
+    user_profile_image = request.session.get('user_profile_image')
+    request.session['role_id'] = session_profile_obj.role_id
+    user_role_id = request.session.get('role_id')
+
+    context = {'segment': 'dashboard',
+               'user_profile_image': user_profile_image,
+               'user_role_id':user_role_id
+               }
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -111,7 +122,11 @@ def pages(request):
 # House list 
 
 def house_list(request):
-    context={}
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context={'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id
+            }
     html_template = loader.get_template('home/house-list.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -181,8 +196,21 @@ def add_house(request):
         return redirect('/house_list')
 
 def  farm_manage (request):
-    context={}
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context={'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id
+            }
     html_template = loader.get_template('home/farm_manage.html')
+    return HttpResponse(html_template.render(context, request))
+
+def  add_farm (request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context={'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id
+            }
+    html_template = loader.get_template('home/add-farm.html')
     return HttpResponse(html_template.render(context, request))
 
 # Add New Plant 

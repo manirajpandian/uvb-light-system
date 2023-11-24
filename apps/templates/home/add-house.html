@@ -594,7 +594,7 @@
                                         </button>
                                     </li>
                                     <li>
-                                        <button type="button" class="default-btn next-step">
+                                        <button type="button" class="default-btn next-step" id="LEDCountGen">
                                             次
                                         </button>
                                     </li>
@@ -821,6 +821,24 @@
                         newNode.append(inputNode);
                         childNode.append(newNode);
                     }
+                    var poleInputElement = $('.poleInput');
+                    var inputValuesArray = [];
+
+                    poleInputElement.on('keyup', function() {
+                        console.log('Element clicked');
+
+                        poleInputElement.each(function (index, element) {
+                            var value = $(element).val();
+                            console.log('index', index);
+                            console.log('inputValues index>>>', index, value);
+                            inputValuesArray[index] = value;
+                        });
+
+                        // Log the array with all values
+                        console.log('Input values array:', inputValuesArray);
+                        localStorage.setItem('LEDCount',JSON.stringify(inputValuesArray))
+                    });
+
                 }
             });
 
@@ -855,32 +873,38 @@
             // Set the maximum height after finding it
             setMaxContentHeight(maxHeight);
         });
+        $(document).on("click", "#LEDCountGen", function () {
+            let coustomLeanCount = localStorage.getItem('leanCount')
+            let coustomPoleCount = JSON.parse(localStorage.getItem('poleCountPerLine'))
+            let LEDSampleArray = []
+            for (let i = 0; i < coustomLeanCount; i++) {
+                LEDSampleArray.push([0]);
+            }
+            console.log('coustomPoleCount',coustomPoleCount);
+                for (let i = 0; i < coustomPoleCount.length; i++) {
+                console.log('index>>>>>',i);
+                
+                console.log('LEDSampleArray',i,LEDSampleArray[i]);
+                for (let j = 1; j < coustomPoleCount[i]; j++) {
+                    LEDSampleArray[i].push(0);
+                    
+                }
+                console.log('LEDSampleArray',LEDSampleArray);
+        }
+        console.log('>>>>result',JSON.parse(localStorage.getItem('LEDSampleArray')));
+        localStorage.setItem('LEDSampleArray',JSON.stringify(LEDSampleArray))
+        });
 
         var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
 
-        for (var i = 0; i < polePerLine.length; i++) {
-            var sampleArray = []; // create a new instance of sampleArray
-            for (let j = 0; j < polePerLine[i]; j++) {
-                sampleArray.push('');
-            }
-            poleInputValues.push(sampleArray);
-            // console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
-        }
-        $(document).on("input", ".poleInput", function () {
-            $(".poleInput").each(function (index, element) {
-                console.log('index>>>>', index);
-                for (var i = 0; i < poleInputValues.length; i++) {
-                    console.log('first loop values!!!!!!', poleInputValues[i]);
-                    if (i === index) {
-                        for (let j = 0; j < poleInputValues[i].length; j++) {
-                            poleInputValues[i][j] = (j === 0) ? $(this).val() : ''; // set value at 0th index and empty string for other indices
-                            console.log('This is the final value', poleInputValues);
-                            localStorage.setItem("LEDCount", JSON.stringify(poleInputValues));
-                        }
-                    }
-                }
-            });
-        });
+        // for (var i = 0; i < polePerLine.length; i++) {
+        //     var sampleArray = []; // create a new instance of sampleArray
+        //     for (let j = 0; j < polePerLine[i]; j++) {
+        //         sampleArray.push('');
+        //     }
+        //     poleInputValues.push(sampleArray);
+        //     // console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
+        // }
         // Load input values from localStorage
         var savedValues = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
         for (var i = 0; i < savedValues.length; i++) {
