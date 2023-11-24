@@ -25,9 +25,9 @@
         {% if messages %}
           {% for message in messages %}
             {% if message.tags == 'success' %}
-              <p class="text-success text-center">{{ message }}</p>
+              <p class="text-success text-center" id="successMessage">{{ message }}</p>
             {% elif message.tags == 'error' %}
-              <p class="text-danger text-center">{{ message }}</p>
+              <p class="text-danger text-center" id="successMessage">{{ message }}</p>
             {% else %}
               <p>{{ message }}</p>
             {% endif %}
@@ -38,7 +38,7 @@
           {% if context.profile_image %}
             <img class="img rounded-circle" id="profile-image" src="{{ context.profile_image.url }}" alt="Profile Image">
         {% else %}
-            <img class="img rounded-circle" id="profile-image" src="/static/assets/img/company_logo1.png" alt="Default Image">
+            <img class="img rounded-circle" id="profile-image" src="/static/assets/img/default.png" alt="Default Image">
         {% endif %}
           <div class="camera-icon m-3">
             <i id="upload-icon" class="material-icons cursor-pointer text-primary">camera_alt</i>
@@ -46,8 +46,8 @@
         </div>
 
         <div class="text-center">
-          <h6 class="text-gray">
-            <b>ID: </b><span>{{ context.id }}</span>
+          <h6 class="">
+            <b class="text-gray">ID: </b><span>{{ context.id }}</span>
           </h6>
         </div>
         <!-- Form for getting the input fields  -->
