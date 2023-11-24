@@ -5,6 +5,8 @@
 
 from django.urls import path, re_path
 from apps.home import views
+from apps.LED import sensorviews
+# from LED import Lviews
 
 urlpatterns = [
 
@@ -24,6 +26,7 @@ urlpatterns = [
     path('add_plant',views.add_plant, name='add_plant'),
     path('update_plant/<str:pk>',views.update_plant,name='update_plant'),
     path('delete_plant/<int:plant_id>/', views.delete_plant, name='delete_plant'),
+    path('sensor_view/', sensorviews.sensor_view, name='sensor_view'),
    
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
