@@ -1,0 +1,307 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Sensors Data {% endblock %}
+
+{% block stylesheets %}
+
+<style>
+    .container {
+      text-align: center;
+      margin-top: 50px;
+    }
+  
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 20px;
+    }
+  
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+  
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+  
+    .flex-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 15px;
+      width: 15px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+  
+    input:checked+.slider {
+      background-color: #66bb6a;
+    }
+  
+    input:checked+.slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(16px);
+    }
+  
+    input:checked+.slider+.toggle-text {
+      left: 35px;
+    }
+  
+    #rotateScreenMessage {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      padding: 20% 0;
+    }
+  
+    @media screen and (orientation: landscape) {
+      #rotateScreenMessage {
+        display: none;
+      }
+  
+      #mainContainer {
+        display: block;
+      }
+    }
+  
+    @media screen and (orientation: portrait) {
+      #rotateScreenMessage {
+        display: block;
+      }
+  
+      #mainContainer {
+        display: none;
+      }
+    }
+  </style>
+  {% endblock stylesheets %}
+
+{% block content %}
+
+<h3><u>Sensor Data :</u></h3>
+
+{% comment %} <div class = " sensordata " style = "text-align : center; ">
+    <h1 >Sensor Data</h1>
+   
+    <p id="temperature"> <h4><b>Temperature: </b></h4>{{ temperature }}</p>
+    <p id="humidity"> <h4><b>Humidity: </b> </h4>{{ humidity }}</p>
+    <p id="soil_moisture"> <h4><b>Soil Moisture: </b> </h4>{{ soil_moisture }}</p>
+    <p id="Rbi_id"> <h4><b>Rbi-id : </b> </h4>{{ Rbi }}</p>
+</div> {% endcomment %}
+<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis">
+            
+              <th> <b>Rpi-id </b></th>
+              <th><b>Temperature</b></th>
+              <th><b>Humidity</b></th>
+              <th><b>Soil_moisture</b></th>
+            </thead>
+            <tbody>
+              <tr>
+             
+                <td>{{ Rbi }}</td>
+                <td>{{ temperature }}</td>
+                <td>{{ humidity }}</td>
+                <td>{{ soil_moisture }}</td>
+                
+
+              </tr>
+              
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+<br>
+<br>
+
+<h3><u>LED Control :</u></h3>
+<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis">
+              <th>LED No</th>
+              <th>LED On History</th>
+              <th>LED Off History</th>
+              <th>Button</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+                <td> OFF <label class="switch">
+                  <input type="checkbox" class="colorToggle" data-led="1" />
+                  <span class="slider round"></span>
+                </label> ON </td>
+
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+
+                <td> OFF <label class="switch">
+                  <input type="checkbox" class="colorToggle" data-led="2" />
+                  <span class="slider round"></span>
+                </label> ON</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+
+                <td> OFF <label class="switch">
+                  <input type="checkbox" class="colorToggle" data-led="3" />
+                  <span class="slider round"></span>
+                </label> ON </td>
+
+
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>2m</td>
+                <td>00:02:34</td>
+
+                <td> OFF <label class="switch">
+                  <input type="checkbox" class="colorToggle" data-led="4"/>
+                  <span class="slider round"></span>
+                </label> ON </td>
+
+
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    {% comment %} // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all the sliders with the class 'colorToggle'
+        var sliders = document.querySelectorAll('.colorToggle');
+
+        // Add a change event listener to each slider
+        sliders.forEach(function(slider) {
+            slider.addEventListener('change', function() {
+                // Get the LED number from the 'data-led' attribute
+                var ledNumber = this.getAttribute('data-led');
+
+                // Log the LED number to the console
+                console.log('LED ' + ledNumber + ' toggled');
+            });
+        });
+    }); {% endcomment %}
+
+     
+    // Wait for the DOM to be ready
+    {% comment %} document.addEventListener('DOMContentLoaded', function() {
+        // Get all the sliders with the class 'colorToggle'
+        var sliders = document.querySelectorAll('.colorToggle');
+
+        // Add a change event listener to each slider
+        sliders.forEach(function(slider) {
+            slider.addEventListener('change', function() {
+                // Get the LED number and CSRF token from the 'data-led' and 'data-csrf' attributes
+                var ledNumber = this.getAttribute('data-led');
+                var csrfToken = this.getAttribute('data-csrf');
+
+                // Log the LED number to the console
+                console.log('LED ' + ledNumber + ' toggled');
+
+                // Send an AJAX request to the toggle_led view
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/toggle_led/', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                
+                // Set the CSRF token in the request headers
+                xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+                // Include the LED number in the request payload
+                var data = 'led_number=' + ledNumber;
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            // Handle the success response
+                            console.log('Server response:', xhr.responseText);
+                        } else {
+                            // Handle the error response
+                            console.error('Server error:', xhr.status, xhr.statusText);
+                        }
+                    }
+                };
+
+                xhr.send(data);
+            });
+        });
+    }); {% endcomment %}
+</script>
+
+<script>
+  $(document).ready(function () {
+    $(".colorToggle").on("change", function () {
+      var ledNo = $(this).data("led");
+      var isChecked = $(this).prop("checked");
+      updateLedStatus(ledNo, isChecked);
+    });
+
+    function updateLedStatus(ledNo, isChecked) {
+      $.ajax({
+        type: "POST",
+        url: "/mqtt_sub/",
+        data: {
+          ledNo: ledNo,
+          isChecked: isChecked,
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        success: function (response) {
+          // Handle success if needed
+          //console.log(response);
+        },
+        error: function (error) {
+          // Handle error if needed
+          //console.log(error);
+        },
+      });
+    }
+  });
+</script>
+
+{% endblock javascripts %}
