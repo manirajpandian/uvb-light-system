@@ -1,7 +1,7 @@
 from django.core.mail import send_mail
 from django.conf import settings
 
-def send_forgot_password_mail(email, token):
+def send_forgot_password_mail(email, token, farm_id):
     base_url = settings.BASE_URL
     link = f'{base_url}change_password/{token}'
     subject = 'パスワードの設定'
@@ -15,7 +15,8 @@ def send_forgot_password_mail(email, token):
 
             ★！現段階ではまた登録は完了しておりません！★
             ※ご本人様確認のため、上記URLへ「24時間以内」にアクセスしアカウントの本登録を完了いただけますようお願いいたします。
-
+            
+            農場ID：{farm_id}
             ID：{email}
 
             ご不明な点がございましたら、このメールへご返信いただくか、

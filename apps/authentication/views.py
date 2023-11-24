@@ -27,27 +27,33 @@ def login_view(request):
             email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password")
             print(username, email, password)
-            if User.objects.filter(email=email).exists():
-                user = authenticate(request,username=username, email=email, password=password)
-                if user is not None:
-                    # Login the user
-                    login(request, user)
-                    return redirect("/")
+            if User.objects.filter(username=username).exists():
+                if User.objects.filter(email=email).exists():
+                    user = authenticate(request,username=username, email=email, password=password)
+                    if user is not None:
+                        # Login the user
+                        login(request, user)
+                        request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
+                        return redirect("/")
+                    else:
+                        msg = '無効な認証'
                 else:
-                    msg = '無効な認証'
+                    msg = 'メールが不正です'
             else:
-                msg = 'メールとユーザは存在しません'
+                msg = '⽣産者IDが不正です'
         else:
             msg = 'バリデーションエラー'
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
     email = request.session.pop('email',None)
-    print('forgot_password_message',forgot_password_message)
+    print('forgot_password_message',)
     return render(request, "accounts/login.html", {"form": form, "msg": msg,'forgot_password_message': forgot_password_message, 'forgot_password_success_msg':forgot_password_success_msg, 'email':email})
 
 # user list and active/disable
 @login_required
 def user_list(request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
     try:
         user_list = User.objects.all().order_by('id')
         profile_list = Profile.objects.filter(user__in=user_list)
@@ -57,7 +63,11 @@ def user_list(request):
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
 
-        context = {'page': page, 'user_profile_list': user_profile_list}
+        context = {'page': page, 
+                   'user_profile_list': user_profile_list,
+                   'user_profile_image': user_profile_image,
+                    'user_role_id':user_role_id
+                }
 
         if request.method == "POST":
             user_id = request.POST.get('user_id')
@@ -65,9 +75,9 @@ def user_list(request):
             user_obj = User.objects.get(id=user_id)
             user_obj.is_active = is_active
             user_obj.save()
-            success_message = "ユーザーステータスの変更に成功しました"
-            context.update({'user_profile_list': user_profile_list, 'success_message': success_message})
-            return render(request, 'home/admin.html', context)
+            update_success_message = 'ユーザー詳細が正常に更新されました'
+            messages.success(request, update_success_message)
+            return redirect('/user_list')
 
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
@@ -79,6 +89,8 @@ def user_list(request):
 # update/edit user 
 @login_required
 def update_user(request, pk):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
     try:
         user_obj = get_object_or_404(User, id=pk)
         profile_obj = get_object_or_404(Profile, user_id=pk)
@@ -101,6 +113,8 @@ def update_user(request, pk):
             'show': 'true',
             'first_name': user_obj.first_name,
             'role_id': profile_obj.role_id,
+            'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id
         }
         return render(request, 'home/add-user.html', context)
 
@@ -114,9 +128,14 @@ def update_user(request, pk):
 @login_required
 def add_user(request):
     current_user_id = request.user.id 
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
     try:
         if request.method == "GET":
-            context = {'current_user_id':current_user_id}
+            context = {'current_user_id':current_user_id,
+                    'user_profile_image': user_profile_image,
+                    'user_role_id':user_role_id
+                    }
             return render(request, 'home/add-user.html', context)
         else:
             first_name = request.POST['first_name']
@@ -130,7 +149,9 @@ def add_user(request):
                     'first_name': first_name,
                     'email': email,
                     'role_id': role_id,
-                    'user_id':user_id
+                    'user_id':user_id,
+                    'user_profile_image': user_profile_image,
+                    'user_role_id':user_role_id
                 }
 
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
@@ -270,11 +291,14 @@ def forgot_password(request):
                 return redirect('/forgot_password/')
             
             user_obj = User.objects.get(email=email)
+            farm_id = str(uuid.uuid4())[:6].upper()
             token = str(uuid.uuid4())
+            user_obj.username = farm_id
+            user_obj.save()
             profile_obj = Profile.objects.get(user=user_obj)
             profile_obj.forget_password_token = token
             profile_obj.save()
-            send_forgot_password_mail(user_obj.email, token)
+            send_forgot_password_mail(user_obj.email, token, farm_id)
             request.session['forgot_password_success_msg'] = '入力したメールアドレスにメールが送信されました。'
             
             return redirect('/login/')
@@ -287,23 +311,25 @@ def forgot_password(request):
 
 
 def user_profile(request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context={
+        'user_profile_image': user_profile_image,
+        'user_role_id':user_role_id
+        }
     try:
         current_user_id = request.user.id
         user_obj = get_object_or_404(User, id=current_user_id)
         profile_obj, created = Profile.objects.get_or_create(user_id=current_user_id)
         
-        role_mapping = {
-            '0': 'BEAM TECH スーパー管理者',
-            '1': '管理者',
-        }
-        role_id = role_mapping.get(profile_obj.role_id, 'ユーザー')
 
         context = {
             'first_name': user_obj.first_name,
             'id': user_obj.username,
             'email': user_obj.email,
-            'role_id': role_id,
             'profile_image': profile_obj.image or None,
+            'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id
         }
 
         if request.method == 'POST':
@@ -333,5 +359,5 @@ def user_profile(request):
     except Exception as e:
         print('Error', e)
 
-    return render(request, 'home/page-user.html', {'context': context})
+    return render(request, 'home/page-user.html',  context)
 
