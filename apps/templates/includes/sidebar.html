@@ -44,12 +44,24 @@
             <p>管理者</p>
         </a>
     </li>
+
+    <li class="nav-item ">
+      <a class="nav-link" href="/suman">
+          <i class="material-icons">manage_accounts</i>
+          <p>センサーデータ</p>
+      </a>
+  </li>
+
+
+
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">
           <i class="material-icons">logout</i>
           <p>ログアウト</p>
         </a>
       </li>
+
+      
 
       {% else %} {% endif %}
     </ul>
