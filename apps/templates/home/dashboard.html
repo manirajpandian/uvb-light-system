@@ -19,31 +19,45 @@
 
 <h3>ダッシュボード</h3>
 <div class="row justify-content-around">
+
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
         <h3 class="text-center">ユーザーの数</h3> 
       </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">5</h1>
+        <h1 class="card-title">{{ user_count }}</h1>
       </div>
     </div>
   </div>
+
+  <div class="col-lg-3">
+    <div class="card text-center custom-card-height color1">
+      <div class="card-header"> 
+        <h3 class="text-center">管理者の数</h3> 
+      </div>
+      <div class="card-body d-flex flex-column justify-content-center align-items-center">
+        <h1 class="card-title">{{ admin_count }}</h1>
+      </div>
+    </div>
+  </div>
+
   <div class="col-lg-3 ">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
-        <h3 class="text-center">農家の数</h3> 
+        <h3 class="text-center">農場の数</h3> 
       </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">50</h1>
+        <h1 class="card-title">{{ farm_count }}</h1>
       </div>
     </div>
   </div>
+
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> <h3 class="text-center">ハウスの数</h3> </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">102</h1>
+        <h1 class="card-title">{{ house_count }}</h1>
       </div>
     </div>
   </div>
@@ -52,7 +66,7 @@
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> <h3 class="text-center">使用LEDのONの数</h3> </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">60<span style="font-size:30px;">/200</span></h1>
+        <h1 class="card-title">{{ led_on_count }}<span style="font-size:30px;">/{{ led_full_count }}</span></h1>
       </div>
     </div>
 </div>
@@ -60,112 +74,84 @@
 </div>
 <br>
 <div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
-  <h3>農場1</h3>
+  <h3>{{ selected_farm_name }}</h3>
   <div class="dropdown my-2">
     <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
      <span>農場フィルター</span>
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item" href="#">農場1</a>
-      <a class="dropdown-item" href="#">農場2</a>
-      <a class="dropdown-item" href="#">農場3</a>
-    </div>
+      {% for farm in farms %}
+          <a class="dropdown-item" href="{% url 'home_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
+      {% endfor %}
+  </div>
   </div>
 </div>
+{% if houses|length > 0 %}
 
 <div class="row">
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <a href="/house_lights">
+  {% for house in houses %}
+<div class="col-lg-3 col-md-6 col-sm-6">
+    <!-- <a href="/house_lights/{{ house.house_id }}"> -->
     <div class="card card-stats" style="cursor: pointer;">
-      <div class="card-header card-header-success card-header-icon">
-        <div class="card-icon"><i class="material-icons">warehouse</i>A</div>
-        <p class="card-category">温度 / 湿度</p>
-        <h4 class="card-title" style="display: flex;align-items: center;justify-content: end;flex-wrap: wrap;">
-          <span class="material-icons text-danger">device_thermostat</span>49℃ /
-          <span class="material-icons text-info">opacity</span>49%
-        </h4>
-        <br>
-        <br>
-        <div class="card-title d-flex justify-content-between">
-          <h4>使用LEDのONの数</h4>
-          <h4>60/200</h4>
-        </div>
-      </div>
-      <div class="card-footer">
-        <div class="stats"><i class="material-icons">update</i> 現在</div>
-      </div>
-    </div>
-  </a>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <a href="/apps/templates/home/house-lights.html">
-    <div class="card card-stats" style="cursor: pointer;">
-      <div class="card-header card-header-success card-header-icon">
-        <div class="card-icon"><i class="material-icons">warehouse</i>B</div>
-        <p class="card-category">温度 / 湿度</p>
-        <h4 class="card-title" style="display: flex;align-items: center;justify-content: end;flex-wrap: wrap;">
-          <span class="material-icons text-danger">device_thermostat</span>49℃ /
-          <span class="material-icons text-info">opacity</span>49%
-        </h4>
-          <br>
-          <br>
+        <div class="card-header card-header-success card-header-icon">
+            <div class="card-icon"><i class="material-icons">warehouse</i>{{ house.house_name }}</div>
+            <p class="card-category">温度 / 湿度</p>
+            <h4 class="card-title" style="display: flex; align-items: center; justify-content: end; flex-wrap: wrap;">
+                <span class="material-icons text-danger">device_thermostat</span>0℃ /
+                <span class="material-icons text-info">opacity</span>0%
+            </h4>
+            <br>
+            <br>
             <div class="card-title d-flex justify-content-between">
-              <h4>使用LEDのONの数</h4>
-              <h4>60/200</h4>
+                <h4>使用LEDのONの数</h4>
+                <h4>{{ house.house_led_on_count }}/{{ house.total_leds }}</h4>
             </div>
-    </div>
-      <div class="card-footer">
-        <div class="stats"><i class="material-icons">update</i> 現在</div>
-      </div>
-    </div>
-  </a>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <a href="/apps/templates/home/house-lights.html">
-    <div class="card card-stats" style="cursor: pointer;">
-      <div class="card-header card-header-success card-header-icon">
-        <div class="card-icon"><i class="material-icons">warehouse</i>C</div>
-        <p class="card-category">温度 / 湿度</p>
-        <h4 class="card-title" style="display: flex;align-items: center;justify-content: end;flex-wrap: wrap;">
-          <span class="material-icons text-danger">device_thermostat</span>49℃ /
-          <span class="material-icons text-info">opacity</span>49%
-        </h4>
-        <br>
-        <br>
-        <div class="card-title d-flex justify-content-between">
-          <h4>使用LEDのONの数</h4>
-          <h4>60/200</h4>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="stats"><i class="material-icons">update</i> 現在</div>
-      </div>
-    </div>
-  </a>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <a href="/apps/templates/home/house-lights.html">
-    <div class="card card-stats" style="cursor: pointer;">
-      <div class="card-header card-header-success card-header-icon">
-        <div class="card-icon"><i class="material-icons">warehouse</i>D</div>
-        <p class="card-category">温度 / 湿度</p>
-        <h4 class="card-title" style="display: flex;align-items: center;justify-content: end;flex-wrap: wrap;">
-          <span class="material-icons text-danger">device_thermostat</span>49℃ /
-          <span class="material-icons text-info">opacity</span>49%
-        </h4>
-        <br>
-        <br>
-        <div class="card-title d-flex justify-content-between">
-          <h4>使用LEDのONの数</h4>
-          <h4>60/200</h4>
+        <div class="card-footer">
+            <div class="stats"><i class="material-icons">update</i> 現在</div>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="stats"><i class="material-icons">update</i> 現在</div>
-      </div>
     </div>
-  </a>
-  </div>
+    <!-- </a> -->
+</div>
+{% endfor %}
+{% else %}
+      <div class="text-center">
+        <h4 class="text-warning">ハウスがありません</h4>
+    </div>
+{% endif %}
+</div>
+{% if user_houses|length > 0 %}
+<div class="row">
+  {% for house in user_houses %}
+<div class="col-lg-3 col-md-6 col-sm-6">
+    <!-- <a href="/house_lights/{{ house.house_id }}"> -->
+    <div class="card card-stats" style="cursor: pointer;">
+        <div class="card-header card-header-success card-header-icon">
+            <div class="card-icon"><i class="material-icons">warehouse</i>{{ house.house_name }}</div>
+            <p class="card-category">温度 / 湿度</p>
+            <h4 class="card-title" style="display: flex; align-items: center; justify-content: end; flex-wrap: wrap;">
+                <span class="material-icons text-danger">device_thermostat</span>0℃ /
+                <span class="material-icons text-info">opacity</span>0%
+            </h4>
+            <br>
+            <br>
+            <div class="card-title d-flex justify-content-between">
+                <h4>使用LEDのONの数</h4>
+                <h4>{{ house.uHouse_led_on_count }}/{{ house.total_leds }}</h4>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="stats"><i class="material-icons">update</i> 現在</div>
+        </div>
+    </div>
+    <!-- </a> -->
+</div>
+{% endfor %}
+{% else %}
+      <div class="text-center">
+        <h4 class="text-warning">ハウスがありません</h4>
+    </div>
+{% endif %}
 </div>
 
 
