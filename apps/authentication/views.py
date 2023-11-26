@@ -15,8 +15,9 @@ from django.core.mail import send_mail
 from .models import Profile
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_protect
 from .helpers import send_forgot_password_mail
+import datetime
+from django.utils import timezone
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -46,7 +47,6 @@ def login_view(request):
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
     email = request.session.pop('email',None)
-    print('forgot_password_message',)
     return render(request, "accounts/login.html", {"form": form, "msg": msg,'forgot_password_message': forgot_password_message, 'forgot_password_success_msg':forgot_password_success_msg, 'email':email})
 
 # user list and active/disable
@@ -143,6 +143,7 @@ def add_user(request):
             role_id = request.POST['role_id']
             user_id = request.user.id
             base_url = settings.BASE_URL
+            expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
 
             if User.objects.filter(email=email).exists():
                 context = {
@@ -187,7 +188,7 @@ def add_user(request):
             user_obj.set_password('Test@123')
             user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = user_id, forget_password_token = token)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = user_id, forget_password_token = token, token_expiration_time = expiration_time)
             profile_obj.save()
 
             success_message = "ユーザが正常に追加されました"
@@ -222,55 +223,54 @@ def delete_user(request, user_id):
 
 # change password 
 
-def change_password (request, token):
-    context={}
+
+def change_password(request, token):
     try:
-        profile_obj = Profile.objects.filter(forget_password_token = token).first()
-        context={ 'is_change_password': True, 'user_id': profile_obj.user.id }
+        profile_obj = Profile.objects.filter(forget_password_token=token).first()
+
+        if profile_obj is None:
+            messages.error(request, 'Invalid or expired reset password link.')
+            return redirect('/change_password/')  # Redirect to a suitable URL
+
+        context = {'is_change_password': True, 'user_id': profile_obj.user.id}
 
         if request.method == 'POST':
-            password = request.POST['password']
-            confirm_password = request.POST['confirm_password']
-            user_id = request.POST['user_id']
+            print('timezone.now()',timezone.now())
+            print('profile_obj.token_expiration_time',profile_obj.token_expiration_time)
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirm_password')
+            user_id = request.POST.get('user_id')
 
-            if user_id is None:
-                messages.error(request, 'no user id found')
+            if not user_id:
+                messages.error(request, 'ユーザー ID が見つかりません。')
                 return redirect(f'/change_password/{token}')
-            
+
+            if not (password and confirm_password):
+                messages.error(request, 'パスワードと確認パスワードの両方を入力してください。')
+                return redirect(f'/change_password/{token}')
+
             if password != confirm_password:
-                messages.error(request, 'password error')
+                messages.error(request, 'パスワードが一致しません。')
+                return redirect(f'/change_password/{token}')
+
+            if profile_obj.token_expiration_time and timezone.now() > profile_obj.token_expiration_time:
+                messages.error(request, 'パスワード再設定リンクの有効期限が切れました。新しいパスワードをリクエストしてください。')
                 return redirect(f'/change_password/{token}')
             
-            user_obj = User.objects.get(id=user_id)
-            user_obj.set_password(password)
-            user_obj.is_active = True
-            user_obj.save()
+            else:
+                user_obj = User.objects.get(id=user_id)
+                user_obj.set_password(password)
+                user_obj.is_active = True
+                user_obj.save()
 
-            return redirect ('/login/')
+                messages.success(request, 'パスワードの変更に成功しました。新しいパスワードでログインできます。')
+                return redirect('/login/')
+
     except Exception as e:
         print(e)
-    return render(request, 'accounts/change_password.html',{'context':context})
+        messages.error(request, 'An error occurred. Please try again.')
 
-
-def register_user(request):
-    msg = None
-    success = False
-
-    if request.method == "POST":
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get("username")
-            raw_password = form.cleaned_data.get("password1")
-            user = authenticate(username=username, password=raw_password)
-
-            msg = 'User created - please <a href="/login">login</a>.'
-            success = True
-
-        else:
-            msg = 'Form is not valid'
-
-    return render(request, "accounts/register.html", { "msg": msg, "success": success})
+    return render(request, 'accounts/change_password.html', {'context': context})
 
 
 # forgot password 
@@ -293,11 +293,18 @@ def forgot_password(request):
             user_obj = User.objects.get(email=email)
             farm_id = str(uuid.uuid4())[:6].upper()
             token = str(uuid.uuid4())
+            
+            # Set expiration time for the token (24 hours from now)
+            expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+
             user_obj.username = farm_id
             user_obj.save()
+            
             profile_obj = Profile.objects.get(user=user_obj)
             profile_obj.forget_password_token = token
+            profile_obj.token_expiration_time = expiration_time  # Save the expiration time
             profile_obj.save()
+            
             send_forgot_password_mail(user_obj.email, token, farm_id)
             request.session['forgot_password_success_msg'] = '入力したメールアドレスにメールが送信されました。'
             
@@ -308,7 +315,6 @@ def forgot_password(request):
         request.session['forgot_password_message'] = 'エラーが発生しました。もう一度お試しください。'
 
     return redirect('/login/')
-
 
 def user_profile(request):
     user_profile_image = request.session.get('user_profile_image')

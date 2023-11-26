@@ -61,6 +61,13 @@
                 <span id="forgot_password_message" class="text-danger"> {{ msg }}</span>
               </div>
               {% endif %}
+              {% if messages %}
+              <div class="text-center">
+                  {% for message in messages %}
+                      <span class="text-success">{{ message }}</span>
+                  {% endfor %}
+              </div>
+              {% endif %}
             </h6>
           </div>
 
