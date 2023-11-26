@@ -100,6 +100,27 @@
       display: none;
     }
   }
+  #successMessage {
+  opacity: 0; /* Start with 0 opacity */
+  z-index: 100;
+  position: fixed;
+  top: 2%;
+  left: 50%;
+  transform: translateY(-50%, -50%);
+  transition: opacity 1.5s ease-in-out; /* Adjust the duration and timing function */
+}
+
+#successMessage.show {
+  opacity: 1; /* When the 'show' class is added, transition to 1 opacity */
+}
+
+  @media (max-width: 767px) {
+    #successMessage {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+    }
+  }
 </style>
 <script>
   
@@ -137,14 +158,14 @@
   </div>
 </div>
 {% if led_success_msg %}
-      <div class="alert alert-success" id="successMessage" role="alert">
+      <div class="alert alert-success show" id="successMessage" role="alert">
         <strong>{{ led_success_msg }}</strong>
       </div>
 {% endif %}
 
 {% if messages %}
 {% for message in messages %}
-  <div class="alert alert-success" id="successMessage" role="alert">
+  <div class="alert alert-success show" id="successMessage" role="alert">
     <strong>{{ message }}</strong>
   </div>
 {% endfor %}
