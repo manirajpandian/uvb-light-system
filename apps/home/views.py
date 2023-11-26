@@ -18,21 +18,90 @@ from django.contrib.auth.models import User
 
 
 @login_required(login_url="/login/")
-def index(request):
-    print('request.user.id',request.user.id)
-    current_user_id = request.user.id
-    session_profile_obj, created = Profile.objects.get_or_create(user_id=current_user_id)
+def index(request,farm_id=None):
+    try:
+        print('request.user.id',request.user.id)
+        current_user_id = request.user.id
+        session_profile_obj, created = Profile.objects.get_or_create(user_id=current_user_id)
 
-    user_profile_image = request.session.get('user_profile_image')
-    request.session['role_id'] = session_profile_obj.role_id
-    user_role_id = request.session.get('role_id')
+        user_profile_image = request.session.get('user_profile_image')
+        request.session['role_id'] = session_profile_obj.role_id
+        user_role_id = request.session.get('role_id')
 
-    context = {'segment': 'dashboard',
+        # Admin login active user count
+        user_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
+
+        #Super Admin login active admin count
+        admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
+
+        #Farm count under the current admin ID
+        farm_count = Farm.objects.filter(user__id=current_user_id).count()
+
+        #Active House count under the current admin ID
+        house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
+
+        #Active and Inactive LED count under the current admin ID
+        led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True).count()
+        led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id).count()
+
+        #Admin - Farm Filter and House Display
+        farms = Farm.objects.all()
+        if len(farms) > 0:
+            selected_farm_id = request.GET.get('farm_id') or farm_id
+            if selected_farm_id:
+                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
+                selected_farm = Farm.objects.get(pk=selected_farm_id)
+                selected_farm_name = selected_farm.farm_name  
+            else:
+                default_farm = Farm.objects.first()
+                houses = House.objects.filter(farm=default_farm).select_related('plant')
+                selected_farm = default_farm
+                selected_farm_name = selected_farm.farm_name
+        
+            for house in houses:
+                house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
+
+            #User House Display
+            user_houses= House.objects.filter(user__id=current_user_id).select_related('plant')
+            for house in user_houses:
+                house.uHouse_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
+        
+            context = {
+                'segment': 'dashboard',
+                'user_profile_image': user_profile_image,
+                'user_role_id':user_role_id,
+                'user_count': user_count,
+                'admin_count': admin_count,
+                'farm_count':farm_count,
+                'house_count':house_count,
+                'led_on_count':led_on_count,
+                'led_full_count':led_full_count,
+                'farms': farms,
+                'houses': houses,
+                'selected_farm_name': selected_farm_name,
+                'user_houses':user_houses
+                }
+            if request.method == "GET":
+                html_template = loader.get_template('home/dashboard.html')
+                return HttpResponse(html_template.render(context, request))
+            return redirect('')
+    
+        else:
+            context = {'segment': 'dashboard',
                'user_profile_image': user_profile_image,
-               'user_role_id':user_role_id
+               'user_role_id':user_role_id,
+               'user_count': user_count,
+               'admin_count': admin_count,
+               'farm_count':farm_count,
+               'house_count':house_count,
+               'led_on_count':led_on_count,
+               'led_full_count':led_full_count,
                }
-    html_template = loader.get_template('home/dashboard.html')
-    return HttpResponse(html_template.render(context, request))
+            html_template = loader.get_template('home/dashboard.html')
+            return HttpResponse(html_template.render(context, request))
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
 
 def house_lights(request):
     context = {'segment': 'house_lights'}
@@ -363,4 +432,21 @@ def delete_plant(request, plant_id):
                 return redirect('/plant_setting')
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
+    
+def delete_house(request, house_id, farm_id):
+    try:
+        if request.method == 'POST':
+            if house_id:
+                house = get_object_or_404(House, pk=house_id)
+                house.delete()
+                house_success_msg = f'{house.house_name}ハウスが正常に削除されました。'     # House successfully deleted
+                messages.success(request, house_success_msg)  
+                if farm_id:
+                    return redirect('house_list_with_farm', farm_id=farm_id)
+                else:
+                    return redirect('house_list')
+
+    except BrokenPipeError as e:
+        print('Exception BrokenPipeError', e)
         return HttpResponseServerError()

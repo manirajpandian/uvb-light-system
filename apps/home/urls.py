@@ -10,13 +10,11 @@ urlpatterns = [
 
     # The home page
     path('', views.index, name='home'),
-    # path('user_list', views.user_list, name='user_list'),
-    # path('add_user', views.add_user, name="add_user"),
-    # path('delete_user', views.delete_user, name='delete_user'),
-    # path('update_user',views.update_user,name='update_user'), #/<str:pk>
+    path('<int:farm_id>/', views.index, name='home_with_farm'),
     path('house_list',views.house_list, name="house_list"),
     path('house_list/<int:farm_id>/', views.house_list, name='house_list_with_farm'),
-    # path('update_house_status/<str:house_id>/', views.update_house_status, name='update_house_status'),
+    path('delete_house/<str:house_id>/', views.delete_house, name='delete_house'),
+    path('delete_house/<str:house_id>/<int:farm_id>/', views.delete_house, name='delete_house_with_farm'),
     path('add_house',views.add_house,name="add_house"),
     path('farm_manage',views.farm_manage, name="farm_manage"),
     path('house_lights',views.house_lights, name='house_lights'),

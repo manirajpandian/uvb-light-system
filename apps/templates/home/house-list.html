@@ -144,7 +144,7 @@
                                 </td>
                                 <td>
                                     <a style="color: #ff9800;" href="#">編集</a>&nbsp; &nbsp;|&nbsp;&nbsp;
-                                    <a class="text-danger" data-toggle="modal" data-target="#DeleteModal" href="#">削除</a>
+                                    <a href="#" class="text-danger deleteButton" data-house-name="{{ house.house_name }}" data-house-id="{{ house.house_id }}" data-farm-id="{{ house.farm.farm_id }}">削除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -197,6 +197,33 @@
                       </ul>
                   </nav>
               </div>
+
+              <!-- Delete House Modal -->
+<div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">ハウス削除</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Are you sure you want to delete this house? -->
+        ハウス『 <span id="houseNameSpan"></span> 』を削除してもよろしいですか？<br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+        <form id="deleteForm" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">削除</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
         </div>
       </div>
     </div>
@@ -224,6 +251,31 @@
       successMessage.style.display = 'none';
     }
   }, 5000);
+
+  document.addEventListener("DOMContentLoaded", function () {
+      const deleteButtons = document.querySelectorAll(".deleteButton");
+      const deleteForm = document.getElementById("deleteForm");
+      const houseNameSpan = document.getElementById("houseNameSpan");
+
+      let currentHouseId;
+
+      deleteButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+              currentHouseId = this.getAttribute("data-house-id");
+              const houseName = this.getAttribute("data-house-name");
+              currentFarmId = this.getAttribute("data-farm-id");
+              houseNameSpan.textContent = houseName;
+              $("#deleteModal").modal("show");
+          });
+      });
+
+      deleteForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          this.action = `/delete_house/${currentHouseId}/${currentFarmId}/`;  
+          this.submit();
+      });
+  }); 
+
 </script>
 
 
