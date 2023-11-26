@@ -62,10 +62,27 @@
     -ms-transform: translateX(26px);
     transform: translateX(16px);
   }
+  #successMessage {
+  opacity: 0; /* Start with 0 opacity */
+  z-index: 100;
+  position: fixed;
+  top: 2%;
+  left: 50%;
+  transform: translateY(-50%, -50%);
+  transition: opacity 1.5s ease-in-out; /* Adjust the duration and timing function */
+}
 
-  /* .switch input:checked+.slider+.toggle-text {
-    left: 35px;
-  } */
+#successMessage.show {
+  opacity: 1; /* When the 'show' class is added, transition to 1 opacity */
+}
+
+  @media (max-width: 767px) {
+    #successMessage {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+    }
+  }
 </style>
 {% endblock stylesheets %}
 {% block content %}
@@ -75,20 +92,20 @@
     </span>&nbsp;&nbsp;追加</button></a>
 </div>
 {% if success_message %}
-<div class=" text-center text-success" id="successMessage">
-        <div class="alert alert-info" role="alert">
+<!-- <div class=" text-center text-success" > -->
+        <span class="alert alert-success show" id="successMessage" role="alert">
           <strong>{{ success_message }}</strong>
-        </div>
-</div>
+        </span>
+<!-- </div> -->
 {% endif %}
 
 {% if messages %}
 {% for message in messages %}
-<div class="text-center" id="successMessage">
-  <div class="alert alert-info" role="alert">
+<!-- <div class="text-center" id=""> -->
+  <span class="alert alert-success show" id="successMessage" role="alert">
     <strong>{{ message }}</strong>
-  </div>
-</div>
+  </span>
+<!-- </div> -->
 {% endfor %}
 {% endif %}
 
@@ -254,11 +271,13 @@
   });
   // user active/ disabled success message 
   setTimeout(function () {
-    var successMessage = document.getElementById('successMessage');
-    if (successMessage) {
-      successMessage.style.display = 'none';
-    }
-  }, 5000);
+  var successMessage = document.getElementById('successMessage');
+  if (successMessage) {
+    successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+    successMessage.style.opacity = '0';
+  }
+}, 5000);
+
   document.addEventListener("DOMContentLoaded", function () {
     const deleteButtons = document.querySelectorAll(".deleteButton");
     const deleteForm = document.getElementById("deleteForm");

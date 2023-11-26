@@ -118,7 +118,8 @@
     setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
-      successMessage.style.display = 'none';
+      successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+    successMessage.style.opacity = '0';
     }
   }, 5000);
     const loader = document.getElementById('loader');
