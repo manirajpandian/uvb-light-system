@@ -20,10 +20,8 @@ from django.contrib.auth.models import User
 @login_required(login_url="/login/")
 def index(request,farm_id=None):
     try:
-        print('request.user.id',request.user.id)
         current_user_id = request.user.id
         session_profile_obj, created = Profile.objects.get_or_create(user_id=current_user_id)
-
         user_profile_image = request.session.get('user_profile_image')
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
@@ -324,22 +322,25 @@ def add_house(request):
         html_template = loader.get_template('home/add-house.html')
         return HttpResponse(html_template.render(context, request))
     else:
-        user_id = request.POST.get("farmerName")
+        user_id = request.POST.get("farmerId")
         house_name = request.POST.get("houseNameReg")
-        plant_id = request.POST.get("plantNameReg")
-        farm_id = request.POST.get("farmNameReg")
+        plant_id = request.POST.get("plantIdReg")
+        farm_id = request.POST.get("farmIdReg")
         memo = request.POST.get("memoReg")
         lane_count = int(request.POST.get("laneCount"))
-        pole_counts = [int(count) for count in request.POST.get("laneCountPerPole").split(",")]
-        led_counts = [int(count) for count in request.POST.get("ledCountPerpole").split(",")]
+        pole_counts = [int(count) for count in request.POST.get("arrayPolePLC").split(',')]
+        led_counts = [int(count) for count in request.POST.get("arrayLED").split(',')]
+        sum_pole_counts = int(request.POST.get("laneCountPerPole"))
+        sum_led_counts = int(request.POST.get("ledCountPerpole"))
 
         house = House(
             house_name=house_name,
             memo=memo,
             total_line_count=lane_count,  
-            total_pole_count=sum(pole_counts),  
-            total_leds=sum(led_counts),  
+            total_pole_count=sum_pole_counts,  
+            total_leds=sum_led_counts,  
             is_active=True
+
         )
         if user_id:
             user = User.objects.get(pk=user_id)
@@ -373,7 +374,7 @@ def add_house(request):
                     )
                     led.save()
 
-        return redirect('/house_list')
+        return redirect('house_list_with_farm', farm_id=farm_id)
 
 def  farm_manage (request):
     user_profile_image = request.session.get('user_profile_image')
