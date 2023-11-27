@@ -57,7 +57,8 @@ def user_list(request):
     try:
         user_list = User.objects.all().order_by('id')
         profile_list = Profile.objects.filter(user__in=user_list)
-        user_profile_list = list(zip(user_list, profile_list))
+        user_profile_list = [(user, profile) for user, profile in zip(user_list, profile_list)
+                         if not user.is_superuser and request.user.id != user.id]
 
         paginator = Paginator(user_profile_list, 5)
         page_number = request.GET.get('page')
@@ -66,7 +67,7 @@ def user_list(request):
         context = {'page': page, 
                    'user_profile_list': user_profile_list,
                    'user_profile_image': user_profile_image,
-                    'user_role_id':user_role_id
+                    'user_role_id':user_role_id,
                 }
 
         if request.method == "POST":
@@ -127,12 +128,11 @@ def update_user(request, pk):
 # add a new user 
 @login_required
 def add_user(request):
-    current_user_id = request.user.id 
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
     try:
         if request.method == "GET":
-            context = {'current_user_id':current_user_id,
+            context = {
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id
                     }
@@ -150,7 +150,6 @@ def add_user(request):
                     'first_name': first_name,
                     'email': email,
                     'role_id': role_id,
-                    'user_id':user_id,
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id
                 }
@@ -188,7 +187,7 @@ def add_user(request):
             user_obj.set_password('Test@123')
             user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = user_id, forget_password_token = token, token_expiration_time = expiration_time)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
             profile_obj.save()
 
             success_message = "ユーザが正常に追加されました"

@@ -375,6 +375,68 @@ def add_house(request):
 
         return redirect('/house_list')
 
+# update house 
+def update_house(request, farm_id):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context = {}
+
+    try:
+        farm_obj = Farm.objects.filter(farm_id=farm_id).first()
+        house_obj, created = House.objects.get_or_create(farm=farm_obj)
+        
+        if request.user.is_authenticated:
+            current_user_id = request.user.id
+            mapped_profiles = Profile.objects.filter(mapped_under=current_user_id)
+            choice_user = [profile.user for profile in mapped_profiles]
+        else:
+            choice_user = []
+
+        choice_plant = Plant.objects.all()
+        choice_farm = Farm.objects.all()
+
+        context = {
+            'segment': 'update_house',
+            'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'choice_user': choice_user,
+            'choice_plant': choice_plant,
+            'choice_farm': choice_farm,
+            'house_obj': house_obj
+        }
+
+        if request.method == "POST":
+            user_id = request.POST['user_id']
+            plant_id = request.POST['plant_id']
+            house_name = request.POST['house_name']
+
+            if house_name == '':
+                context = {
+            'segment': 'update_house',
+            'errorMessage': 'ユーザー名は空であってはなりません',
+            'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'choice_user': choice_user,
+            'choice_plant': choice_plant,
+            'choice_farm': choice_farm,
+            'house_obj': house_obj}
+                return render(request, 'home/update-house.html', context)
+            
+            house_obj.user_id = user_id
+            house_obj.plant_id = plant_id
+            house_obj.house_name = house_name
+            house_obj.save()
+
+            message = f"ハウス{house_obj.house_name} が更新されました"
+            messages.success(request, message)
+            return redirect('/house_list')
+
+    except Exception as e:
+        print('error', e)
+
+    return render(request, 'home/update-house.html', context)
+
+
 def  farm_manage (request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')

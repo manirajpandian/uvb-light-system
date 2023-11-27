@@ -63,9 +63,9 @@
               {% endif %}
               {% if messages %}
               <div class="text-center">
-                  {% for message in messages %}
-                      <span class="text-success">{{ message }}</span>
-                  {% endfor %}
+                {% for message in messages %}
+                <span class="text-success">{{ message }}</span>
+                {% endfor %}
               </div>
               {% endif %}
             </h6>
@@ -186,7 +186,6 @@
     $(document).ready(function () {
       if (forgotPasswordMessage != 'None') {
         // Show the modal
-        console.log('forgotPasswordMessage>>>', forgotPasswordMessage);
         $("#ForgotModal").modal("show");
       }
     });
