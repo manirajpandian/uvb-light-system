@@ -46,7 +46,7 @@ def login_view(request):
                 else:
                     msg = 'メールが不正です'
             else:
-                msg = '⽣産者IDが不正です'
+                msg = ' 農場IDが不正です'
         else:
             msg = 'バリデーションエラー'
     forgot_password_message = request.session.pop('forgot_password_message', None)
@@ -55,7 +55,7 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form, "msg": msg,'forgot_password_message': forgot_password_message, 'forgot_password_success_msg':forgot_password_success_msg, 'email':email})
 
 # user list and active/disable
-@login_required
+@login_required(login_url="/login/")
 def user_list(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -93,7 +93,7 @@ def user_list(request):
 
 
 # update/edit user 
-@login_required
+@login_required(login_url="/login/")
 def update_user(request, pk):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -131,7 +131,7 @@ def update_user(request, pk):
         return redirect('/user_list')
 
 # add a new user 
-@login_required
+@login_required(login_url="/login/")
 def add_user(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -204,7 +204,7 @@ def add_user(request):
     return render(request, 'home/add-user.html')
 
 # delete user 
-@login_required
+@login_required(login_url="/login/")
 def delete_user(request, user_id):
     try:
         if request.method == 'POST':
@@ -225,9 +225,8 @@ def delete_user(request, user_id):
         print(e)
     return redirect('/user_list')
 
+
 # change password 
-
-
 def change_password(request, token):
     try:
         profile_obj = Profile.objects.filter(forget_password_token=token).first()
@@ -278,7 +277,6 @@ def change_password(request, token):
 
 
 # forgot password 
-
 def forgot_password(request):
     try:
         if request.method == 'POST':
@@ -320,6 +318,7 @@ def forgot_password(request):
 
     return redirect('/login/')
 
+@login_required(login_url="/login/")
 def user_profile(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
