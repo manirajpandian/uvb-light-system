@@ -9,15 +9,15 @@ class PlantForm(forms.ModelForm):
      
         self.fields['plant_name'] = forms.CharField(
             required=False,
-            widget=forms.TextInput(attrs={'placeholder': ''})
+            widget=forms.TextInput(attrs={'placeholder': '', 'maxlength': '50'})
         )
         self.fields['distance'] = forms.FloatField(
             required=False,
-            widget=forms.TextInput(attrs={'placeholder': ''})
+            widget=forms.NumberInput(attrs={'placeholder': '', 'max': '50'})
         )
         self.fields['remarks'] = forms.CharField(
             required=False,
-            widget=forms.TextInput(attrs={'placeholder': ''})
+            widget=forms.TextInput(attrs={'placeholder': '', 'maxlength': '150'})
         )
 
         for field in self.fields:

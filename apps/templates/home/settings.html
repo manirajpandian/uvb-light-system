@@ -170,6 +170,11 @@
               <ul class="pagination justify-content-end">
                 <li class="page-item">
                   {% if page.has_previous %}
+                  <a class="page-link" href="?page=1" tabindex="-1">最初</a>
+                  {% endif %}
+                </li>
+                <li class="page-item">
+                  {% if page.has_previous %}
                   <a class="page-link" href="{% url 'plant_setting' %}?page={{ page.previous_page_number }}"
                     tabindex="-1">前</a>
                   {% endif %}
@@ -190,6 +195,11 @@
                 <li class="page-item">
                   {% if page.has_next %}
                   <a class="page-link" href="{% url 'plant_setting' %}?page={{ page.next_page_number }}">次</a>
+                  {% endif %}
+                </li>
+                <li class="page-item">
+                  {% if page.has_next %}
+                  <a class="page-link" href="?page={{ page.paginator.num_pages }}">最後</a>
                   {% endif %}
                 </li>
               </ul>

@@ -514,9 +514,11 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
-                                        <div class="form-group">
+                                        <div class="form-group text-gray">
                                             <label class=" bmd-label-floating" for="memo">メモ</label>
-                                            <textarea name = "memo" class="form-control" id="memo" rows="3"></textarea>
+                                            <textarea name = "memo" class="form-control" id="memo" rows="3" maxlength="150"></textarea>
+                                            
+                                            <span id="memoCount">0</span>/<span>150</span>
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -718,6 +720,19 @@
 {% block javascripts %}
 <!-- Add this script to your HTML file -->
 <script>
+    let memoInput = document.getElementById('memo');
+    let remarkCountSpan = document.getElementById('memoCount');
+
+    memoInput.addEventListener("input", function(event) {
+        let charCount = memoInput.value.length;
+        remarkCountSpan.textContent = charCount;
+        if (charCount>80) {
+            remarkCountSpan.style.color = 'orange'
+        }
+        if(charCount>120){
+            remarkCountSpan.style.color = 'red'
+        }
+    });
     var poleInputValues = [];
     $(document).ready(function () {
         // Check if there is a last active tab stored

@@ -30,7 +30,7 @@
         {% if error_message %}
         <p class="text-danger">{{ error_message }}</p>
         {% endif %}
-        <form id="plantForm" method="post" action=""　autocomplete="off">
+        <form id="plantForm" class="my-4" method="post" action="" autocomplete="off">
             {% csrf_token %}
             <div class="form-group">
                 <label class="bmd-label-floating" for="plant_name">作物名</label>
@@ -78,9 +78,10 @@
             {{ form.time_required }}
             <br>
             <br>
-            <div class="form-group">
+            <div class="form-group text-gray">
                 <label class="bmd-label-floating" for="remarks">備考</label>
                 {{ form.remarks }}
+                <span id="remarkCount">0</span>/<span>150</span>
             </div>
             <div class="center-container">
                 <a href="/plant_setting">
@@ -105,6 +106,21 @@
 
 
 <script>
+
+let remarkInput = document.getElementById('id_remarks');
+let remarkCountSpan = document.getElementById('remarkCount');
+
+remarkInput.addEventListener("input", function(event) {
+    let charCount = remarkInput.value.length;
+    remarkCountSpan.textContent = charCount;
+    if (charCount>80) {
+            remarkCountSpan.style.color = 'orange'
+        }
+        if(charCount>120){
+            remarkCountSpan.style.color = 'red'
+        }
+});
+
 document.getElementById('id_plant_name').addEventListener('input', function() {
     document.getElementById('plantNameMsg').innerText = '';
 });

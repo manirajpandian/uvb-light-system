@@ -75,9 +75,8 @@
         <div class="col-md-6 my-4">
           <div class="form-group">
             <label for="userName" class="bmd-label-floating">⽒名</label>
-            <input type="text" id="username" class="form-control" name="first_name" {% if show=='true'
-              %}value="{{ user_obj.first_name }}" {% else %} value="{{ context.first_name }}" {% endif %}
-              maxlength="30">
+            <input type="text" id="username" class="form-control" name="first_name" 
+            {% if show == 'true' %}value="{{ user_obj.first_name }}" {% else %} value="{{ context.first_name }}" {% endif %} maxlength="30">
           </div>
           <span class="text-danger" id="userNameMsg"></span>
         </div>
