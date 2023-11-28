@@ -175,6 +175,23 @@
     {% if houses|length > 0 %}
       {% for house in houses %}
       <h4 class="mt-4">{{ house.house_name }}</h4>
+      <div style="display: inline-block; margin-left: 20px;">
+        <i class="material-icons text-success">router</i>
+        <span style="margin-left: 4px">{{Rbi}}</span>
+    </div>
+      <div style="display: inline-block; margin-left: 20px;">
+          <i class="material-icons text-danger">device_thermostat</i>
+          <span style="margin-left: 4px">{{temperature}}</span>
+      </div>
+      <div style="display: inline-block; margin-left: 20px;">
+          <i class="material-icons text-info">opacity</i>
+          <span style="margin-left: 4px">{{humidity}}</span>
+      </div>
+      <div style="display: inline-block; margin-left: 20px;">
+          <i class="material-icons text-success">grass</i>
+          <span style="margin-left: 10px">{{soil_moisture}}</span>
+      </div>
+
       <div class="accordion" id="accordionExample">
           {% for line in house.lines.all %}
               <div class="accordion-item">
@@ -193,18 +210,18 @@
                 <div class="accordion-body">
                     <table class="table table-striped">
                         <thead class="text-primary-emphasis">
-                            <th>LED No</th>
-                            <th>光源距離</th>
-                            <th>照射時間</th>
-                            <th>照射</th>
+                          <th>LED No</th>
+                          <th>LED点灯履歴</th>
+                          <th>LED消灯履歴</th>
+                          <th>照射</th>
                         </thead>
                         <tbody>
                             {% for pole in line.poles.all|dictsort:"pole_id" %}
                                 {% for led in pole.leds.all|dictsort:"led_id" %}
                                     <tr>
-                                        <td>{{ led.led_id }}</td>
-                                        <td>{{ pole.light_distance }}</td>
-                                        <td>{{ pole.illumination_time }}</td>
+                                      <td>{{ led.led_id }}</td>
+                                      <td>{{ led.led_on_date  }}</td>
+                                      <td>{{ led.led_off_date  }}</td>
                                         <td>
                                           <form method="post" action="{% if farm and farm.farm_id %}{% url 'LED_control_farm_id' farm_id=farm.farm_id %}{% else %}{% url 'LED_control' %}{% endif %}" class="status-form" id="status-form-{{ led.led_id }}">
                                             {% csrf_token %}

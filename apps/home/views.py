@@ -16,6 +16,33 @@ from django.contrib import messages
 from apps.authentication.models import Profile
 from django.contrib.auth.models import User
 
+from .models import Raspberrypi
+import paho.mqtt.client as mqtt
+import json
+from django.utils import timezone
+import paho.mqtt.publish as publish
+
+from datetime import date, datetime
+
+
+from .models import Raspberrypi
+import paho.mqtt.client as mqtt
+import json
+from django.utils import timezone
+import paho.mqtt.publish as publish
+
+from datetime import date, datetime
+from django.db import IntegrityError
+
+
+
+
+
+broker_address = "localhost"  # Replace with your local broker address
+port = 1883
+topic_rpi_to_ec2 = "rpi_to_ec2_topic"
+topic_ec2_to_rpi = "ec2_to_rpi_topic"
+
 
 @login_required(login_url="/login/")
 def index(request,farm_id=None):
@@ -107,13 +134,115 @@ def house_lights(request):
     html_template = loader.get_template('home/house-lights.html')
     return HttpResponse(html_template.render(context, request))
 
+
+
+
+
+#LED Control - Sensor and LED Access
+sensor_data = {
+    'temperature': None,
+    'humidity': None,
+    'soil_moisture': None,
+    'raspberry_id': None,
+    'date':None
+  
+
+}
+
+latest_stored_date ={}
+current_date = date.today()
+
 #LED Control - Sensor and LED Access
 @login_required(login_url="/login/")
+
+#LED Control - Sensor and LED Access
 def LED_control(request,farm_id=None):
     try:
+        global sensor_data , latest_stored_date
+
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         farms = Farm.objects.all()
+    
+        def on_message(client, userdata, message):
+            sensor_data , latest_stored_date
+    
+            payload = json.loads(message.payload.decode())
+            print(f"Received message from MQTT: {payload}")
+
+            # Extract data from payload and save to the database
+            sensor_data['temperature'] = payload.get('temperature')
+            sensor_data['humidity'] = payload.get('humidity')
+            sensor_data['soil_moisture'] = payload.get('soil_moisture')
+            sensor_data['raspberry_id'] = payload.get('raspberry_id')
+            sensor_data['date'] = payload.get('date')
+            payload_date_str = sensor_data['date']
+            
+            if payload_date_str:
+                
+                sensor_data['date'] = datetime.strptime(payload_date_str, "%Y-%m-%d %H:%M:%S").date()
+            else:
+                print("Invalid date provided in sensor data.")
+                return
+         
+            # Inside your on_message function
+            raspberry_id = sensor_data['raspberry_id']
+
+            if raspberry_id not in latest_stored_date:
+                latest_stored_date[raspberry_id] = None
+
+            # Check if it's a new date
+            if sensor_data['date'] is not None:
+                # Get the latest record for the current day and Raspberry Pi ID
+                latest_record = Raspberrypi.objects.filter(
+                    raspberry_id=raspberry_id,
+                    date=sensor_data['date']
+                ).order_by('-date').first()
+
+                if latest_record:
+                    # Update the latest record with the new data
+                    latest_record.temperature = sensor_data['temperature']
+                    latest_record.humidity = sensor_data['humidity']
+                    latest_record.soil_moisture = sensor_data['soil_moisture']
+                    latest_record.date = sensor_data['date']
+                    latest_record.save()
+                    print("Sensor data updated in the database:", latest_record)
+                else:
+                    # Save data to the database
+                    sensor_db_data, created = Raspberrypi.objects.update_or_create(
+                        raspberry_id=raspberry_id,
+                        date=sensor_data['date'],
+                        defaults={
+                            'temperature': sensor_data['temperature'],
+                            'humidity': sensor_data['humidity'],
+                            'soil_moisture': sensor_data['soil_moisture'],
+                        }
+                    )
+
+                    if created:
+                        print("Sensor data saved to the database:", sensor_db_data)
+                    else:
+                        print("Sensor data updated in the database:", sensor_db_data)
+
+                    # Update the latest stored date for the current Raspberry Pi ID
+                    latest_stored_date[raspberry_id] = sensor_data['date']
+            else:
+                print("Invalid date provided in sensor data.")
+
+
+        # MQTT client for receiving sensor data
+        mqtt_client = mqtt.Client()
+        mqtt_client.on_message = on_message
+
+        # Connect to the MQTT broker
+        mqtt_client.connect(broker_address, port, 60)
+
+        # Subscribe to the topic where the Raspberry Pi publishes sensor data
+        mqtt_client.subscribe(topic_rpi_to_ec2)
+
+        # Start the MQTT loop in the background
+        mqtt_client.loop_start()
+        
         if len(farms) > 0:
             selected_farm_id = request.GET.get('farm_id') or farm_id
             if selected_farm_id:
@@ -131,7 +260,13 @@ def LED_control(request,farm_id=None):
                 'houses': houses,
                 'selected_farm_name': selected_farm_name,
                 'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id
+                'user_role_id':user_role_id,
+                'temperature': sensor_data['temperature'],
+                'humidity': sensor_data['humidity'],
+                'soil_moisture': sensor_data['soil_moisture'],
+                'Rbi': sensor_data['raspberry_id'],
+              
+                
                 }
             if request.method == "GET":
                 html_template = loader.get_template('home/LED-control.html')
@@ -143,16 +278,29 @@ def LED_control(request,farm_id=None):
 
                 if led_id:
                     led = LED.objects.get(pk=led_id)
-
+                    
                     if led.is_on:  
                         led.is_on = False  # Set to False
+                        led.led_off_date = timezone.now() 
                         led.save()
+                        print('button no',led.button_no)
+                        button_data = led.button_no
+                        # Publish button_no data to the topic
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data}),
+                               hostname=broker_address, port=port)
+
                         led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
             
                     else:
                         led.is_on = True  # Set to True
+                        led.led_on_date = timezone.now() 
                         led.save()
+                        button_data = led.button_no
+                        # Publish button_no data to the topic
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data}),
+                               hostname=broker_address, port=port)
+                        print('button no',led.button_no)
                         led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
 
@@ -169,6 +317,7 @@ def LED_control(request,farm_id=None):
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
+
 
 
 
