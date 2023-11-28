@@ -13,43 +13,47 @@
           <p>ダッシュボード</p>
         </a>
       </li>
-      {% if user_role_id == '1' or user_role_id == '2'  %}
+      {% if user_role_id == '1' or user_role_id == '2' %}
       <li class="nav-item {% if 'LED_control' in segment %} active {% endif %}">
         <a class="nav-link" href="/LED_control">
-            <i class="material-icons">wb_incandescent</i>
+          <i class="material-icons">wb_incandescent</i>
           <p>LED管理</p>
         </a>
       </li>
       {% endif %}
       {% if user_role_id == '1' %}
-      <li class="nav-item {% if 'house_list' in request.path or 'add_house' in request.path  %} active {% endif %}">
+      <li
+        class="nav-item {% if 'house_list' in request.path or 'add_house' in request.path or 'update_house' in segment %} active {% endif %}">
         <a class="nav-link" href="/house_list">
           <i class="material-icons">warehouse</i>
           <p>ハウス管理</p>
         </a>
       </li>
-      <li class="nav-item {% if 'plant_settings' in segment or 'add_plant' in request.path　or 'update_plant' in request.path %} active {% endif %}">
+      <li
+        class="nav-item {% if 'plant_settings' in segment or 'add_plant' in request.path　or 'update_plant' in request.path %} active {% endif %}">
         <a class="nav-link" href="/plant_setting">
           <i class="material-icons">compost</i>
           <p>作物設定</p>
         </a>
       </li>
-      {% comment %} new settings  {% endcomment %}
-      <li class="nav-item {% if '/farm_manage' in request.path or '/apps/templates/home/add-farm.html' in request.path %} active {% endif %}">
+      {% comment %} new settings {% endcomment %}
+      <li
+        class="nav-item {% if '/farm_manage' in request.path or '/apps/templates/home/add-farm.html' in request.path %} active {% endif %}">
         <a class="nav-link" href="/farm_manage">
           <i class="material-icons">agriculture</i>
           <p>農家管理</p>
         </a>
       </li>
       {% endif %}
-      {% if user_role_id == '0' or  user_role_id == '1' %}
-      <li class="nav-item {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} active {% endif %}">
+      {% if user_role_id == '0' or user_role_id == '1' %}
+      <li
+        class="nav-item {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} active {% endif %}">
         <a class="nav-link" href="/user_list">
-            <i class="material-icons">manage_accounts</i>
-            <p>管理者</p>
+          <i class="material-icons">manage_accounts</i>
+          <p>管理者</p>
         </a>
-    </li>
-    {% endif %}
+      </li>
+      {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">
           <i class="material-icons">logout</i>

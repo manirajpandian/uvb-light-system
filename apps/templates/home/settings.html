@@ -66,6 +66,27 @@
   input:checked+.slider+.toggle-text {
     left: 35px;
   }
+  #successMessage {
+  opacity: 0; /* Start with 0 opacity */
+  z-index: 100;
+  position: fixed;
+  top: 2%;
+  left: 50%;
+  transform: translateY(-50%, -50%);
+  transition: opacity 1.5s ease-in-out; /* Adjust the duration and timing function */
+}
+
+#successMessage.show {
+  opacity: 1; /* When the 'show' class is added, transition to 1 opacity */
+}
+
+  @media (max-width: 767px) {
+    #successMessage {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+    }
+  }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -87,20 +108,16 @@
 </div>
 
 {% if plant_success_msg %}
-<div class=" text-center text-success" id="successMessage">
-      <div class="alert alert-info" role="alert">
+      <div class="alert alert-success show" id="successMessage" role="alert">
         <strong>{{ plant_success_msg }}</strong>
       </div>
-</div>
 {% endif %}
 
 {% if messages %}
 {% for message in messages %}
-<div class="text-center" id="successMessage">
-  <div class="alert alert-info" role="alert">
+  <div class="alert alert-success show" id="successMessage" role="alert">
     <strong>{{ message }}</strong>
   </div>
-</div>
 {% endfor %}
 {% endif %}
 
@@ -242,7 +259,8 @@
   setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
-      successMessage.style.display = 'none';
+      successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+    successMessage.style.opacity = '0';
     }
   }, 5000);
 </script>

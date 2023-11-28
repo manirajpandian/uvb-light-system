@@ -1,0 +1,81 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} ハウス編集 {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .center-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<nav aria-label="breadcrumb" role="navigation">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/house_list">ハウス管理</a></li>
+        <li class="breadcrumb-item" aria-current="page">編集</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-body">
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 my-4">
+                    <div class="form-group">
+                        <label for="userName" class="bmd-label-floating">ユーザー名</label>
+                        <select name="user_id" class="form-control" id="user_name">
+                            {% for user in choice_user %}
+                            <option {% if house_obj.user_id==user.id %} selected {% endif %} value="{{ user.id }}">{{
+                                user.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 my-4">
+                    <div class="form-group">
+                        <label for="userName" class="bmd-label-floating">作物名</label>
+                        <select name="plant_id" class="form-control" id="plat_name">
+                            {% for plant in choice_plant %}
+                            <option {% if house_obj.plant_id==plant.plant_id %} selected {% endif %}
+                                value="{{ plant.plant_id }}">{{ plant.plant_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-6 my-4">
+                    <div class="form-group">
+                        <label for="userName" class="bmd-label-floating">ハウス名</label>
+                        <input type="text" class="form-control" name="house_name" id="houseName"
+                            value="{{ house_obj.house_name }}" maxlength="30">
+                    </div>
+                    {% if errorMessage %}
+                    <span id="errorMessage" class="text-danger">{{ errorMessage }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="center-container">
+                <a href="/house_list"><button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+                <button type="submit" class="btn btn-success">変更</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    $(document).ready(function () {
+        $('#houseName').keyup(function () {
+            $('#errorMessage').text('');
+        });
+    });
+</script>
+{% endblock javascripts %}

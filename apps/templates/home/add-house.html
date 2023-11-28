@@ -456,13 +456,13 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">農家名</label>
+                                            <label class=" bmd-label-floating">ユーザー名</label>
                                             <select name="userName" class="form-control" id="user_name">
                                                 <option value="" selected="selected" disabled>
                                                     選択してください
                                                 </option>
                                                 {% for user in choice_user %}
-                                                 <option value="{{ user.id }}">{{ user.first_name }}</option>
+                                                 <option value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}</option>
                                                  {% endfor %}
                                             </select>
                                         </div>
@@ -488,8 +488,10 @@
                                                     選択してください
                                                 </option>
                                                 {% for plant in choice_plant %}
-                                                 <option value="{{ plant.plant_id }}">{{ plant.plant_name }}</option>
+                                                 <option value="{{ plant.plant_id }}" data-plantname="{{ plant.plant_name }}">{{ plant.plant_name }}</option>
+                                                 
                                                  {% endfor %}
+                                                 
                                             </select>
                                         </div>
                                     </div>
@@ -501,8 +503,10 @@
                                                     選択してください
                                                 </option>
                                                 {% for farm in choice_farm %}
-                                                 <option value="{{ farm.farm_id }}">{{ farm.farm_name }}</option>
+                                                 <option value="{{ farm.farm_id }}" data-farmname="{{ farm.farm_name }}">{{ farm.farm_name }}</option>
+                                                 
                                                  {% endfor %}
+                                                 
                                             </select>
                                         </div>
                                     </div>
@@ -519,7 +523,7 @@
                                 </div>
                                 <ul class="list-inline pull-right">
                                     <li>
-                                        <button type="button" class="default-btn next-step">
+                                        <button type="button" class="default-btn next-step" id="firstnext" onclick="firstnext(event)">
                                             次
                                         </button>
                                     </li>
@@ -600,6 +604,7 @@
                                     </li>
                                 </ul>
                             </div>
+
                             <!-- 確認 -->
                             
                             <div class="tab-pane" role="tabpanel" id="step3">
@@ -611,9 +616,10 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
-                                            <label class=" bmd-label-floating">農家名</label>
-                                            <input class="form-control" id="farmerName" type="text" name="farmerName"
-                                                placeholder="" />
+                                            <label class=" bmd-label-floating">ユーザー名</label>
+                                            <input class="form-control" id="userNameReg" type="text" name="userNameReg"
+                                                placeholder=""  value=""/>
+                                            <input type="hidden" id="farmerId" name="farmerId">
                                         </div>
                                     </div>
                                         <div class="col-md-3 mt-4">
@@ -621,6 +627,7 @@
                                             <label class=" bmd-label-floating">農場名</label>
                                             <input class="form-control" type="text" id="farmNameReg"
                                                 name="farmNameReg" placeholder="" />
+                                                <input type="hidden" id="farmIdReg" name="farmIdReg">
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -629,14 +636,17 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ハウス名</label>
                                             <input class="form-control" type="text" id="houseNameReg"
-                                                name="houseNameReg" placeholder="" />
+                                                name="houseNameReg" placeholder=""  />
+                                            
+                                            
                                         </div>
                                     </div>
                                     <div class="col-md-3 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">作物名</label>
                                             <input class="form-control" type="text" id="plantNameReg"
-                                                name="plantNameReg" placeholder="" />
+                                                name="plantNameReg" placeholder=""  />
+                                            <input type="hidden" id="plantIdReg" name="plantIdReg">
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -651,17 +661,19 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
-                                            <label class=" bmd-label-floating">１レーンのポールの数</label>
+                                            <label class=" bmd-label-floating">ポールの数</label>
                                             <input class="form-control" type="text" name="laneCountPerPole" id="polePLC"
                                                 placeholder="" />
+                                                <input type="hidden" id="arrayPolePLC" name="arrayPolePLC">
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group bmd-form-group is-focused">
-                                            <label class=" bmd-label-floating">1ポールのLEDの数</label>
+                                            <label class=" bmd-label-floating">LEDの数</label>
                                             <input class="form-control" type="text" name="ledCountPerpole" id="ledPPC" placeholder="" />
+                                            <input type="hidden" id="arrayLED" name="arrayLED">
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -869,42 +881,12 @@
                     maxHeight = height;
                 }
             });
-
-            // Set the maximum height after finding it
             setMaxContentHeight(maxHeight);
         });
-        $(document).on("click", "#LEDCountGen", function () {
-            let coustomLeanCount = localStorage.getItem('leanCount')
-            let coustomPoleCount = JSON.parse(localStorage.getItem('poleCountPerLine'))
-            let LEDSampleArray = []
-            for (let i = 0; i < coustomLeanCount; i++) {
-                LEDSampleArray.push([0]);
-            }
-            console.log('coustomPoleCount',coustomPoleCount);
-                for (let i = 0; i < coustomPoleCount.length; i++) {
-                console.log('index>>>>>',i);
-                
-                console.log('LEDSampleArray',i,LEDSampleArray[i]);
-                for (let j = 1; j < coustomPoleCount[i]; j++) {
-                    LEDSampleArray[i].push(0);
-                    
-                }
-                console.log('LEDSampleArray',LEDSampleArray);
-        }
-        console.log('>>>>result',JSON.parse(localStorage.getItem('LEDSampleArray')));
-        localStorage.setItem('LEDSampleArray',JSON.stringify(LEDSampleArray))
-        });
+
 
         var polePerLine = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
 
-        // for (var i = 0; i < polePerLine.length; i++) {
-        //     var sampleArray = []; // create a new instance of sampleArray
-        //     for (let j = 0; j < polePerLine[i]; j++) {
-        //         sampleArray.push('');
-        //     }
-        //     poleInputValues.push(sampleArray);
-        //     // console.log('[[[[[[[[[[[[[[array]]]]]]]]]]]]]]]', poleInputValues);
-        // }
         // Load input values from localStorage
         var savedValues = JSON.parse(localStorage.getItem("poleCountPerLine")) || [];
         for (var i = 0; i < savedValues.length; i++) {
@@ -926,27 +908,25 @@
             localStorage.removeItem('lastActiveTab')
             localStorage.removeItem('leanCount')
             localStorage.removeItem('poleCountPerLine')
-            localStorage.removeItem('plantName')
-            localStorage.removeItem('houseName')
-            localStorage.removeItem('memo')
-            localStorage.removeItem('user_name')
-            localStorage.removeItem('farmName')
+            localStorage.removeItem('LEDSampleArray')
             window.location.pathname = '/house_list'
         })
+        
         // houseName value 
         $('#houseName').on('input', function (e) {
             let houseName = e.target.value
-            localStorage.setItem('houseName', houseName)
-            var storedHouseValue = localStorage.getItem('houseName')
-            $('#houseNameReg').val(storedHouseValue);
+            $('#houseNameReg').val(e.target.value);
         })
         // plantName value 
         $('#plantName').change(function (e) {
-            let plantName = e.target.value
-            localStorage.setItem('plantName', plantName)
-            var storedPlantValue = localStorage.getItem('plantName')
-            $('#plantNameReg').val(storedPlantValue);
+            let plantId = e.target.value
+            let plant_name = $(e.target).find('option:selected').data('plantname');
+            $('#plantNameReg').val(plant_name);
+            $('#plantIdReg').val(plantId);
+
         })
+
+        // lineCount, poleCount, LEDCount value
         var leanCount
         var poleCount
         var LEDCount
@@ -964,40 +944,84 @@
                     let subArray = Array.from({ length: parseInt(poleCountArray[j], 10) }, () => LEDCount);
                     LEDCountArray.push(subArray);
                 }
-                console.log('leanCount & poleCountArray & LEDCountArray', leanCount, poleCountArray, LEDCountArray);
+
+                let sumPoleCount = poleCountArray.reduce((acc, value) => acc + parseInt(value, 10), 0);
+                let sumLEDCount = LEDCountArray.reduce((acc, subArray) => acc + subArray.reduce((subAcc, value) => subAcc + parseInt(value, 10), 0),0);
 
                 let laneCountDisplay = document.getElementById('laneCountReg')
                 laneCountDisplay.value = leanCount 
+
                 let poleCountDisplay = document.getElementById('polePLC')
-                poleCountDisplay.value = poleCountArray 
+                poleCountDisplay.value = sumPoleCount
+
+                let arrayPolePLC = document.getElementById('arrayPolePLC')
+                arrayPolePLC.value = poleCountArray
+                 
                 let ledCountDisplay = document.getElementById('ledPPC')
-                ledCountDisplay.value = LEDCountArray 
+                ledCountDisplay.value = sumLEDCount 
+
+                let arrayLED = document.getElementById('arrayLED')
+                arrayLED.value = LEDCountArray
+
+                
                 
             }
         })
+        $('#LEDCountGen').click(function(e){
+
+
+        storedLaneCount = localStorage.getItem('leanCount')
+        storedPoleCount = localStorage.getItem('poleCountPerLine')
+        storedLEDCount = localStorage.getItem('LEDCount')
+        if(storedLaneCount && storedPoleCount && storedLEDCount){
+            
+
+            let poleCountArray = JSON.parse(storedPoleCount);
+            let ledCountArray = JSON.parse(storedLEDCount);
+
+            let sumPoleCount = poleCountArray.reduce((acc, value) => acc + parseInt(value, 10), 0);
+            let sumLEDCount = ledCountArray.reduce((acc, value) => acc + parseInt(value, 10), 0);
+           
+
+                let laneCountDisplay = document.getElementById('laneCountReg')
+                laneCountDisplay.value = storedLaneCount 
+
+                let poleCountDisplay = document.getElementById('polePLC')
+                poleCountDisplay.value = sumPoleCount
+
+                let arrayPolePLC = document.getElementById('arrayPolePLC')
+                arrayPolePLC.value = poleCountArray
+                 
+                let ledCountDisplay = document.getElementById('ledPPC')
+                ledCountDisplay.value = sumLEDCount 
+
+                let arrayLED = document.getElementById('arrayLED')
+                arrayLED.value = ledCountArray
+            
+        }
+    })
         //memo
         $('#memo').change(function (e) {
             let memo = e.target.value
-            localStorage.setItem('memo', memo)
-            var storedMemoValue = localStorage.getItem('memo')
-            $('#memoReg').val(storedMemoValue);
+            $('#memoReg').val(e.target.value);
         })
         //farmerName
         $('#user_name').change(function (e) {
-            let farmerName = e.target.value
-            localStorage.setItem('user_name', farmerName)
-            var storedMemoValue = localStorage.getItem('user_name')
-            $('#farmerName').val(storedMemoValue);
+            let farmerId= e.target.value
+            let user_name = $(e.target).find('option:selected').data('username');
+            $('#farmerId').val(farmerId);
+            $('#userNameReg').val(user_name);
         })
         //farmName
         $('#farmName').change(function (e) {
-            let farmName = e.target.value
-            localStorage.setItem('farmName', farmName)
-            var storedMemoValue = localStorage.getItem('farmName')
-            $('#farmNameReg').val(storedMemoValue);
+            let farmId = e.target.value
+            let farm_name = $(e.target).find('option:selected').data('farmname');
+            $('#farmIdReg').val(farmId);
+            $('#farmNameReg').val(farm_name);
         })
     });
-    
+
+   
 </script>
 
 {% endblock javascripts %}

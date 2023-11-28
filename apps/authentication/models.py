@@ -17,6 +17,7 @@ class Profile(models.Model):
     role_id = models.CharField(max_length=100, null=True)
     mapped_under = models.IntegerField(default=0,null=True)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
+    token_expiration_time = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_created=True, default=timezone.now)
 
     def __str__(self):

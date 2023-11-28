@@ -63,6 +63,30 @@
     transform: translateX(16px);
   }
 
+  #successMessage {
+    opacity: 0;
+    /* Start with 0 opacity */
+    z-index: 100;
+    position: fixed;
+    top: 2%;
+    left: 50%;
+    transform: translateY(-50%, -50%);
+    transition: opacity 1.5s ease-in-out;
+    /* Adjust the duration and timing function */
+  }
+
+  #successMessage.show {
+    opacity: 1;
+    /* When the 'show' class is added, transition to 1 opacity */
+  }
+
+  @media (max-width: 767px) {
+    #successMessage {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+    }
+  }
 </style>
 
 <div class="flex-container">
@@ -72,156 +96,163 @@
 </div>
 
 {% if house_success_msg %}
-<div class=" text-center text-success" id="successMessage">
-      <div class="alert alert-info" role="alert">
+      <div class=" alert alert-success show" id="successMessage" role="alert">
         <strong>{{ house_success_msg }}</strong>
-      </div>
 </div>
 {% endif %}
 
 {% if messages %}
 {% for message in messages %}
-<div class="text-center" id="successMessage">
-  <div class="alert alert-info" role="alert">
-    <strong>{{ message }}</strong>
-  </div>
+<div class="alert alert-success show" id="successMessage" role="alert">
+  <strong>{{ message }}</strong>
 </div>
 {% endfor %}
 {% endif %}
 
-      <div class=" row">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center justify-content-end justify-content-between">
-                <h3 class="my-2">{{ selected_farm_name }}</h3>
-            
-    <div class="dropdown my-2">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span>農場フィルター</span>
-        </button>
-        
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {% for farm in farms %}
-                <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
-            {% endfor %}
-        </div>
-    </div>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-striped">
-                  <thead class="text-primary-emphasis table-success">
-                    <th>ハウス名</th>
-                    <th>作物名</th>
-                    <th>レーンの数</th>
-                    <th>ポール数</th>
-                    <th>LEDの数</th>
-                    <th>メモ</th>
-                    <th>ステイタス</th>
-                    <th>アクション</th>
-                </thead>
-                {% if page.object_list|length > 0 %}
-                    <tbody>
-                        {% for house in page.object_list %}
-                            <tr>
-                                <td>{{ house.house_name }}</td>
-                                <td>{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">プラント 未割り当て</span>{% endif %}</td>
-                                <td>{{ house.total_line_count }}</td>
-                                <td>{{ house.total_pole_count }}</td>
-                                <td>{{ house.total_leds }}</td>
-                                <td>{{ house.memo }}</td>
-                                <td>
-                                    <form method="post" action="{% if farm and farm.farm_id %}{% url 'house_list_with_farm' farm_id=farm.farm_id %}{% else %}{% url 'house_list' %}{% endif %}" class="status-form" id="status-form-{{ house.house_id }}">
-                                      {% csrf_token %}
-                                      <input type="hidden" name="house_id" value="{{ house.house_id }}">
-                                      <input type="hidden" name="farm_id" value="{{ house.farm.farm_id }}">
-                                      無 &nbsp; <label class="switch">
-                                        <input type="checkbox" class="colorToggle" {% if house.is_active %}checked{% endif %}>
-                                        <span class="slider round"></span>
-                                      </label> &nbsp;有
-                                    </form>
-                                </td>
-                                <td>
-                                    <a style="color: #ff9800;" href="#">編集</a>&nbsp; &nbsp;|&nbsp;&nbsp;
-                                    <a href="#" class="text-danger deleteButton" data-house-name="{{ house.house_name }}" data-house-id="{{ house.house_id }}" data-farm-id="{{ house.farm.farm_id }}">削除</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                  <tbody> 
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td class="text-warning">データがありません</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  </tbody>
-                  {% endif %}
-                </table>
-     
-                <!-- Pagination Section  -->
-                <div class="flex-container">
-                  <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
-                  <nav aria-label="...">
-                      <ul class="pagination justify-content-end">
-                          <li class="page-item">
-                              {% if page.has_previous %}
-                              <a class="page-link" href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.previous_page_number }}"
-                                  tabindex="-1">前</a>
-                              {% endif %}
-                          </li>
-                          {% for num_page in page.paginator.page_range %}
-                          {% if page.number == num_page %}
-                          <li class="page-item active">
-                              <a class="page-link" href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{ num_page }}<span
-                                      class="sr-only">(current)</span></a>
-                          </li>
-                          {% else %}
-                          <li class="page-item">
-                              <a class="page-link" href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{ num_page }}<span
-                                      class="sr-only">(current)</span></a>
-                          </li>
-                          {% endif %}
-                          {% endfor %}
-                          <li class="page-item">
-                              {% if page.has_next %}
-                              <a class="page-link" href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.next_page_number }}">次</a>
-                              {% endif %}
-                          </li>
-                      </ul>
-                  </nav>
-              </div>
+<div class=" row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-end justify-content-between">
+          <h3 class="my-2">{{ selected_farm_name }}</h3>
 
-              <!-- Delete House Modal -->
-<div class="modal" id="deleteModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">ハウス削除</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Are you sure you want to delete this house? -->
-        ハウス『 <span id="houseNameSpan"></span> 』を削除してもよろしいですか？<br>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
-        <form id="deleteForm" method="post">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">削除</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+          <div class="dropdown my-2">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <span>農場フィルター</span>
+            </button>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for farm in farms %}
+              <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name
+                }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis table-success">
+              <th>ハウス名</th>
+              <th>作物名</th>
+              <th>ユーザー名</th>
+              <th>レーンの数</th>
+              <th>ポール数</th>
+              <th>LEDの数</th>
+              <th>メモ</th>
+              <th>ステイタス</th>
+              <th>アクション</th>
+            </thead>
+            {% if page.object_list|length > 0 %}
+            <tbody>
+              {% for house in page.object_list %}
+              <tr>
+                <td>{{ house.house_name }}</td>
+                <td>{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">プラント
+                    未割り当て</span>{% endif %}</td>
+                <td>{{ house.user.first_name }}</td>
+                <td>{{ house.total_line_count }}</td>
+                <td>{{ house.total_pole_count }}</td>
+                <td>{{ house.total_leds }}</td>
+                <td>{{ house.memo }}</td>
+                <td>
+                  <form method="post"
+                    action="{% if farm and farm.farm_id %}{% url 'house_list_with_farm' farm_id=farm.farm_id %}{% else %}{% url 'house_list' %}{% endif %}"
+                    class="status-form" id="status-form-{{ house.house_id }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="house_id" value="{{ house.house_id }}">
+                    <input type="hidden" name="farm_id" value="{{ house.farm.farm_id }}">
+                    無 &nbsp; <label class="switch">
+                      <input type="checkbox" class="colorToggle" {% if house.is_active %}checked{% endif %}>
+                      <span class="slider round"></span>
+                    </label> &nbsp;有
+                  </form>
+                </td>
+                <td>
+                  <a class="text-warning" href="/update_house/{{house.farm.farm_id}}">編集</a>&nbsp; &nbsp;|&nbsp;&nbsp;
+                  <a href="#" class="text-danger deleteButton" data-house-name="{{ house.house_name }}"
+                    data-house-id="{{ house.house_id }}" data-farm-id="{{ house.farm.farm_id }}">削除</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-warning">データがありません</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+            {% endif %}
+          </table>
+
+          <!-- Pagination Section  -->
+          <div class="flex-container">
+            <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
+            <nav aria-label="...">
+              <ul class="pagination justify-content-end">
+                <li class="page-item">
+                  {% if page.has_previous %}
+                  <a class="page-link"
+                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.previous_page_number }}"
+                    tabindex="-1">前</a>
+                  {% endif %}
+                </li>
+                {% for num_page in page.paginator.page_range %}
+                {% if page.number == num_page %}
+                <li class="page-item active">
+                  <a class="page-link"
+                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{
+                    num_page }}<span class="sr-only">(current)</span></a>
+                </li>
+                {% else %}
+                <li class="page-item">
+                  <a class="page-link"
+                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{
+                    num_page }}<span class="sr-only">(current)</span></a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                <li class="page-item">
+                  {% if page.has_next %}
+                  <a class="page-link"
+                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.next_page_number }}">次</a>
+                  {% endif %}
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <!-- Delete House Modal -->
+          <div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">ハウス削除</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <!-- Are you sure you want to delete this house? -->
+                  ハウス『 <span id="houseNameSpan"></span> 』を削除してもよろしいですか？<br>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                  <form id="deleteForm" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">削除</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
 
 
         </div>
@@ -238,43 +269,44 @@
 {% block javascripts %}
 
 <script>
-  document.querySelectorAll('.colorToggle').forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
-        var form = this.closest('form');
-        form.submit();
+  document.querySelectorAll('.colorToggle').forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
+      var form = this.closest('form');
+      form.submit();
     });
-});
+  });
 
   setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
-      successMessage.style.display = 'none';
+      successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+      successMessage.style.opacity = '0';
     }
   }, 5000);
 
   document.addEventListener("DOMContentLoaded", function () {
-      const deleteButtons = document.querySelectorAll(".deleteButton");
-      const deleteForm = document.getElementById("deleteForm");
-      const houseNameSpan = document.getElementById("houseNameSpan");
+    const deleteButtons = document.querySelectorAll(".deleteButton");
+    const deleteForm = document.getElementById("deleteForm");
+    const houseNameSpan = document.getElementById("houseNameSpan");
 
-      let currentHouseId;
+    let currentHouseId;
 
-      deleteButtons.forEach(function (button) {
-          button.addEventListener("click", function () {
-              currentHouseId = this.getAttribute("data-house-id");
-              const houseName = this.getAttribute("data-house-name");
-              currentFarmId = this.getAttribute("data-farm-id");
-              houseNameSpan.textContent = houseName;
-              $("#deleteModal").modal("show");
-          });
+    deleteButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        currentHouseId = this.getAttribute("data-house-id");
+        const houseName = this.getAttribute("data-house-name");
+        currentFarmId = this.getAttribute("data-farm-id");
+        houseNameSpan.textContent = houseName;
+        $("#deleteModal").modal("show");
       });
+    });
 
-      deleteForm.addEventListener("submit", function (event) {
-          event.preventDefault();
-          this.action = `/delete_house/${currentHouseId}/${currentFarmId}/`;  
-          this.submit();
-      });
-  }); 
+    deleteForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      this.action = `/delete_house/${currentHouseId}/${currentFarmId}/`;
+      this.submit();
+    });
+  });
 
 </script>
 

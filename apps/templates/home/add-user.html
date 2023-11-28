@@ -10,12 +10,13 @@
     justify-content: flex-end;
     align-items: center;
   }
+
   .info-loader {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 10px;
-      text-align: center;
+    text-align: center;
   }
 
   .loader {
@@ -28,12 +29,19 @@
     margin-bottom: 16px;
     margin-right: 10px;
   }
-  .loader-d{
+
+  .loader-d {
     display: none;
   }
+
   @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>
 {% endblock stylesheets %}{% block content %}
@@ -51,10 +59,10 @@
   </ol>
 </nav>
 <span class="loader-d" id="loader">
-<div class="info-loader" >
-  <div class="loader"></div>
-  <p class="text-success">メール送信中...</p>
-</div>
+  <div class="info-loader">
+    <div class="loader"></div>
+    <p class="text-success">メール送信中...</p>
+  </div>
 </span>
 <div class="card">
   <div class="card-body">
@@ -67,7 +75,9 @@
         <div class="col-md-6 my-4">
           <div class="form-group">
             <label for="userName" class="bmd-label-floating">⽒名</label>
-            <input type="text" id="username" class="form-control" name="first_name" {% if show == 'true' %}value="{{ user_obj.first_name }}" {% else %} value="{{ context.first_name }}" {% endif %}>
+            <input type="text" id="username" class="form-control" name="first_name" {% if show=='true'
+              %}value="{{ user_obj.first_name }}" {% else %} value="{{ context.first_name }}" {% endif %}
+              maxlength="30">
           </div>
           <span class="text-danger" id="userNameMsg"></span>
         </div>
@@ -75,11 +85,12 @@
           <div class="form-group">
             {% if show == 'true' %}
             <label for="email" class="bmd-label-floating">メール</label>
-            <input type="text"  class="form-control" name="email" value="{{ user_obj.email }}" disabled>
+            <input type="text" class="form-control" name="email" value="{{ user_obj.email }}" disabled>
 
             {% else %}
             <label for="email" class="bmd-label-floating">メール</label>
-            <input type="email" id="email" class="form-control" name="email" value="{{ context.email }}">
+            <input type="email" id="email" class="form-control" name="email" value="{{ context.email }}"
+              maxlength="253">
             {% endif %}
           </div>
           <span id="emailMsg" class="text-danger"></span>
@@ -87,19 +98,19 @@
       </div>
       <div class="row">
         <div class="col-md-6 my-4">
-            <div class="form-group">
-                <label for="権限" class="bmd-label-floating">権限</label>
-                <select name="role_id" class="form-control" id="roleId">
-                    <option value="1" {% if role_id == '1' %}selected{% endif %}>管理者</option>
-                </select>
-            </div>
+          <div class="form-group">
+            <label for="権限" class="bmd-label-floating">権限</label>
+            <select name="role_id" class="form-control" id="roleId">
+              {% if user_role_id == '0' %}
+              <option value="1">管理者</option>
+              {% else %}
+              <option value="2">ユーザー</option>
+              {% endif %}
+            </select>
+          </div>
         </div>
-    </div>    
-    {% if show == 'true' %}
-    <input type="hidden" class="form-control" name="mapped_under" value="{{ current_user_id }}">
-    {% else %}
-    <input type="hidden" class="form-control" name="mapped_under" value="{{ context.user_id }}">
-    {% endif %}
+      </div>
+
       <div class="center-container">
         <a href="/user_list">
           <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
@@ -115,42 +126,43 @@
 {% endblock content %}
 {% block javascripts %}
 <script>
-    setTimeout(function () {
+  setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
-      successMessage.style.display = 'none';
+      successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+      successMessage.style.opacity = '0';
     }
   }, 5000);
-    const loader = document.getElementById('loader');
-    document.getElementById('username').addEventListener('input', function() {
-      document.getElementById('userNameMsg').innerText = '';
-      });
-      document.getElementById('email').addEventListener('input', function() {
-      document.getElementById('emailMsg').innerText = '';
-      });
-    document.getElementById('myForm').addEventListener('submit', function(event) {
+  const loader = document.getElementById('loader');
+  document.getElementById('username').addEventListener('input', function () {
+    document.getElementById('userNameMsg').innerText = '';
+  });
+  document.getElementById('email').addEventListener('input', function () {
+    document.getElementById('emailMsg').innerText = '';
+  });
+  document.getElementById('myForm').addEventListener('submit', function (event) {
 
-        // Example validation:
-        var userInput = document.getElementById('username').value;
-        var emailInput = document.getElementById('email').value;
+    // Example validation:
+    var userInput = document.getElementById('username').value;
+    var emailInput = document.getElementById('email').value;
 
-        // Clear previous error messages
-        document.getElementById('userNameMsg').innerText = '';
-        document.getElementById('emailMsg').innerText = '';
+    // Clear previous error messages
+    document.getElementById('userNameMsg').innerText = '';
+    document.getElementById('emailMsg').innerText = '';
 
-        if (userInput === '') {
-            document.getElementById('userNameMsg').innerText = '氏名を入力してください。';
-            event.preventDefault(); // Prevent form submission
-        }
+    if (userInput === '') {
+      document.getElementById('userNameMsg').innerText = '氏名を入力してください。';
+      event.preventDefault(); // Prevent form submission
+    }
 
-        if (emailInput === '') {
-            document.getElementById('emailMsg').innerText = 'メールを入力してください。';
-            event.preventDefault(); // Prevent form submission
-        }
-        else
-        loader.style.display = 'block';  // Show the loader when the button is clicked
-        // Additional validation logic can be added as needed
-    });
+    if (emailInput === '') {
+      document.getElementById('emailMsg').innerText = 'メールを入力してください。';
+      event.preventDefault(); // Prevent form submission
+    }
+    else
+      loader.style.display = 'block';  // Show the loader when the button is clicked
+    // Additional validation logic can be added as needed
+  });
 
 </script>
 {% endblock javascripts %}
