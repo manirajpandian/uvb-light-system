@@ -1,0 +1,409 @@
+{% extends "layouts/base.html" %} {% block title %} 光源設定 {% endblock %}
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %} 
+<style>
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 15px;
+    width: 15px;
+    left: 4px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #66bb6a;
+  }
+
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(16px);
+  }
+
+  input:checked+.slider+.toggle-text {
+    left: 35px;
+  }
+
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .th,
+  td {
+    text-align: left;
+    padding: 10px;
+  }
+
+  .table th,
+  .table td {
+    white-space: nowrap;
+  }
+
+  .table th:nth-child(1),
+  .table td:nth-child(1) {
+    width: 20%;
+  }
+
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    width: 30%;
+    }
+
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    width: 30%;
+  }
+
+  .table th:nth-child(4),
+  .table td:nth-child(4) {
+    width: 20%;
+  }
+</style>
+{% endblock stylesheets %}
+{% block content %}
+
+<div class="flex-container">
+  <h3>農場管理</h3>
+<!--Add Modal trigger-->
+
+  <button type="button" class="btn btn-success" name="search" data-toggle="modal" data-target="#addFarmModal"
+    data-whatever="@mdo"><span class="material-icons">add_circle
+    </span>&nbsp;&nbsp;
+    追加
+  </button>
+</div> 
+{% if farm_success_msg %}
+<div class="text-center text-success" id="successMessage">
+  <div class="alert alert-info" role="alert">
+    <strong>{{ farm_success_msg }}</strong>
+  </div>
+</div>
+{% endif %}
+{% if messages %}
+{% for message in messages %}
+<div class="text-center" id="successMessage">
+  <div class="alert alert-info" role="alert">
+    <strong>{{ message }}</strong>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="text-primary-emphasis table-success mr-1">
+              <th>ID</th>
+              <th>農場名</th>
+              <th>住所</th>
+              <th>アクション</th>
+            </thead>
+            {% if page.object_list|length > 0 %}
+            <tbody>
+              {% for farm in page.object_list %}
+              <tr>
+                <td>{{ farm.farm_id }}</td>
+                <td>{{ farm.farm_name }}</td>
+                <td>{{ farm.address }}</td>
+
+                <td>
+<!--Update Modal trigger-->
+                  <a id="updatedButton" data-toggle="modal" data-farm-id="{{farm.farm_id}}"
+                    data-farm-name='{{ farm.farm_name }}' style="color: #ff9800;" data-farm-address='{{ farm.address }}'
+                    data-target="#updateFarmModal" >
+                    <span>編集</span> 
+                  </a>&nbsp; &nbsp;|&nbsp;&nbsp;
+                  <span class="text-danger deleteButton" data-farm-id="{{ farm.farm_id }}"
+                    data-farm-name="{{ farm.farm_name }}" style="color: #ff9800;"
+                    data-farm-address='{{ farm.address }}'>削除</span>
+                </td>
+
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td class="text-warning">データがありません</td>
+                <td></td>
+              </tr>
+            </tbody>
+            {% endif %}
+          </table>
+
+          <!-- Pagination Section  -->
+
+          <div class="flex-container">
+            <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
+
+            <nav aria-label="...">
+              <ul class="pagination justify-content-end">
+                <li class="page-item">
+                  {% if page.has_previous %}
+                  <a class="page-link" href="{% url 'farm_list' %}?page={{ page.previous_page_number }}"
+                    tabindex="-1">前</a>
+                  {% endif %}
+                </li>
+                {% for num_page in page.paginator.page_range %}
+                {% if page.number == num_page %}
+                <li class="page-item active">
+                  <a class="page-link" href="{% url 'farm_list' %}?page={{ num_page }}">{{ num_page }}<span
+                      class="sr-only">(current)</span></a>
+                </li>
+                {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="{% url 'farm_list' %}?page={{ num_page }}">{{ num_page }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                <li class="page-item">
+                  {% if page.has_next %}
+
+                  <a class="page-link" href="{% url 'farm_list' %}?page={{ page.next_page_number }}">次</a>
+                  {% endif %}
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><span class="text-danger" id="deleteModalTitle"></span> - 削除</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        農場<span id="deleteNameSpan"></span> を削除してもよろしいですか？
+      </div>
+      <div class="modal-footer">
+        <form id="deleteForm" method="post">
+          {% csrf_token %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+          <button type="submit" id="deleteButton" class="btn btn-danger">削除</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Update Modal-->
+<div class="modal fade" id="updateFarmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+
+
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">編集</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" id="updateFormSubmit" autocomplete="off">
+            {% csrf_token %}
+          <div class="form-group my-4">
+            <label for="farm_name" class="bmd-label-floating">農場名</label>
+            <input type="text" class="form-control" id="farm_name" name="farm_name" value="{{ farm.farm_name }}"
+              required />
+          </div>
+          <div class="form-group my-4">
+            <label for="address" class="bmd-label-floating">住所</label>
+            <input type="text" class="form-control" id="address" name="address" value="{{ farm.address }} " required />
+            <input type="hidden" name="farm_id" value="{{ farm.farm_id }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">戻る</button>
+          <button type="submit" class="btn btn-success">変更</button>
+        </div>
+     </form>
+      </div>
+    </div>
+</div>
+
+
+<!--Add Modal-->
+<div class="modal fade" id="addFarmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">追加</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" id="addFormSubmit" action="{% url 'add_farm' %}" autocomplete="off">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="my-4 form-group">
+            <label for="farm_name" class="bmd-label-floating">農場名</label>
+            <input type="text" class="form-control" id="add_farm_name" name="farm_name" />
+            <span class="text-danger" id="farmNameMsg"></span>
+          </div>
+
+          <div class="my-4 form-group">
+            <label for="address" class="bmd-label-floating">住所</label>
+            <input type="text" class="form-control" id="add_address" name="address" />
+            <span class="text-danger" id="addressMsg"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            戻る
+          </button>
+          <button type="submit" id="addButton" class="btn btn-success">
+            追加
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    document.getElementById('add_farm_name').addEventListener('input', function () {
+      document.getElementById('farmNameMsg').innerText = '';
+    });
+    document.getElementById('add_address').addEventListener('input', function () {
+      document.getElementById('addressMsg').innerText = '';
+    });
+
+    document.getElementById('addFormSubmit').addEventListener('submit', function (event) {
+      var AddInput = document.getElementById('add_farm_name').value;
+      var AddressInput = document.getElementById('add_address').value;
+
+
+      document.getElementById('farmNameMsg').innerText = '';
+
+      document.getElementById('addressMsg').innerText = '';
+
+      if (AddInput === '') {
+        document.getElementById('farmNameMsg').innerText = '作物名を入力してください。';
+        event.preventDefault();
+      }
+
+      if (AddressInput === '') {
+        document.getElementById('addressMsg').innerText = '住所を入力してください。';
+        event.preventDefault();
+      }
+
+    });
+    const deleteButtons = document.querySelectorAll(".deleteButton");
+    const deleteForm = document.getElementById("deleteForm");
+    const updateForm = document.getElementById("updateFormSubmit");
+    const updatedButton = document.querySelectorAll("#updatedButton");
+    let currentFarmId;
+  
+    updatedButton.forEach(function (button) {
+      button.addEventListener("click", function () {
+        let farmId = this.getAttribute("data-farm-id");
+        let farmName = this.getAttribute("data-farm-name");
+        let address = this.getAttribute("data-farm-address");
+
+        // Set values in the form fields
+        document.getElementById("farm_name").value = farmName;
+        document.getElementById("address").value = address;
+
+        // Set currentFarmId
+        currentFarmId = farmId;
+
+        $("#updateFarmModal").modal("show");
+      });
+    });
+
+    updateForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      this.action = `/update_farm/${currentFarmId}/`;
+      this.submit();
+    });
+
+    deleteForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      this.action = `/delete_farm/${currentFarmId}/`;
+      this.submit();
+    });
+
+    deleteButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        currentFarmId = this.getAttribute("data-farm-id");
+        let deletedName = this.getAttribute("data-farm-name");
+        document.getElementById("deleteModalTitle").innerText = `${deletedName}`;
+        $("#deleteModal").modal("show");
+      });
+    });
+  });
+
+  setTimeout(function () {
+    var successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+      successMessage.style.display = 'none';
+    }
+  }, 5000);
+
+</script>
+{% endblock javascripts %}

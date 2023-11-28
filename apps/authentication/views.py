@@ -34,6 +34,11 @@ def login_view(request):
                     if user is not None:
                         # Login the user
                         login(request, user)
+                        session_profile_obj, created = Profile.objects.get_or_create(user_id=request.user.id)
+                        if created:
+                            session_profile_obj.created_at = timezone.now()
+                            session_profile_obj.role_id = '0'
+                            session_profile_obj.save()
                         request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
                         return redirect("/")
                     else:
@@ -208,11 +213,11 @@ def delete_user(request, user_id):
 
             user_obj.delete()
             profile_obj.delete()
-            user_delete_success = 'ユーザーが正常に削除されました。' 
+            user_delete_success = f'ユーザー{ user_obj.first_name }が正常に削除されました。' 
             messages.success(request, user_delete_success)
             return redirect('/user_list')
         else:
-            user_delete_success = 'ユーザーが提供されていないです。'  
+            user_delete_success = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
             messages.success(request, user_delete_success)
             return redirect('/user_list')
 

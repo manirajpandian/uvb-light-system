@@ -124,8 +124,7 @@
 
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               {% for farm in farms %}
-              <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name
-                }}</a>
+              <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
               {% endfor %}
             </div>
           </div>
@@ -148,8 +147,7 @@
               {% for house in page.object_list %}
               <tr>
                 <td>{{ house.house_name }}</td>
-                <td>{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">プラント
-                    未割り当て</span>{% endif %}</td>
+                <td>{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">プラント未割り当て</span>{% endif %}</td>
                 <td>{{ house.user.first_name }}</td>
                 <td>{{ house.total_line_count }}</td>
                 <td>{{ house.total_pole_count }}</td>
@@ -187,6 +185,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
               </tr>
             </tbody>
             {% endif %}
@@ -199,6 +198,11 @@
               <ul class="pagination justify-content-end">
                 <li class="page-item">
                   {% if page.has_previous %}
+                  <a class="page-link" href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page=1" tabindex="-1">最初</a>
+                  {% endif %}
+                </li>
+                <li class="page-item">
+                  {% if page.has_previous %}
                   <a class="page-link"
                     href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.previous_page_number }}"
                     tabindex="-1">前</a>
@@ -208,14 +212,12 @@
                 {% if page.number == num_page %}
                 <li class="page-item active">
                   <a class="page-link"
-                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{
-                    num_page }}<span class="sr-only">(current)</span></a>
+                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{ num_page }}<span class="sr-only">(current)</span></a>
                 </li>
                 {% else %}
                 <li class="page-item">
                   <a class="page-link"
-                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{
-                    num_page }}<span class="sr-only">(current)</span></a>
+                    href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ num_page }}">{{ num_page }}<span class="sr-only">(current)</span></a>
                 </li>
                 {% endif %}
                 {% endfor %}
@@ -223,6 +225,11 @@
                   {% if page.has_next %}
                   <a class="page-link"
                     href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.next_page_number }}">次</a>
+                  {% endif %}
+                </li>
+                <li class="page-item">
+                  {% if page.has_next %}
+                  <a class="page-link" href="{% if selected_farm_id %}{% url 'house_list_with_farm' farm_id=selected_farm_id %}{% else %}{% url 'house_list' %}{% endif %}?page={{ page.paginator.num_pages }}">最後</a>
                   {% endif %}
                 </li>
               </ul>
