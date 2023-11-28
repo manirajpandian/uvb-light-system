@@ -175,7 +175,6 @@
                 <td></td>
                 <td class="text-warning">データがありません</td>
                 <td></td>
-                <td></td>
               </tr>
             </tbody>
             {% endif %}
@@ -248,8 +247,7 @@
 <div class="modal fade" id="updateFarmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
   aria-hidden="true">
 
-  <form method="POST" id="updateFormSubmit" autocomplete="off">
-    {% csrf_token %}
+
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -259,16 +257,15 @@
           </button>
         </div>
         <div class="modal-body">
-
-
-          <div class="form-floating mb-3">
-            <label for="farm_name" class="col-form-label">農場名</label>
+          <form method="POST" id="updateFormSubmit" autocomplete="off">
+            {% csrf_token %}
+          <div class="form-group my-4">
+            <label for="farm_name" class="bmd-label-floating">農場名</label>
             <input type="text" class="form-control" id="farm_name" name="farm_name" value="{{ farm.farm_name }}"
               required />
           </div>
-
-          <div class="form-floating mb-3">
-            <label for="address" class="col-form-label">住所</label>
+          <div class="form-group my-4">
+            <label for="address" class="bmd-label-floating">住所</label>
             <input type="text" class="form-control" id="address" name="address" value="{{ farm.address }} " required />
             <input type="hidden" name="farm_id" value="{{ farm.farm_id }}">
           </div>
@@ -277,9 +274,9 @@
           <button type="button" class="btn btn-secondary" data-dismiss="modal">戻る</button>
           <button type="submit" class="btn btn-success">変更</button>
         </div>
+     </form>
       </div>
     </div>
-  </form>
 </div>
 
 
@@ -297,14 +294,14 @@
       <form method="POST" id="addFormSubmit" action="{% url 'add_farm' %}" autocomplete="off">
         {% csrf_token %}
         <div class="modal-body">
-          <div class="form-floating mb-3">
+          <div class="my-4 form-group">
             <label for="farm_name" class="bmd-label-floating">農場名</label>
             <input type="text" class="form-control" id="add_farm_name" name="farm_name" />
             <span class="text-danger" id="farmNameMsg"></span>
           </div>
 
-          <div class="form-floating mb-3">
-            <label for="address" class="col-form-label">住所</label>
+          <div class="my-4 form-group">
+            <label for="address" class="bmd-label-floating">住所</label>
             <input type="text" class="form-control" id="add_address" name="address" />
             <span class="text-danger" id="addressMsg"></span>
           </div>
