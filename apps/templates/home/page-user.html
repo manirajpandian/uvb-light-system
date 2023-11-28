@@ -14,19 +14,23 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  #successMessage #imageSizeError {
-  opacity: 0; /* Start with 0 opacity */
-  z-index: 100;
-  position: fixed;
-  top: 2%;
-  left: 50%;
-  transform: translateY(-50%, -50%);
-  transition: opacity 1.5s ease-in-out; /* Adjust the duration and timing function */
-}
 
-#successMessage.show #imageSizeError.show {
-  opacity: 1; /* When the 'show' class is added, transition to 1 opacity */
-}
+  #successMessage #imageSizeError {
+    opacity: 0;
+    /* Start with 0 opacity */
+    z-index: 100;
+    position: fixed;
+    top: 2%;
+    left: 50%;
+    transform: translateY(-50%, -50%);
+    transition: opacity 1.5s ease-in-out;
+    /* Adjust the duration and timing function */
+  }
+
+  #successMessage.show #imageSizeError.show {
+    opacity: 1;
+    /* When the 'show' class is added, transition to 1 opacity */
+  }
 
   @media (max-width: 767px) {
     #successMessage #imageSizeError {
@@ -44,23 +48,23 @@
     <div class="card">
       <div class="card-body">
         {% if messages %}
-          {% for message in messages %}
-            {% if message.tags == 'success' %}
-              <div class="alert alert-success show" role="alert" id="successMessage">{{ message }}</div>
-            {% elif message.tags == 'error' %}
-              <div class="alert alert-danger show" role="alert" id="successMessage">{{ message }}</div>
-            {% else %}
-              <div class="alert alert-danger show" role="alert" id="successMessage">{{ message }}</div>
-            {% endif %}
-          {% endfor %}
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alert alert-success show" role="alert" id="successMessage">{{ message }}</div>
+        {% elif message.tags == 'error' %}
+        <div class="alert alert-danger show" role="alert" id="successMessage">{{ message }}</div>
+        {% else %}
+        <div class="alert alert-danger show" role="alert" id="successMessage">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
         {% endif %}
         <!-- <div class="alert alert-danger show d-none" role="alert" id="imageSizeError"></div> -->
         <div class="card-avatar text-center">
           {% if profile_image %}
-            <img class="img rounded-circle" id="profile-image" src="{{ profile_image.url }}" alt="Profile Image">
-        {% else %}
-            <img class="img rounded-circle" id="profile-image" src="/static/assets/img/default.png" alt="Default Image">
-        {% endif %}
+          <img class="img rounded-circle" id="profile-image" src="{{ profile_image.url }}" alt="Profile Image">
+          {% else %}
+          <img class="img rounded-circle" id="profile-image" src="/static/assets/img/default.png" alt="Default Image">
+          {% endif %}
           <div class="camera-icon m-3">
             <i id="upload-icon" class="material-icons cursor-pointer text-primary">camera_alt</i>
           </div>
@@ -80,8 +84,8 @@
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">氏名</label>
-                <input type="text" name="first_name" id="firstName" class="form-control"
-                  value="{{ first_name }}">
+                <input type="text" name="first_name" id="firstName" class="form-control" value="{{ first_name }}"
+                  maxlength="30">
               </div>
               <span id="FNspan"></span>
             </div>
@@ -94,11 +98,10 @@
             <div class="col-12 m-2">
               <div class="form-group">
                 <label class="bmd-label-floating">役割</label>
-                <input type="text" name="role_id" class="form-control" 
-                  {% if user_role_id == "0" %} value="BEAM TECH スーパー管理者" 
-                  {% elif user_role_id == "1" %} value="管理者" 
-                  {% else %} value="ユーザー" {% endif %} disabled>
-            </div>
+                <input type="text" name="role_id" class="form-control" {% if user_role_id=="0" %}
+                  value="BEAM TECH スーパー管理者" {% elif user_role_id=="1" %} value="管理者" {% else %} value="ユーザー" {% endif %}
+                  disabled>
+              </div>
             </div>
             <div class="col-12 m-2">
               <div class="form-group">
@@ -126,9 +129,9 @@
     // var imageSizeError = document.getElementById('imageSizeError');
     if (successMessage) {
       successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
-    successMessage.style.opacity = '0';
-    // imageSizeError.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
-    // imageSizeError.style.opacity = '0';
+      successMessage.style.opacity = '0';
+      // imageSizeError.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+      // imageSizeError.style.opacity = '0';
     }
   }, 5000);
   //Profile-Image Upload (image-click function)
