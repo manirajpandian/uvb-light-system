@@ -162,7 +162,7 @@ def add_user(request):
                 error_message = "このメールはすでに存在します。別のメールをお試しください。"
                 return render(request, 'home/add-user.html', {'error_message': error_message,"context":context})
 
-            farm_id = str(uuid.uuid4())[:6].upper()
+            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
             token = str(uuid.uuid4())
             link = f'{base_url}change_password/{token}'
             subject = 'パスワードの設定'
@@ -295,7 +295,7 @@ def forgot_password(request):
                 return redirect('/forgot_password/')
             
             user_obj = User.objects.get(email=email)
-            farm_id = str(uuid.uuid4())[:6].upper()
+            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
             token = str(uuid.uuid4())
             
             # Set expiration time for the token (24 hours from now)
