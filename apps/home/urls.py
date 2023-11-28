@@ -25,8 +25,11 @@ urlpatterns = [
     path('update_plant/<str:pk>',views.update_plant,name='update_plant'),
     path('delete_plant/<int:plant_id>/', views.delete_plant, name='delete_plant'),
     path('add_farm',views.add_farm, name='add_farm'),
+ 
    
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
+    
+
 
 ]

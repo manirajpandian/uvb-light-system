@@ -87,15 +87,27 @@ class Pole(models.Model):
                 new_number = 1
             self.pole_id = f'{self.line.line_id}P{new_number}'
         super().save(*args, **kwargs)
+
 class LED(models.Model):
     led_id = models.CharField(max_length=25, primary_key=True)
     pole = models.ForeignKey(Pole, on_delete=models.CASCADE, related_name='leds')
     is_on = models.BooleanField(default=False)
+    button_no = models.PositiveIntegerField(unique=True)
+    led_on_history = models.DateTimeField(null=True, blank=True)
+    led_off_history = models.DateTimeField(null=True, blank=True)
+
     def save(self, *args, **kwargs):
+        if not self.button_no:
+            last_instance = LED.objects.order_by('-button_no').first()
+            if last_instance:
+                new_button_no = last_instance.button_no + 1
+            else:
+                new_button_no = 1
+            self.button_no = new_button_no
         if not self.led_id:
             last_instance = LED.objects.filter(pole=self.pole).last()
             if last_instance:
-                last_number = int(last_instance.led_id[-1])
+                last_number = int(last_instance.led_id.split('B')[-1])
                 new_number = last_number + 1
             else:
                 new_number = 1
@@ -103,6 +115,17 @@ class LED(models.Model):
         super().save(*args, **kwargs)
 
 
+class Raspberrypi(models.Model):
+    raspberry_id = models.CharField(max_length=20, unique=True)
+    date = models.DateField()
+    time = models.TimeField()
+    temperature = models.FloatField()
+    humidity = models.FloatField()
+    soil_moisture = models.FloatField()
+
+
+    def __str__(self):
+        return f"{self.raspberry_id} - {self.temperature}°C, {self.humidity}%, {self.soil_moisture}%"
 
 
 

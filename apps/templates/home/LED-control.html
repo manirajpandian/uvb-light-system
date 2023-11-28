@@ -122,6 +122,8 @@
 </div>
 <div id="mainContainer">
   <h3>LED管理</h3>
+
+   
   <div class="d-flex align-items-center justify-content-end justify-content-between">
     <h3 class="my-2">{{ selected_farm_name }}</h3>
     <div class="dropdown my-2">
@@ -157,7 +159,31 @@
   <div class="accordion mt-4" id="accordionExample">
     {% if houses|length > 0 %}
       {% for house in houses %}
-      <h4 class="mt-4">{{ house.house_name }}</h4>
+      <div style="display: inline-block; margin-right: 20px;">
+        <h4 class="mt-4">{{ house.house_name }}</h4>
+    </div>
+    <div style="display: inline-block; margin-left: 20px;">
+      <i class="material-icons text-success">router</i>
+      <span style="margin-left: 4px">{{Rbi}}</span>
+  </div>
+    <div style="display: inline-block; margin-left: 20px;">
+        <i class="material-icons text-danger">device_thermostat</i>
+        <span style="margin-left: 4px">{{temperature}}</span>
+    </div>
+    <div style="display: inline-block; margin-left: 20px;">
+        <i class="material-icons text-info">opacity</i>
+        <span style="margin-left: 4px">{{humidity}}</span>
+    </div>
+    <div style="display: inline-block; margin-left: 20px;">
+        <i class="material-icons text-success">grass</i>
+        <span style="margin-left: 10px">{{soil_moisture}}</span>
+    </div>
+    <div style="display: inline-block; margin-left: 20px;">
+        <span class="material-icons" data-bs-toggle="modal" data-bs-target="#staticBackdrop">sim_card_download</span>
+    </div>
+    <br>
+    <br>
+    
       <div class="accordion" id="accordionExample">
           {% for line in house.lines.all %}
               <div class="accordion-item">
@@ -177,8 +203,8 @@
                     <table class="table table-striped">
                         <thead class="text-primary-emphasis">
                             <th>LED No</th>
-                            <th>光源距離</th>
-                            <th>照射時間</th>
+                            <th>LED ON History</th>
+                            <th>LED OFF History</th>
                             <th>照射</th>
                         </thead>
                         <tbody>
@@ -186,8 +212,8 @@
                                 {% for led in pole.leds.all|dictsort:"led_id" %}
                                     <tr>
                                         <td>{{ led.led_id }}</td>
-                                        <td>{{ pole.light_distance }}</td>
-                                        <td>{{ pole.illumination_time }}</td>
+                                        <td>{{ led.led_on_history  }}</td>
+                                        <td>{{ led.led_off_history  }}</td>
                                         <td>
                                           <form method="post" action="{% if farm and farm.farm_id %}{% url 'LED_control_farm_id' farm_id=farm.farm_id %}{% else %}{% url 'LED_control' %}{% endif %}" class="status-form" id="status-form-{{ led.led_id }}">
                                             {% csrf_token %}
@@ -222,7 +248,7 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-
+  
   setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
@@ -236,6 +262,7 @@
         form.submit();
     });
 });
+
 
 
 </script>
