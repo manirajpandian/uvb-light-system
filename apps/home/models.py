@@ -35,6 +35,7 @@ class Farm(models.Model):
     farm_name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='farms')
+    
 class House(models.Model):
     house_id = models.CharField(max_length=10, primary_key=True)
     house_name = models.CharField(max_length=255)

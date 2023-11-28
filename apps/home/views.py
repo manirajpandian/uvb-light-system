@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PlantForm
+from .forms import PlantForm,FarmForm
 from .models import Plant, Farm, House, Line, Pole, LED
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -375,23 +375,127 @@ def add_house(request):
 
         return redirect('/house_list')
 
-def  farm_manage (request):
-    user_profile_image = request.session.get('user_profile_image')
-    user_role_id = request.session.get('role_id')
-    context={'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
-            }
-    html_template = loader.get_template('home/farm_manage.html')
-    return HttpResponse(html_template.render(context, request))
+# List of farm (farm_list.html)
+def farm_list(request):
+    try:
+        if request.method == "GET":
+            farm_list = Farm.objects.all().order_by('farm_id')
+            page_number = request.GET.get('page', 1)
+            paginator = Paginator(farm_list, 5)
+            page = paginator.get_page(page_number)
+            user_profile_image = request.session.get('user_profile_image')
+            user_role_id = request.session.get('role_id')
 
-def  add_farm (request):
-    user_profile_image = request.session.get('user_profile_image')
-    user_role_id = request.session.get('role_id')
-    context={'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
+            context = {
+                'segment': 'farm_list',
+                'farm_list': farm_list,
+                'page': page,
+                'user_profile_image': user_profile_image,
+                'user_role_id': user_role_id,
             }
-    html_template = loader.get_template('home/add-farm.html')
-    return HttpResponse(html_template.render(context, request))
+
+            html_template = loader.get_template('home/farm_list.html')
+            return HttpResponse(html_template.render(context, request))
+
+        elif request.method == "POST":
+            form = FarmForm(request.POST)
+            if form.is_valid():
+                farm = form.save(commit=False)
+                farm.user = request.user  # Assuming you have a user field in your Farm model
+                farm.save()
+                # Optionally, you can add a success message
+                # messages.success(request, 'Farm added successfully')
+                return redirect('farm_list')
+
+    except BrokenPipeError as e:
+        print('Exception BrokenPipeError', e)
+        return HttpResponseServerError()
+
+    return HttpResponse(status=400)
+
+
+
+#Add New farm
+
+def add_farm(request):
+    try:
+        user_profile_image = request.session.get('user_profile_image')
+        user_role_id = request.session.get('role_id')
+
+        if request.method == "GET":
+            form = FarmForm()
+        else:
+            form = FarmForm(request.POST)
+            if form.is_valid():
+                
+                farm = form.save(commit=False)  # Don't save to the database yet
+                farm.user = request.user
+                farm.save()
+                messages.success(request, '新しい農場の詳細が追加されました')
+                return redirect('/farm_list')
+
+        farm_list = Farm.objects.all().order_by('farm_id')
+        context = {
+            'segment': 'farm_list',
+            'farm_list': farm_list,
+            'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'form': form,
+        }
+
+        return render(request, 'home/farm_list.html', context)
+
+    except BrokenPipeError as e:
+        print('Exception BrokenPipeError', e)
+        return HttpResponseServerError()
+
+  # Edit option (Updating the farm details)
+def update_farm(request, pk):
+    try:
+        show = 'true'
+        farm = Farm.objects.get(farm_id=pk)
+        if request.method == 'POST':
+            form = FarmForm(request.POST, instance=farm)
+            if form.is_valid():
+                form.save()
+                Farm_success_msg = '作物詳細の更新成功しました。'  # Successfully updated of crop details
+                messages.success(request, Farm_success_msg)
+                return redirect('/farm_list')
+
+        context = {"farm": farm, "show": show}
+        return render(request, 'home/farm_list.html', context)
+
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
+
+
+#Delete option (Deleting the farm details)
+
+def delete_farm(request, farm_id):
+    try: 
+        if request.method == 'POST':
+            if farm_id:
+                farm = get_object_or_404(Farm, pk=farm_id)
+                # Get all houses associated with the farm
+                houses_to_delete = House.objects.filter(farm=farm)
+                for house in houses_to_delete:
+                    # You may want to add additional logic here before deleting each house
+                    # For example, turning off any associated LEDs, etc.
+                    house.delete()
+                # Now delete the farm
+                farm.delete()
+                farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
+                messages.success(request, farm_success_msg)
+                return redirect('/farm_list')
+            else:
+                farm_success_msg = '農場が提供されていないです。'  # Farm was not in the list.
+                messages.success(request, farm_success_msg)
+                return redirect('/farm_list')
+    except BrokenPipeError as e:
+        print('exception BrokenPipeError', e)
+        return HttpResponseServerError()
+
 
 # Add New Plant 
 
