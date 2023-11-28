@@ -487,7 +487,7 @@ def farm_list(request):
 
 
 #Add New farm
-
+@login_required(login_url="/login/")
 def add_farm(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
@@ -521,6 +521,7 @@ def add_farm(request):
         return HttpResponseServerError()
 
   # Edit option (Updating the farm details)
+@login_required(login_url="/login/")
 def update_farm(request, pk):
     try:
         show = 'true'
@@ -542,7 +543,7 @@ def update_farm(request, pk):
 
 
 #Delete option (Deleting the farm details)
-
+@login_required(login_url="/login/")
 def delete_farm(request, farm_id):
     try: 
         if request.method == 'POST':
