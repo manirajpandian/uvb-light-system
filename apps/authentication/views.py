@@ -148,7 +148,7 @@ def add_user(request):
             role_id = request.POST['role_id']
             user_id = request.user.id
             base_url = settings.BASE_URL
-            expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+            expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
             if User.objects.filter(email=email).exists():
                 context = {
@@ -297,7 +297,7 @@ def forgot_password(request):
             token = str(uuid.uuid4())
             
             # Set expiration time for the token (24 hours from now)
-            expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+            expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
             user_obj.username = farm_id
             user_obj.save()
