@@ -471,9 +471,10 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">ハウス名 <span class="text-danger">*</span></label>
+                                            <label id="sample" class=" bmd-label-floating">ハウス名 <span class="text-danger">*</span></label>
                                             <input class="form-control" id="houseName" type="text" name="houseName"
-                                                placeholder="" />
+                                                placeholder="" maxlength="30" />
+                                                <span class="text-danger" id="housenameMsg"></span>
                                         </div>
                                     </div>
                                     
@@ -493,7 +494,9 @@
                                                  {% endfor %}
                                                  
                                             </select>
+                                            <span class="text-danger" id="plantnameMsg"></span>
                                         </div>
+                                       
                                     </div>
                                     <div class="col-md-3 mt-4">
                                         <div class="form-group">
@@ -508,6 +511,7 @@
                                                  {% endfor %}
                                                  
                                             </select>
+                                            <span class="text-danger" id="farmnameMsg"></span>
                                         </div>
                                     </div>
                                
@@ -516,8 +520,7 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group text-gray">
                                             <label class=" bmd-label-floating" for="memo">メモ</label>
-                                            <textarea name = "memo" class="form-control" id="memo" rows="3" maxlength="150"></textarea>
-                                            
+                                            <textarea name = "memo" class="form-control" id="memo" rows="3" maxlength="150"></textarea>                                            
                                             <span id="memoCount">0</span>/<span>150</span>
                                         </div>
                                     </div>
@@ -525,7 +528,7 @@
                                 </div>
                                 <ul class="list-inline pull-right">
                                     <li>
-                                        <button type="button" class="default-btn next-step" id="firstnext" onclick="firstnext(event)">
+                                        <button type="button" class="default-btn next-step" id="firststep">
                                             次
                                         </button>
                                     </li>
@@ -539,8 +542,9 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class=" bmd-label-floating">レーンの数 <span class="text-danger">*</span></label>
-                                            <input class="form-control" id="N-leanCount" type="text" name="leanCount"
+                                            <input class="form-control" id="N-leanCount" type="number" name="leanCount"
                                                 placeholder="" />
+                                                <span class="text-danger" id="nleanMsg"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -548,8 +552,9 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class=" bmd-label-floating">１レーンのポールの数 <span class="text-danger">*</span></label>
-                                            <input class="form-control" id="N-poleCount" type="text"
+                                            <input class="form-control" id="N-poleCount" type="number"
                                                 name="laneCountPerPole" placeholder="" />
+                                                <span class="text-danger" id="npoleMsg"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -557,8 +562,9 @@
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
                                             <label class=" bmd-label-floating">1ポールのLEDの数 <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" id="N-LEDCount" name="LEDcount"
+                                            <input class="form-control" type="number" id="N-LEDCount" name="LEDcount"
                                                 placeholder="" />
+                                                <span class="text-danger" id="nledMsg"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
@@ -575,7 +581,10 @@
                                             <label class=" bmd-label-floating">レーンの数</label>
                                             <input class="form-control" type="number" id="verticalCount"
                                                 placeholder="" />
+                                                <span class="text-danger" id="customleanMsg"></span>
+                                                
                                         </div>
+                                        <span class="text-danger" id="poleMsg"></span>
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-1.5"></div>
@@ -752,12 +761,6 @@
             localStorage.setItem("lastActiveTab", target);
         });
 
-        $(".next-step").click(function (e) {
-            var active = $(".wizard .nav-tabs li.active");
-            active.next().removeClass("disabled");
-            nextTab(active);
-        });
-
         $(".prev-step").click(function (e) {
             var active = $(".wizard .nav-tabs li.active");
             prevTab(active);
@@ -852,17 +855,14 @@
                     var inputValuesArray = [];
 
                     poleInputElement.on('keyup', function() {
-                        console.log('Element clicked');
+                   
 
                         poleInputElement.each(function (index, element) {
                             var value = $(element).val();
-                            console.log('index', index);
-                            console.log('inputValues index>>>', index, value);
                             inputValuesArray[index] = value;
                         });
 
                         // Log the array with all values
-                        console.log('Input values array:', inputValuesArray);
                         localStorage.setItem('LEDCount',JSON.stringify(inputValuesArray))
                     });
 
@@ -1036,7 +1036,123 @@
         })
     });
 
-   
+    lineAddViewBtn.addEventListener('click', function() {   
+        buttonClicked = true;
+    });
+    document.getElementById('LEDCountGen').addEventListener('click', function() {
+    
+    var nlean = document.getElementById("N-leanCount").value;
+        var npole = document.getElementById("N-poleCount").value;
+        var nled = document.getElementById("N-LEDCount").value;
+        var customlean = document.getElementById("verticalCount").value;
+       
+        var dynamicInputs = document.querySelectorAll('.dynamic-input');
+        var poleInputs = document.querySelectorAll('.poleInput');
+      
+        
+if (!buttonClicked){
+    
+        if (nlean < 0 || isNaN(nlean) || nlean == ''){
+            document.getElementById('nleanMsg').innerText = '有効な数値を入力してください。';
+        }
+        else if (npole < 0 || isNaN(npole) || npole == ''){
+            document.getElementById('npoleMsg').innerText = '有効な数値を入力してください。';
+        }
+        else if (nled < 0 || isNaN(nled) || nled == '' ){
+            document.getElementById('nledMsg').innerText = '有効な数値を入力してください。';
+        }else {
+        var active = $(".wizard .nav-tabs li.active");
+        active.next().removeClass("disabled");
+        nextTab(active);
+    }
+    }
+    
+        else if(buttonClicked){
+            
+            if (customlean < 0 || isNaN(customlean) || customlean == ''){
+                document.getElementById('customleanMsg').innerText = '有効なライン値を入力してください。';
+            }
+            
+            else if (customlean > 0){
+              
+                var invalidPoleInputFound = false;
+                dynamicInputs.forEach(function(input) {
+                    var inputValue = input.value;
+                    if (inputValue === '' || isNaN(inputValue)) {
+                        invalidPoleInputFound = true;
+        }
+    });
+    if (invalidPoleInputFound) {
+        document.getElementById('poleMsg').innerText = '有効なポール値を入力してください。';
+            }
+            else{
+                document.getElementById('poleMsg').innerText = '';
+                var invalidLedInputFound = false;
+    poleInputs.forEach(function(poleInput) {
+        var poleValue = poleInput.value;
+        if (poleValue === '' || isNaN(poleValue)) {
+            invalidLedInputFound = true;
+        }
+    });
+    if (invalidLedInputFound) {
+        document.getElementById('poleMsg').innerText = '有効なLED値を入力してください。';
+            }
+        
+    else {
+        var active = $(".wizard .nav-tabs li.active");
+        active.next().removeClass("disabled");
+        nextTab(active);
+        buttonClicked = false;
+        document.getElementById('poleMsg').innerText = '';
+    }
+}
+}
+        }
+});
+document.getElementById('houseName').addEventListener('input', function() {
+    document.getElementById('housenameMsg').innerText = '';
+});
+document.getElementById('plantName').addEventListener('input', function() {
+    document.getElementById('plantnameMsg').innerText = '';
+});
+document.getElementById('farmName').addEventListener('input', function() {
+    document.getElementById('farmnameMsg').innerText = '';
+});
+document.getElementById('N-leanCount').addEventListener('input', function() {
+    document.getElementById('nleanMsg').innerText = '';
+});
+document.getElementById('N-poleCount').addEventListener('input', function() {
+    document.getElementById('npoleMsg').innerText = '';
+});
+document.getElementById('N-LEDCount').addEventListener('input', function() {
+    document.getElementById('nledMsg').innerText = '';
+});
+document.getElementById('verticalCount').addEventListener('input', function() {
+    document.getElementById('customleanMsg').innerText = '';
+});
+
+document.getElementById('firststep').addEventListener('click', function() {
+    var housename = document.getElementById("houseName").value;
+        var plantname = document.getElementById("plantName").value;
+        var farmname = document.getElementById("farmName").value;
+
+        if(housename == '' ){
+            document.getElementById('housenameMsg').innerText = 'ハウス名を入力してください。';
+        }
+        else if (plantname == ''){
+            document.getElementById('plantnameMsg').innerText = '植物を選択してください。';
+        }
+        else if (farmname == ''){
+            document.getElementById('farmnameMsg').innerText = '農場を選択してください。';
+        }else {
+      
+        var active = $(".wizard .nav-tabs li.active");
+        active.next().removeClass("disabled");
+        nextTab(active);
+    }
+
+});
+
 </script>
 
 {% endblock javascripts %}
