@@ -101,12 +101,14 @@ def index(request,farm_id=None):
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
 
+@login_required(login_url="/login/")
 def house_lights(request):
     context = {'segment': 'house_lights'}
     html_template = loader.get_template('home/house-lights.html')
     return HttpResponse(html_template.render(context, request))
 
 #LED Control - Sensor and LED Access
+@login_required(login_url="/login/")
 def LED_control(request,farm_id=None):
     try:
         user_profile_image = request.session.get('user_profile_image')
@@ -171,6 +173,7 @@ def LED_control(request,farm_id=None):
 
 
     #List of plant (settings.html)
+@login_required(login_url="/login/")
 def plant_setting(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
@@ -188,6 +191,7 @@ def plant_setting(request):
         return HttpResponseServerError()
 
     # Edit option (Updating the plant details)
+@login_required(login_url="/login/")
 def update_plant(request,pk):
     try:
         user_profile_image = request.session.get('user_profile_image')
@@ -235,6 +239,7 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
 # House list 
+@login_required(login_url="/login/")
 def house_list(request, farm_id=None):
     try:
         user_profile_image = request.session.get('user_profile_image')
@@ -302,12 +307,13 @@ def house_list(request, farm_id=None):
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
 
+@login_required(login_url="/login/")
 def add_house(request):
     choice_plant = Plant.objects.all()
     choice_farm = Farm.objects.all()
     if request.user.is_authenticated:
         current_user_id = request.user.id
-        mapped_profiles = Profile.objects.filter(mapped_under=current_user_id)
+        mapped_profiles = Profile.objects.filter(mapped_under=current_user_id,user__is_active=True)
         
     choice_user = [profile.user for profile in mapped_profiles]
     user_profile_image = request.session.get('user_profile_image')
@@ -377,6 +383,7 @@ def add_house(request):
         return redirect('house_list_with_farm', farm_id=farm_id)
 
 # update house 
+@login_required(login_url="/login/")
 def update_house(request, farm_id):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -438,6 +445,7 @@ def update_house(request, farm_id):
     return render(request, 'home/update-house.html', context)
 
 
+@login_required(login_url="/login/")
 def  farm_manage (request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -447,6 +455,7 @@ def  farm_manage (request):
     html_template = loader.get_template('home/farm_manage.html')
     return HttpResponse(html_template.render(context, request))
 
+@login_required(login_url="/login/")
 def  add_farm (request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -458,6 +467,7 @@ def  add_farm (request):
 
 # Add New Plant 
 
+@login_required(login_url="/login/")
 def add_plant(request):
     try: 
         if request.method == "GET":
@@ -477,6 +487,7 @@ def add_plant(request):
         return HttpResponseServerError()
 
 # Delete the existing plant details
+@login_required(login_url="/login/")
 def delete_plant(request, plant_id):
     try: 
         if request.method == 'POST':
@@ -497,6 +508,7 @@ def delete_plant(request, plant_id):
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
     
+@login_required(login_url="/login/")
 def delete_house(request, house_id, farm_id):
     try:
         if request.method == 'POST':
