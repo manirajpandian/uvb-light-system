@@ -76,7 +76,7 @@
           <div class="form-group">
             <label for="userName" class="bmd-label-floating">⽒名</label>
             <input type="text" id="username" class="form-control" name="first_name" 
-            {% if show == 'true' %}value="{{ user_obj.first_name }}" {% else %} value="{{ context.first_name }}" {% endif %} maxlength="30">
+            {% if show == 'true' %}value="{{ user_obj.first_name }}" {% else %} value="{{ first_name }}" {% endif %} maxlength="30">
           </div>
           <span class="text-danger" id="userNameMsg"></span>
         </div>
@@ -88,7 +88,7 @@
 
             {% else %}
             <label for="email" class="bmd-label-floating">メール</label>
-            <input type="email" id="email" class="form-control" name="email" value="{{ context.email }}"
+            <input type="email" id="email" class="form-control" name="email" value="{{ email }}"
               maxlength="253">
             {% endif %}
           </div>

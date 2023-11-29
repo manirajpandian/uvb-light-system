@@ -155,12 +155,12 @@ def add_user(request):
                     'first_name': first_name,
                     'email': email,
                     'role_id': role_id,
+                    'user_id':user_id,
                     'user_profile_image': user_profile_image,
-                    'user_role_id':user_role_id
+                    'user_role_id':user_role_id,
+                    'error_message':"このメールはすでに存在します。別のメールをお試しください。"
                 }
-
-                error_message = "このメールはすでに存在します。別のメールをお試しください。"
-                return render(request, 'home/add-user.html', {'error_message': error_message,"context":context})
+                return render(request, 'home/add-user.html', context)
 
             farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
             token = str(uuid.uuid4())
