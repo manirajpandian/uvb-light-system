@@ -13,7 +13,7 @@ class PlantForm(forms.ModelForm):
         )
         self.fields['distance'] = forms.FloatField(
             required=False,
-            widget=forms.NumberInput(attrs={'placeholder': '', 'max': '50'})
+            widget=forms.NumberInput(attrs={'placeholder': '',})
         )
         self.fields['remarks'] = forms.CharField(
             required=False,

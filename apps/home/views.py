@@ -506,7 +506,7 @@ def add_house(request):
             farm_id
             house.farm_id = farm_id
         house.save()
-
+             
         for i in range(1, lane_count + 1):
             line = Line(
                 house=house,
@@ -528,7 +528,9 @@ def add_house(request):
                         pole=pole
                     )
                     led.save()
-
+                    
+        house_success_msg ="ハウスが正常に追加されました。"        #House is added Successfully
+        messages.success(request, house_success_msg)  
         return redirect('house_list_with_farm', farm_id=farm_id)
 
 # update house 

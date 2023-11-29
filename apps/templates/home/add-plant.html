@@ -163,6 +163,9 @@ document.getElementById('plantForm').addEventListener('submit', function(event) 
         } else if (distanceInput <= 0){
             document.getElementById('distanceMsg').innerText = '距離は0より大きくなければなりません。';
             event.preventDefault();
+        } else if (distanceInput > 50){
+            document.getElementById('distanceMsg').innerText = '距離は50を超えてはなりません。';
+            event.preventDefault();
         }
     
     if (hour < 0 ){
