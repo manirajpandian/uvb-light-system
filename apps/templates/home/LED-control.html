@@ -144,16 +144,19 @@
 <div id="mainContainer">
   <h3>LED管理</h3>
   <div class="d-flex align-items-center justify-content-end justify-content-between">
-    <h3 class="my-2">{{ selected_farm_name }}</h3>
+    <h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
+    {% if farms %}
     <div class="dropdown my-2">
       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span>農場フィルター</span>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+       
           {% for farm in farms %}
               <a class="dropdown-item" href="{% url 'LED_control_farm_id' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
           {% endfor %}
+        {% endif %}
       </div>
   </div>
 </div>

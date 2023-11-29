@@ -239,16 +239,22 @@ def LED_control(request,farm_id=None):
         mqtt_client.loop_start()
         
         if len(farms) > 0:
-            selected_farm_id = request.GET.get('farm_id') or farm_id
-            if selected_farm_id:
-                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
-                selected_farm = Farm.objects.get(pk=selected_farm_id)
-                selected_farm_name = selected_farm.farm_name  
+            if user_role_id == '2':
+                houses = House.objects.filter(user=request.user.id).select_related('plant')
+                farms = None
+                selected_farm_name = None
             else:
-                default_farm = Farm.objects.first()
-                houses = House.objects.filter(farm=default_farm).select_related('plant')
-                selected_farm = default_farm
-                selected_farm_name = selected_farm.farm_name
+                selected_farm_id = request.GET.get('farm_id') or farm_id
+                if selected_farm_id:
+                    houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
+                    selected_farm = Farm.objects.get(pk=selected_farm_id)
+                    selected_farm_name = selected_farm.farm_name  
+                else:
+                    default_farm = Farm.objects.first()
+                    houses = House.objects.filter(farm=default_farm).select_related('plant')
+                    selected_farm = default_farm
+                    selected_farm_name = selected_farm.farm_name
+
             context = {
                 'segment': 'LED_control',
                 'farms': farms,
@@ -260,9 +266,7 @@ def LED_control(request,farm_id=None):
                 'humidity': sensor_data['humidity'],
                 'soil_moisture': sensor_data['soil_moisture'],
                 'Rbi': sensor_data['raspberry_id'],
-              
-                
-                }
+                }  
             if request.method == "GET":
                 html_template = loader.get_template('home/LED-control.html')
                 return HttpResponse(html_template.render(context, request))
