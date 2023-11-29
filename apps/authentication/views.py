@@ -24,7 +24,6 @@ def login_view(request):
     msg = None
     
     if request.method == "POST":
-        print('form>>',form)
         if form.is_valid():
             username = form.cleaned_data['username']
             email = form.cleaned_data.get("email")
