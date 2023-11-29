@@ -56,12 +56,30 @@
   //all modules message toaster 
   {% if messages %}
   {% for message in messages %}
-      Toast.fire({
+      
+  {% endfor %}
+  {% endif %}
+
+  {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+        Toast.fire({
           icon: "success",
           title: '{{ message }}'
         });
-  {% endfor %}
-  {% endif %}
+        {% elif message.tags == 'error' %}
+        Toast.fire({
+          icon: "error",
+          title: '{{ message }}'
+        });
+        {% else %}
+        Toast.fire({
+          icon: "error",
+          title: '{{ message }}'
+        });
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 //user success message
   {% if success_message %}
