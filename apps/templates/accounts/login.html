@@ -44,7 +44,7 @@
   <div class="col-12">
     <div class="card" style="min-width: 364px;">
       <div class="card-body">
-        <form role="form" method="post" action="">
+        <form role="form" method="post" action="" id="id_form">
           {% comment %} Company Logo {% endcomment %}
           <div class="card-avatar text-center">
             <img class="img rounded-circle" src="/static/assets/img/company_logo1.png" id="profile-image" />
@@ -189,6 +189,7 @@
     var email = document.getElementById('id_email')
     var password = document.getElementById('id_password')
     var loginBtn = document.getElementById('id_loginBtn')
+    var form = document.getElementById('id_form')
 
     loginBtn.addEventListener('click',function(){
       var userSpan = document.getElementById('userSpan')
@@ -203,6 +204,7 @@
       if(!password.value){
         passwordSpan.innerText = 'パスワードを入力してください。'
       }
+      form.submit()
     })
     username.addEventListener('input',function(){
       userSpan.innerText = ''
