@@ -79,6 +79,7 @@
                 <label class="bmd-label-floating">農場ID</label>
                 {{ form.username }}
               </div>
+              <span class="text-danger" id="userSpan"></span>
             </div>
           </div>
 
@@ -95,6 +96,7 @@
               <span class="text-danger">有効なメールアドレスを入力してください。</span>
               {% endfor %}
               {% endif %}
+              <span class="text-danger" id="emailSpan"></span>
             </div>
           </div>
           <br />
@@ -105,6 +107,7 @@
                 <label class="bmd-label-floating">パスワード</label>
                 {{ form.password }}
               </div>
+              <span class="text-danger" id="passwordSpan"></span>
             </div>
           </div>
           <br />
@@ -126,7 +129,7 @@
           {% comment %} submit button {% endcomment %}
           <div class="row">
             <div class="col-12">
-              <button type="submit" class="btn btn-primary pull-left w-100">
+              <button type="button" id='id_loginBtn' class="btn btn-primary pull-left w-100">
                 ログイン
               </button>
             </div>
@@ -181,6 +184,37 @@
 {% block javascripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+
+    var username = document.getElementById('id_username')
+    var email = document.getElementById('id_email')
+    var password = document.getElementById('id_password')
+    var loginBtn = document.getElementById('id_loginBtn')
+
+    loginBtn.addEventListener('click',function(){
+      var userSpan = document.getElementById('userSpan')
+      var emailSpan = document.getElementById('emailSpan')
+      var passwordSpan = document.getElementById('passwordSpan')
+      if(!username.value){
+        userSpan.innerText = '農場ID入力してください。'
+      }
+      if(!email.value){
+        emailSpan.innerText = 'メールを入力してください。'
+      }
+      if(!password.value){
+        passwordSpan.innerText = 'パスワードを入力してください。'
+      }
+    })
+    username.addEventListener('input',function(){
+      userSpan.innerText = ''
+      forgot_password_message.innerText = ''
+    })
+    email.addEventListener('input',function(){
+      emailSpan.innerText = ''
+    })
+    password.addEventListener('input',function(){
+      passwordSpan.innerText = ''
+    })
+
 
     var forgotPasswordMessage = "{{ forgot_password_message }}";
     $(document).ready(function () {

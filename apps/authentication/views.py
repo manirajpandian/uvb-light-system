@@ -22,7 +22,9 @@ from django.utils import timezone
 def login_view(request):
     form = LoginForm(request.POST or None)
     msg = None
+    
     if request.method == "POST":
+        print('form>>',form)
         if form.is_valid():
             username = form.cleaned_data['username']
             email = form.cleaned_data.get("email")
