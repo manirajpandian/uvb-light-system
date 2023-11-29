@@ -533,14 +533,13 @@ def add_house(request):
 
 # update house 
 @login_required(login_url="/login/")
-def update_house(request, farm_id):
+def update_house(request, house_id):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
     context = {}
 
     try:
-        farm_obj = Farm.objects.filter(farm_id=farm_id).first()
-        house_obj, created = House.objects.get_or_create(farm=farm_obj)
+        house_obj = House.objects.filter(house_id=house_id).first()
         
         if request.user.is_authenticated:
             current_user_id = request.user.id
@@ -550,7 +549,6 @@ def update_house(request, farm_id):
             choice_user = []
 
         choice_plant = Plant.objects.all()
-        choice_farm = Farm.objects.all()
 
         context = {
             'segment': 'update_house',
@@ -558,7 +556,6 @@ def update_house(request, farm_id):
             'user_role_id': user_role_id,
             'choice_user': choice_user,
             'choice_plant': choice_plant,
-            'choice_farm': choice_farm,
             'house_obj': house_obj
         }
 
@@ -570,12 +567,11 @@ def update_house(request, farm_id):
             if house_name == '':
                 context = {
             'segment': 'update_house',
-            'errorMessage': 'ユーザー名は空であってはなりません',
+            'errorMessage': 'ハウス名は空であってはなりません',
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
             'choice_user': choice_user,
             'choice_plant': choice_plant,
-            'choice_farm': choice_farm,
             'house_obj': house_obj}
                 return render(request, 'home/update-house.html', context)
             
@@ -589,7 +585,7 @@ def update_house(request, farm_id):
             return redirect('/house_list')
 
     except Exception as e:
-        print('error', e)
+        print('+++++update_house error+++++', e)
 
     return render(request, 'home/update-house.html', context)
 

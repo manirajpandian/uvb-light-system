@@ -81,10 +81,10 @@
             <div class="form-group text-gray">
                 <label class="bmd-label-floating" for="remarks">備考</label>
                 {{ form.remarks }}
-                <span id="remarkCount">0</span>/<span>150</span>
+                <span id="remarkCount">{% if show == 'true' %}<span id='editRemarkCount'></span>{% else %}0{% endif %}</span>/<span>150</span>
             </div>
             <div class="center-container">
-                <a href="/plant_setting">
+                <a onclick='goBack()' href="#">
                     <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
                     {% if show == 'true' %}
     <button type="submit" id="updateBtn" class="btn btn-success" >変更</button>
@@ -109,6 +109,11 @@
 
 let remarkInput = document.getElementById('id_remarks');
 let remarkCountSpan = document.getElementById('remarkCount');
+
+if(remarkInput.value){
+    console.log('remarkInput.value')
+    document.getElementById('editRemarkCount').textContent = remarkInput.value.length
+}
 
 remarkInput.addEventListener("input", function(event) {
     let charCount = remarkInput.value.length;

@@ -40,4 +40,63 @@
   <!-- <script src="/static/assets/js/plugins/bootstrap-notify.js"></script> -->
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="/static/assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
-  
+  <script>
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+      }
+  });
+
+  //all modules message toaster 
+  {% if messages %}
+  {% for message in messages %}
+      Toast.fire({
+          icon: "success",
+          title: '{{ message }}'
+        });
+  {% endfor %}
+  {% endif %}
+
+//user success message
+  {% if success_message %}
+        Toast.fire({
+            icon: "success",
+            title: '{{ success_message }}'
+          });
+  {% endif %}
+
+//plant success message
+  {% if plant_success_msg %}
+  Toast.fire({
+      icon: "success",
+      title: '{{ plant_success_msg }}'
+    });
+  {% endif %}
+
+//farm success message
+  {% if farm_success_msg %}
+Toast.fire({
+  icon: "success",
+  title: '{{ farm_success_msg }}'
+});
+{% endif %}
+
+//house success message
+{% if house_success_msg %}
+Toast.fire({
+  icon: "success",
+  title: '{{ house_success_msg }}'
+});
+{% endif %}
+
+//go back event 
+function goBack() {
+  window.history.back();
+}
+  </script>
