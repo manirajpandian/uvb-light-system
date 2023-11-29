@@ -11,38 +11,6 @@
     align-items: center;
   }
 
-  .info-loader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 10px;
-    text-align: center;
-  }
-
-  .loader {
-    border: 0px solid #f3f3f3;
-    border-top: 4px solid #00cae3;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
-    margin-right: 10px;
-  }
-
-  .loader-d {
-    display: none;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
 </style>
 {% endblock stylesheets %}{% block content %}
 <nav aria-label="breadcrumb" role="navigation">
@@ -58,12 +26,6 @@
 
   </ol>
 </nav>
-<span class="loader-d" id="loader">
-  <div class="info-loader">
-    <div class="loader"></div>
-    <p class="text-success">メール送信中...</p>
-  </div>
-</span>
 <div class="card">
   <div class="card-body">
     {% if error_message %}
@@ -125,6 +87,8 @@
 {% endblock content %}
 {% block javascripts %}
 <script>
+  var loading = '{{ loading }}'
+  console.log('loading>>',loading)
   setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
@@ -132,7 +96,6 @@
       successMessage.style.opacity = '0';
     }
   }, 5000);
-  const loader = document.getElementById('loader');
   document.getElementById('username').addEventListener('input', function () {
     document.getElementById('userNameMsg').innerText = '';
   });
@@ -148,6 +111,7 @@
     // Clear previous error messages
     document.getElementById('userNameMsg').innerText = '';
     document.getElementById('emailMsg').innerText = '';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (userInput === '') {
       document.getElementById('userNameMsg').innerText = '氏名を入力してください。';
@@ -158,9 +122,18 @@
       document.getElementById('emailMsg').innerText = 'メールを入力してください。';
       event.preventDefault(); // Prevent form submission
     }
-    else
-      loader.style.display = 'block';  // Show the loader when the button is clicked
-    // Additional validation logic can be added as needed
+    else if (!emailRegex.test(emailInput)) {
+      document.getElementById('emailMsg').innerText = '有効なメールアドレスを入力してください。';
+      event.preventDefault();
+    }
+    else{
+      console.log('loading>>>',loading)
+      if (loading) {
+        openSweetAlert();
+      } else {
+        closeSweetAlert();
+      }
+    }
   });
 
 </script>

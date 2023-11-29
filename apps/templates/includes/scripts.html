@@ -53,12 +53,36 @@
       }
   });
 
+  let timerInterval;
+
+  function openSweetAlert() {
+    Swal.fire({
+      title: "メール送信中",
+      html: "<b></b>秒後に送信されます",
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+        const timer = Swal.getPopup().querySelector("b");
+        timerInterval = setInterval(() => {
+          timer.textContent = `${Swal.getTimerLeft()}`;
+        }, 100);
+      },
+      willClose: () => {
+        clearInterval(timerInterval);
+      }
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.timer) {
+        console.log("I was closed by the timer");
+      }
+    });
+  }
+  
+  function closeSweetAlert() {
+    Swal.close();
+  }
+
   //all modules message toaster 
-  {% if messages %}
-  {% for message in messages %}
-      
-  {% endfor %}
-  {% endif %}
 
   {% if messages %}
     {% for message in messages %}
@@ -79,6 +103,14 @@
         });
         {% endif %}
     {% endfor %}
+{% endif %}
+
+//forgot password message 
+{% if forgot_password_success_msg %}
+    Toast.fire({
+      icon: "success",
+      title: '入力したメールアドレスにメールが送信されました。'
+    });
 {% endif %}
 
 //user success message

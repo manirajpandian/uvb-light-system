@@ -93,7 +93,7 @@
               </div>
               {% if form.email.errors %}
               {% for error in form.email.errors %}
-              <span class="text-danger">有効なメールアドレスを入力してください。</span>
+              <span id='invalidEmailError' class="text-danger">有効なメールアドレスを入力してください。</span>
               {% endfor %}
               {% endif %}
               <span class="text-danger" id="emailSpan"></span>
@@ -160,7 +160,7 @@
                     <div class="form-group">
                       <label class="bmd-label-floating">メール</label>
                       <input type="email" name="email" class="form-control" id="FPEmail" {% if email %}
-                        value="{{ email }}" {% endif %}required>
+                        value="{{ email }}" {% endif %} >
                     </div>
                     <span class="text-danger" id="emailErrorSpan"></span>
                   </div>
@@ -183,77 +183,103 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
 
-    var username = document.getElementById('id_username')
-    var email = document.getElementById('id_email')
-    var password = document.getElementById('id_password')
-    var loginBtn = document.getElementById('id_loginBtn')
-    var form = document.getElementById('id_form')
+document.addEventListener("DOMContentLoaded", function () {
+  var username = document.getElementById('id_username');
+  var email = document.getElementById('id_email');
+  var password = document.getElementById('id_password');
+  var loginBtn = document.getElementById('id_loginBtn');
+  var form = document.getElementById('id_form');
+  const emailSpan = document.getElementById('emailErrorSpan');
 
-    loginBtn.addEventListener('click',function(){
-      var userSpan = document.getElementById('userSpan')
-      var emailSpan = document.getElementById('emailSpan')
-      var passwordSpan = document.getElementById('passwordSpan')
-      if(!username.value){
-        userSpan.innerText = '農場ID入力してください。'
+  function showError(element, message, event) {
+    element.innerText = message;
+    event.preventDefault();
+    return false; // Added return statement to prevent form submission
+  }
+  
+  loginBtn.addEventListener('click', function (event) {
+    var userSpan = document.getElementById('userSpan');
+    var emailSpan = document.getElementById('emailSpan');
+    var passwordSpan = document.getElementById('passwordSpan');
+  
+    if (!username.value) {
+      if (showError(userSpan, '農場ID入力してください。', event)) {
+        event.preventDefault();
+        return false; // Stop further execution if there's an error
       }
-      if(!email.value){
-        emailSpan.innerText = 'メールを入力してください。'
+    }
+    if (!email.value) {
+      if (showError(emailSpan, 'メールを入力してください。', event)) {
+        event.preventDefault();
+        return false;
       }
-      if(!password.value){
-        passwordSpan.innerText = 'パスワードを入力してください。'
+    }
+    if (!password.value) {
+      if (showError(passwordSpan, 'パスワードを入力してください。', event)) {
+        event.preventDefault();
+        return false;
       }
-      form.submit()
-    })
-    username.addEventListener('input',function(){
-      userSpan.innerText = ''
-      forgot_password_message.innerText = ''
-    })
-    email.addEventListener('input',function(){
-      emailSpan.innerText = ''
-    })
-    password.addEventListener('input',function(){
-      passwordSpan.innerText = ''
-    })
+    }
+  else{form.submit();}
+    
+  });
 
 
-    var forgotPasswordMessage = "{{ forgot_password_message }}";
-    $(document).ready(function () {
-      if (forgotPasswordMessage != 'None') {
-        // Show the modal
-        $("#ForgotModal").modal("show");
-      }
-    });
-
-    const forgotButton = document.getElementById("forgotModal");
-    const forgotForm = document.getElementById("forgotForm");
-    const emailInput = document.getElementById('FPEmail');
-    const emailSpan = document.getElementById('emailErrorSpan')
-
-    forgotButton.addEventListener("click", function () {
-      $("#ForgotModal").modal("show");
-    });
-    document.getElementById('FPEmail').addEventListener('input', function () {
+  [username, email, password].forEach((input) => {
+    input.addEventListener('input', function () {
+      userSpan.innerText = '';
+      var invalidEmailError = document.getElementById('invalidEmailError')
+      if(invalidEmailError){invalidEmailError.innerText = '';}
       emailSpan.innerText = '';
-      forgot_password_messageSpan = document.getElementById('forgot_password_message')
-      if (forgot_password_messageSpan.innerText) {
-        forgot_password_messageSpan.innerText = ''
-      }
-    });
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    document.getElementById("emailSendBtn").addEventListener("click", function () {
-      if (!emailInput.value) {
-        emailSpan.innerText = 'メールアドレスを入力してください。';
-        $("#ForgotModal").modal("show");
-      } else if (!emailRegex.test(emailInput.value)) {
-        emailSpan.innerText = '有効なメールアドレスを入力してください。';
-        $("#ForgotModal").modal("show");
-      } else {
-        forgotForm.action = '/forgot_password';
-        forgotForm.submit();
-      }
     });
   });
+
+  var forgotPasswordMessage = ''
+  var forgotPasswordMessage = "{{ forgot_password_message }}";
+
+  $(document).ready(function () {
+    if (forgotPasswordMessage !== 'None') {
+      $("#ForgotModal").modal("show");
+    }
+  });
+
+  const forgotButton = document.getElementById("forgotModal");
+  const forgotForm = document.getElementById("forgotForm");
+  const emailInput = document.getElementById('FPEmail');
+
+  forgotButton.addEventListener("click", function () {
+    $("#ForgotModal").modal("show");
+  });
+
+  document.getElementById('FPEmail').addEventListener('input', function () {
+    emailSpan.innerText = '';
+    var forgot_password_messageSpan = document.getElementById('forgot_password_message');
+    if (forgot_password_messageSpan) {
+      forgot_password_messageSpan.innerText = '';
+    }
+  });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  document.getElementById("emailSendBtn").addEventListener("click", function () {
+    if (!emailInput.value) {
+      showError(emailSpan, 'メールアドレスを入力してください。');
+      $("#ForgotModal").modal("show");
+    } else if (!emailRegex.test(emailInput.value)) {
+      showError(emailSpan, '有効なメールアドレスを入力してください。');
+      $("#ForgotModal").modal("show");
+    } else {
+      forgotForm.action = '/forgot_password';
+      forgotForm.submit();
+      const loading = true; // Replace with your actual loading variable
+      if (loading) {
+        openSweetAlert();
+      } else {
+        closeSweetAlert();
+      }
+    }
+  });
+});
+
 </script>
 {% endblock javascripts %}

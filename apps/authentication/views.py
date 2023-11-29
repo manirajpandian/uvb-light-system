@@ -22,13 +22,13 @@ from django.utils import timezone
 def login_view(request):
     form = LoginForm(request.POST or None)
     msg = None
+    loading = False
     
     if request.method == "POST":
         if form.is_valid():
             username = form.cleaned_data['username']
             email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password")
-            print(username, email, password)
             if User.objects.filter(username=username).exists():
                 if User.objects.filter(email=email).exists():
                     user = authenticate(request,username=username, email=email, password=password)
@@ -53,7 +53,7 @@ def login_view(request):
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
     email = request.session.pop('email',None)
-    return render(request, "accounts/login.html", {"form": form, "msg": msg,'forgot_password_message': forgot_password_message, 'forgot_password_success_msg':forgot_password_success_msg, 'email':email})
+    return render(request, "accounts/login.html", {"form": form, "msg": msg,'forgot_password_message': forgot_password_message, 'forgot_password_success_msg':forgot_password_success_msg, 'email':email, 'loading':loading})
 
 # user list and active/disable
 @login_required(login_url="/login/")
@@ -136,11 +136,13 @@ def update_user(request, pk):
 def add_user(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    loading = False
     try:
         if request.method == "GET":
             context = {
                     'user_profile_image': user_profile_image,
-                    'user_role_id':user_role_id
+                    'user_role_id':user_role_id,
+                    'loading':loading
                     }
             return render(request, 'home/add-user.html', context)
         else:
@@ -149,9 +151,11 @@ def add_user(request):
             role_id = request.POST['role_id']
             user_id = request.user.id
             base_url = settings.BASE_URL
+            loading = True
             expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
             if User.objects.filter(email=email).exists():
+                loading = False
                 context = {
                     'first_name': first_name,
                     'email': email,
@@ -159,7 +163,8 @@ def add_user(request):
                     'user_id':user_id,
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
-                    'error_message':"このメールはすでに存在します。別のメールをお試しください。"
+                    'error_message':"このメールはすでに存在します。別のメールをお試しください。",
+                    'loading':loading
                 }
                 return render(request, 'home/add-user.html', context)
 
@@ -196,6 +201,7 @@ def add_user(request):
             profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
             profile_obj.save()
 
+            loading = False
             success_message = "ユーザが正常に追加されました"
             messages.success(request, success_message)
             return redirect('/user_list')
@@ -281,6 +287,7 @@ def change_password(request, token):
 def forgot_password(request):
     try:
         if request.method == 'POST':
+            loading = True
             csrf_token = request.POST.get('csrfmiddlewaretoken', '')
             if not csrf_token or not request.META.get('CSRF_COOKIE'):
                 request.session['forgot_password_message'] = 'CSRF token is missing or invalid'
@@ -289,6 +296,7 @@ def forgot_password(request):
             email = request.POST.get("email")
 
             if not User.objects.filter(email=email).first():
+                loading = False
                 request.session['email'] = email
                 request.session['forgot_password_message'] = 'メールが存在しません'
                 return redirect('/forgot_password/')
@@ -302,7 +310,7 @@ def forgot_password(request):
 
             user_obj.username = farm_id
             user_obj.save()
-            
+
             profile_obj = Profile.objects.get(user=user_obj)
             profile_obj.forget_password_token = token
             profile_obj.token_expiration_time = expiration_time  # Save the expiration time
@@ -310,13 +318,15 @@ def forgot_password(request):
             
             send_forgot_password_mail(user_obj.email, token, farm_id)
             request.session['forgot_password_success_msg'] = '入力したメールアドレスにメールが送信されました。'
+
+            loading = False
             
             return redirect('/login/')
 
     except Exception as e:
         print('Error', e)
         request.session['forgot_password_message'] = 'エラーが発生しました。もう一度お試しください。'
-
+        loading = False
     return redirect('/login/')
 
 @login_required(login_url="/login/")
