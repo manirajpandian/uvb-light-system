@@ -118,32 +118,16 @@ class LED(models.Model):
 
 
 
+class Rasp(models.Model):
+    rbi = models.CharField(max_length=20, primary_key=True)
 
-class Raspberrypi(models.Model):
-    raspberry_id = models.CharField(max_length=20 ,primary_key=True)
+class data(models.Model):
+    raspberry_id = models.ForeignKey(Rasp, on_delete=models.CASCADE, related_name='raspberry_instances')
     date = models.DateTimeField()
     temperature = models.FloatField()
     humidity = models.FloatField()
     soil_moisture = models.FloatField()
 
-
-    def __str__(self):
-        return f"{self.raspberry_id} - {self.temperature}°C, {self.humidity}%, {self.soil_moisture}%"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    class Meta:
+        unique_together = ('date', 'raspberry_id')
+    
