@@ -256,11 +256,31 @@
             </div>
           </div>
         </div>
+        <button id="triggerButton">Click me</button>
         {% endblock content %}
 
         <!-- Specific Page JS goes HERE  -->
         {% block javascripts %}
         <script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    document.getElementById('triggerButton').addEventListener('click', function () {
+        // Trigger the success message
+        Toast.fire({
+            icon: "success",
+            title: "Signed in successfully"
+        });
+    });
           document.addEventListener("DOMContentLoaded", function () {
             const colorToggles = document.querySelectorAll(".colorToggle");
 
