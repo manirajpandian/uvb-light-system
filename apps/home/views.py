@@ -16,7 +16,7 @@ from django.contrib import messages
 from apps.authentication.models import Profile
 from django.contrib.auth.models import User
 
-from .models import Raspberrypi
+
 import paho.mqtt.client as mqtt
 import json
 from django.utils import timezone
@@ -25,7 +25,7 @@ import paho.mqtt.publish as publish
 from datetime import date, datetime
 
 
-from .models import Raspberrypi
+from .models import data , Rasp
 import paho.mqtt.client as mqtt
 import json
 from django.utils import timezone
@@ -38,10 +38,6 @@ from django.db import IntegrityError
 
 
 
-broker_address = "localhost"  # Replace with your local broker address
-port = 1883
-topic_rpi_to_ec2 = "rpi_to_ec2_topic"
-topic_ec2_to_rpi = "ec2_to_rpi_topic"
 
 
 @login_required(login_url="/login/")
@@ -137,8 +133,17 @@ def house_lights(request):
 
 
 
+# MQTT---Crdentials 
 
-#LED Control - Sensor and LED Access
+broker_address = "52.193.119.75"  # Replace with your local broker address
+port = 1883
+topic_rpi_to_ec2 = "rpi_to_ec2_topic"
+topic_ec2_to_rpi = "ec2_to_rpi_topic"
+
+mqtt_username = "dht"
+mqtt_password = "dht123"
+
+# LED Control - Sensor and LED Access
 sensor_data = {
     'temperature': None,
     'humidity': None,
@@ -151,6 +156,8 @@ sensor_data = {
 
 latest_stored_date ={}
 current_date = date.today()
+
+
 
 #LED Control - Sensor and LED Access
 @login_required(login_url="/login/")
@@ -181,57 +188,45 @@ def LED_control(request,farm_id=None):
             if payload_date_str:
                 
                 sensor_data['date'] = datetime.strptime(payload_date_str, "%Y-%m-%d %H:%M:%S").date()
+                
             else:
                 print("Invalid date provided in sensor data.")
                 return
          
             # Inside your on_message function
             raspberry_id = sensor_data['raspberry_id']
+            rasp_instance, created = Rasp.objects.get_or_create(rbi=raspberry_id)
+            
 
             if raspberry_id not in latest_stored_date:
                 latest_stored_date[raspberry_id] = None
 
             # Check if it's a new date
             if sensor_data['date'] is not None:
-                # Get the latest record for the current day and Raspberry Pi ID
-                latest_record = Raspberrypi.objects.filter(
-                    raspberry_id=raspberry_id,
-                    date=sensor_data['date']
-                ).order_by('-date').first()
-
-                if latest_record:
-                    # Update the latest record with the new data
-                    latest_record.temperature = sensor_data['temperature']
-                    latest_record.humidity = sensor_data['humidity']
-                    latest_record.soil_moisture = sensor_data['soil_moisture']
-                    latest_record.date = sensor_data['date']
-                    latest_record.save()
-                    print("Sensor data updated in the database:", latest_record)
-                else:
-                    # Save data to the database
-                    sensor_db_data, created = Raspberrypi.objects.update_or_create(
-                        raspberry_id=raspberry_id,
-                        date=sensor_data['date'],
-                        defaults={
-                            'temperature': sensor_data['temperature'],
-                            'humidity': sensor_data['humidity'],
-                            'soil_moisture': sensor_data['soil_moisture'],
-                        }
+                sensor_db_data, created = data.objects.update_or_create(
+                raspberry_id=rasp_instance,
+                date=sensor_data['date'],
+                defaults={
+                'temperature': sensor_data['temperature'],
+                'humidity': sensor_data['humidity'],
+                'soil_moisture': sensor_data['soil_moisture'],
+                }
                     )
 
-                    if created:
-                        print("Sensor data saved to the database:", sensor_db_data)
-                    else:
-                        print("Sensor data updated in the database:", sensor_db_data)
+                if created:
+                    print("Sensor data saved to the database:", sensor_db_data)
+                else:
+                    print("Sensor data updated in the database:", sensor_db_data)
 
                     # Update the latest stored date for the current Raspberry Pi ID
-                    latest_stored_date[raspberry_id] = sensor_data['date']
+                latest_stored_date[raspberry_id] = sensor_data['date']
             else:
                 print("Invalid date provided in sensor data.")
 
-
+       
         # MQTT client for receiving sensor data
         mqtt_client = mqtt.Client()
+        mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
         mqtt_client.on_message = on_message
 
         # Connect to the MQTT broker
@@ -285,9 +280,9 @@ def LED_control(request,farm_id=None):
                         led.save()
                         print('button no',led.button_no)
                         button_data = led.button_no
+                        Relay_data= True
                         # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data}),
-                               hostname=broker_address, port=port)
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
 
                         led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
@@ -297,9 +292,9 @@ def LED_control(request,farm_id=None):
                         led.led_on_date = timezone.now() 
                         led.save()
                         button_data = led.button_no
+                        Relay_data = False
                         # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data}),
-                               hostname=broker_address, port=port)
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         print('button no',led.button_no)
                         led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
