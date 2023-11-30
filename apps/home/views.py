@@ -134,14 +134,14 @@ def house_lights(request):
 
 
 # MQTT---Crdentials 
-broker_address = "localhost" 
-# broker_address = "52.193.119.75"  # Replace with your local broker address
+
+broker_address = "52.193.119.75"  # Replace with your local broker address
 port = 1883
 topic_rpi_to_ec2 = "rpi_to_ec2_topic"
 topic_ec2_to_rpi = "ec2_to_rpi_topic"
 
-# mqtt_username = "dht"
-# mqtt_password = "dht123"
+mqtt_username = "dht"
+mqtt_password = "dht123"
 
 # LED Control - Sensor and LED Access
 sensor_data = {
@@ -226,7 +226,7 @@ def LED_control(request,farm_id=None):
        
         # MQTT client for receiving sensor data
         mqtt_client = mqtt.Client()
-        # mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
+        mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
         mqtt_client.on_message = on_message
 
         # Connect to the MQTT broker
@@ -286,8 +286,8 @@ def LED_control(request,farm_id=None):
                         button_data = led.button_no
                         Relay_data= True
                         # Publish button_no data to the topic
-                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port,)
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        
                         led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
             
@@ -298,8 +298,8 @@ def LED_control(request,farm_id=None):
                         button_data = led.button_no
                         Relay_data = False
                         # Publish button_no data to the topic
-                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port,)
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        
                         print('button no',led.button_no)
                         led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
