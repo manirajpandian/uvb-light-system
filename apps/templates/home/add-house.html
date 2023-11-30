@@ -461,6 +461,7 @@
                                                 <option value="" selected="selected" disabled>
                                                     選択してください
                                                 </option>
+                                                <option value="">誰も割り当てられない</option>
                                                 {% for user in choice_user %}
                                                  <option value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}</option>
                                                  {% endfor %}

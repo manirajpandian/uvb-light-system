@@ -144,6 +144,13 @@ Toast.fire({
   title: '{{ house_success_msg }}'
 });
 {% endif %}
+//Led_control success message
+{% if led_success_msg %}
+Toast.fire({
+  icon: "success",
+  title: '{{ led_success_msg }}'
+});
+{% endif %}
 
 //go back event 
 function goBack() {
