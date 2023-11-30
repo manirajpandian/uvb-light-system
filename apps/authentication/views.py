@@ -81,12 +81,31 @@ def user_list(request):
         if request.method == "POST":
             user_id = request.POST.get('user_id')
             is_active = request.POST.get('is_active')
-            user_obj = User.objects.get(id=user_id)
-            user_obj.is_active = is_active
-            user_obj.save()
-            update_success_message = 'ユーザー詳細が正常に更新されました'
-            messages.success(request, update_success_message)
-            return redirect('/user_list')
+            try:
+                user_obj = User.objects.get(id=user_id)
+
+                # Deactivate the main user
+                user_obj.is_active = is_active
+                user_obj.save()
+
+                # Get all profile objects mapped under the user_id
+                profile_obj = Profile.objects.filter(mapped_under=user_id)
+                for obj in profile_obj:
+                   active_user_obj = User.objects.get(id=obj.user_id)
+                   active_user_obj.is_active = is_active
+                   active_user_obj.save()
+
+                update_success_message = 'ユーザー詳細が正常に更新されました'
+                messages.success(request, update_success_message)
+                return redirect('/user_list')
+
+            except User.DoesNotExist:
+                messages.error(request, '指定されたユーザーが存在しません。')
+                return redirect('/user_list')
+
+            except Profile.DoesNotExist:
+                messages.error(request, '指定されたプロファイルが存在しません。')
+                return redirect('/user_list')
 
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
