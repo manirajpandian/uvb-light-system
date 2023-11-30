@@ -60,11 +60,13 @@ def login_view(request):
 def user_list(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    current_user = request.user.id
     try:
-        user_list = User.objects.all().order_by('id')
-        profile_list = Profile.objects.filter(user__in=user_list)
-        user_profile_list = [(user, profile) for user, profile in zip(user_list, profile_list)
-                         if not user.is_superuser and request.user.id != user.id]
+        profile_list = Profile.objects.filter(mapped_under=current_user)
+        user_profile_list = [
+            (profile.user, profile) for profile in profile_list
+            if not profile.user.is_superuser and request.user.id != profile.user.id
+        ]
 
         paginator = Paginator(user_profile_list, 5)
         page_number = request.GET.get('page')

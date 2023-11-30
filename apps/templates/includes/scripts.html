@@ -45,7 +45,7 @@
       toast: true,
       position: "top-end",
       showConfirmButton: false,
-      timer: 3000,
+      timer: 2500,
       timerProgressBar: true,
       didOpen: (toast) => {
           toast.onmouseenter = Swal.stopTimer;
@@ -59,7 +59,7 @@
     Swal.fire({
       title: "メール送信中",
       html: "<b></b>秒後に送信されます",
-      timer: 3000,
+      timer: 5000,
       timerProgressBar: true,
       didOpen: () => {
         Swal.showLoading();
