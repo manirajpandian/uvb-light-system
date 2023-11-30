@@ -62,31 +62,44 @@ def index(request,farm_id=None):
         house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
 
         #Active and Inactive LED count under the current admin ID
-        led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True).count()
-        led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id).count()
+        led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+        led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,pole__line__house__is_active=True).count()
+
+        #User House count
+        user_house_count = House.objects.filter(user=current_user_id,is_active=True).count()
+
+        #User Led On and Off count
+        user_led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+        user_led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
 
         #Admin - Farm Filter and House Display
-        farms = Farm.objects.all()
+        farms = Farm.objects.filter(user_id=request.user.id)
         if len(farms) > 0:
-            selected_farm_id = request.GET.get('farm_id') or farm_id
-            if selected_farm_id:
-                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
-                selected_farm = Farm.objects.get(pk=selected_farm_id)
-                selected_farm_name = selected_farm.farm_name  
+            if user_role_id == '2':
+                houses = House.objects.filter(user=current_user_id,is_active=True).select_related('plant')
+                farms = None
+                selected_farm_name = None
+                for house in houses:
+                    house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
             else:
-                default_farm = Farm.objects.first()
-                houses = House.objects.filter(farm=default_farm).select_related('plant')
-                selected_farm = default_farm
-                selected_farm_name = selected_farm.farm_name
-        
-            for house in houses:
-                house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
+                selected_farm_id = request.GET.get('farm_id') or farm_id
+                if selected_farm_id:
+                    houses = House.objects.filter(farm_id=selected_farm_id,is_active=True).select_related('plant')
+                    selected_farm = Farm.objects.get(pk=selected_farm_id)
+                    selected_farm_name = selected_farm.farm_name  
+                else:
+                    default_farm = farms.first()
+                    houses = House.objects.filter(farm=default_farm,is_active=True).select_related('plant')
+                    selected_farm = default_farm
+                    selected_farm_name = selected_farm.farm_name
+            
+                for house in houses:
+                    house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
 
-            #User House Display
-            user_houses= House.objects.filter(user__id=current_user_id).select_related('plant')
-            for house in user_houses:
-                house.uHouse_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-        
+            print("houses",houses)
+            print('role id',user_role_id)
+            print('id',current_user_id)
+            print('farm',farms)    
             context = {
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
@@ -100,7 +113,9 @@ def index(request,farm_id=None):
                 'farms': farms,
                 'houses': houses,
                 'selected_farm_name': selected_farm_name,
-                'user_houses':user_houses
+                'user_house_count' : user_house_count,
+                'user_led_on_count' :  user_led_on_count,
+                'user_led_full_count':user_led_full_count
                 }
             if request.method == "GET":
                 html_template = loader.get_template('home/dashboard.html')
@@ -117,6 +132,9 @@ def index(request,farm_id=None):
                'house_count':house_count,
                'led_on_count':led_on_count,
                'led_full_count':led_full_count,
+               'user_house_count':user_house_count,
+               'user_led_on_count': user_led_on_count,
+               'user_led_full_count':user_led_full_count
                }
             html_template = loader.get_template('home/dashboard.html')
             return HttpResponse(html_template.render(context, request))
@@ -135,13 +153,13 @@ def house_lights(request):
 
 # MQTT---Crdentials 
 
-broker_address = "52.193.119.75"  # Replace with your local broker address
-port = 1883
-topic_rpi_to_ec2 = "rpi_to_ec2_topic"
-topic_ec2_to_rpi = "ec2_to_rpi_topic"
+# broker_address = "52.193.119.75"  # Replace with your local broker address
+# port = 1883
+# topic_rpi_to_ec2 = "rpi_to_ec2_topic"
+# topic_ec2_to_rpi = "ec2_to_rpi_topic"
 
-mqtt_username = "dht"
-mqtt_password = "dht123"
+# mqtt_username = "dht"
+# mqtt_password = "dht123"
 
 # LED Control - Sensor and LED Access
 sensor_data = {
@@ -169,7 +187,7 @@ def LED_control(request,farm_id=None):
 
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        farms = Farm.objects.all()
+        farms = Farm.objects.filter(user_id=request.user.id)
     
         def on_message(client, userdata, message):
             sensor_data , latest_stored_date
@@ -224,34 +242,34 @@ def LED_control(request,farm_id=None):
                 print("Invalid date provided in sensor data.")
 
        
-        # MQTT client for receiving sensor data
-        mqtt_client = mqtt.Client()
-        mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
-        mqtt_client.on_message = on_message
+        # # MQTT client for receiving sensor data
+        # mqtt_client = mqtt.Client()
+        # mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
+        # mqtt_client.on_message = on_message
 
-        # Connect to the MQTT broker
-        mqtt_client.connect(broker_address, port, 60)
+        # # Connect to the MQTT broker
+        # mqtt_client.connect(broker_address, port, 60)
 
-        # Subscribe to the topic where the Raspberry Pi publishes sensor data
-        mqtt_client.subscribe(topic_rpi_to_ec2)
+        # # Subscribe to the topic where the Raspberry Pi publishes sensor data
+        # mqtt_client.subscribe(topic_rpi_to_ec2)
 
-        # Start the MQTT loop in the background
-        mqtt_client.loop_start()
+        # # Start the MQTT loop in the background
+        # mqtt_client.loop_start()
         
         if len(farms) > 0:
             if user_role_id == '2':
-                houses = House.objects.filter(user=request.user.id).select_related('plant')
+                houses = House.objects.filter(user=request.user.id,is_active=True).select_related('plant')
                 farms = None
                 selected_farm_name = None
             else:
                 selected_farm_id = request.GET.get('farm_id') or farm_id
                 if selected_farm_id:
-                    houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
+                    houses = House.objects.filter(farm_id=selected_farm_id,is_active=True,farm__user_id=request.user.id).select_related('plant')
                     selected_farm = Farm.objects.get(pk=selected_farm_id)
                     selected_farm_name = selected_farm.farm_name  
                 else:
-                    default_farm = Farm.objects.first()
-                    houses = House.objects.filter(farm=default_farm).select_related('plant')
+                    default_farm = farms.first()
+                    houses = House.objects.filter(farm=default_farm,is_active=True,farm__user_id=request.user.id).select_related('plant')
                     selected_farm = default_farm
                     selected_farm_name = selected_farm.farm_name
 
@@ -286,7 +304,7 @@ def LED_control(request,farm_id=None):
                         button_data = led.button_no
                         Relay_data= True
                         # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
 
                         led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
@@ -298,7 +316,7 @@ def LED_control(request,farm_id=None):
                         button_data = led.button_no
                         Relay_data = False
                         # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         print('button no',led.button_no)
                         led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
@@ -326,7 +344,7 @@ def plant_setting(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        plant_list = Plant.objects.all().order_by('plant_id')
+        plant_list = Plant.objects.filter(createdBy=request.user.id).order_by('plant_id')
         page = Paginator(plant_list, 5)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
@@ -392,15 +410,15 @@ def house_list(request, farm_id=None):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        farms = Farm.objects.all()
+        farms = Farm.objects.filter(user_id=request.user.id)
         if len(farms) > 0:
             selected_farm_id = request.GET.get('farm_id') or farm_id
             if selected_farm_id:
-                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
+                houses = House.objects.filter(farm_id=selected_farm_id,farm__user_id=request.user.id).select_related('plant')
                 selected_farm = Farm.objects.get(pk=selected_farm_id)
                 selected_farm_name = selected_farm.farm_name  
             else:
-                default_farm = Farm.objects.first()
+                default_farm = farms.first()
                 houses = House.objects.filter(farm=default_farm).select_related('plant')
                 selected_farm = default_farm
                 selected_farm_name = selected_farm.farm_name
@@ -457,8 +475,8 @@ def house_list(request, farm_id=None):
 
 @login_required(login_url="/login/")
 def add_house(request):
-    choice_plant = Plant.objects.all()
-    choice_farm = Farm.objects.all()
+    choice_plant = Plant.objects.filter(createdBy=request.user.id)
+    choice_farm = Farm.objects.filter(user_id=request.user.id)
     if request.user.is_authenticated:
         current_user_id = request.user.id
         mapped_profiles = Profile.objects.filter(mapped_under=current_user_id,user__is_active=True)
@@ -549,7 +567,7 @@ def update_house(request, house_id):
         else:
             choice_user = []
 
-        choice_plant = Plant.objects.all()
+        choice_plant = Plant.objects.filter(createdBy=request.user.id)
 
         context = {
             'segment': 'update_house',
@@ -596,7 +614,7 @@ def update_house(request, house_id):
 def farm_list(request):
     try:
         if request.method == "GET":
-            farm_list = Farm.objects.all().order_by('farm_id')
+            farm_list = Farm.objects.filter(user_id = request.user.id).order_by('farm_id')
             page_number = request.GET.get('page', 1)
             paginator = Paginator(farm_list, 5)
             page = paginator.get_page(page_number)
@@ -651,7 +669,7 @@ def add_farm(request):
                 messages.success(request, '新しい農場の詳細が追加されました')
                 return redirect('/farm_list')
 
-        farm_list = Farm.objects.all().order_by('farm_id')
+        farm_list = Farm.objects.filter(user_id=request.user.id).order_by('farm_id')
         context = {
             'segment': 'farm_list',
             'farm_list': farm_list,
@@ -726,8 +744,9 @@ def add_plant(request):
             form = PlantForm()
             return render(request, 'home/add-plant.html', {"form": form,'user_profile_image': user_profile_image,'user_role_id':user_role_id})
         else:
-            form = PlantForm(request.POST)
+            form = PlantForm(request.POST, request=request)
             if form.is_valid():
+
                 form.save()
                 plant_success_msg = '新しい植物の詳細が追加されました'  #New plant details has been added
                 messages.success(request, plant_success_msg)
@@ -743,7 +762,7 @@ def delete_plant(request, plant_id):
         if request.method == 'POST':
             if plant_id:
                 plant = get_object_or_404(Plant, pk=plant_id)
-                for house in plant.house_set.all():
+                for house in plant.house_set.filter(farm__user_id=request.user.id):
                     house.is_active = False
                     house.save()
                 plant.delete()

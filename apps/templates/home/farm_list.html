@@ -335,18 +335,23 @@
       var AddInput = document.getElementById('add_farm_name').value;
       var AddressInput = document.getElementById('add_address').value;
 
-
       document.getElementById('farmNameMsg').innerText = '';
 
       document.getElementById('addressMsg').innerText = '';
 
       if (AddInput === '') {
-        document.getElementById('farmNameMsg').innerText = '作物名を入力してください。';
+        document.getElementById('farmNameMsg').innerText = '農場名を入力してください。';
+        event.preventDefault();
+      }else if(AddInput.length > 30) {
+        document.getElementById('farmNameMsg').innerText = '農場名は30文字を超えてはなりません。';
         event.preventDefault();
       }
 
       if (AddressInput === '') {
         document.getElementById('addressMsg').innerText = '住所を入力してください。';
+        event.preventDefault();
+      }else if(AddressInput.length > 150) {
+        document.getElementById('addressMsg').innerText = '住所は150文字を超えてはなりません。';
         event.preventDefault();
       }
 

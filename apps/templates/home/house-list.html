@@ -85,9 +85,13 @@
             </button>
 
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% if farms|length > 0 %}
               {% for farm in farms %}
               <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
               {% endfor %}
+              {% else %}
+              <p class="dropdown-item text-warning">農場がありません</p>
+              {% endif %}
             </div>
           </div>
         </div>
