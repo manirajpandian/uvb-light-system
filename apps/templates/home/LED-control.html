@@ -194,6 +194,11 @@
           <i class="material-icons text-success">grass</i>
           <span style="margin-left: 10px">{{soil_moisture}}</span>
       </div>
+    
+      <span class="material-icons" style="margin-left: 20px">
+        <a href="{% url 'farmdata' %}" style="text-decoration: none; color: inherit;">sim_card_download</a>
+    </span>
+    
 
       <div class="accordion" id="accordionExample">
           {% for line in house.lines.all %}
