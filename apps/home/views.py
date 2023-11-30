@@ -33,7 +33,7 @@ import paho.mqtt.publish as publish
 
 from datetime import date, datetime
 from django.db import IntegrityError
-
+import csv
 
 
 
@@ -313,7 +313,7 @@ def LED_control(request,farm_id=None):
                         Relay_data= True
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-
+                        
                         led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
             
@@ -325,6 +325,7 @@ def LED_control(request,farm_id=None):
                         Relay_data = False
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        
                         print('button no',led.button_no)
                         led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
@@ -802,3 +803,38 @@ def delete_house(request, house_id, farm_id):
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
         return HttpResponseServerError()
+
+# download
+@login_required(login_url='/login/')
+def farm_data_download(request):
+    try:
+        #Your query
+        sensor = data.objects.all()
+       
+        # Create a CSV response
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="sensors_data.csv"'
+        # Create a CSV writer and write the header
+        csv_writer = csv.writer(response)
+        # csv_writer.writerow(['Username', 'First Name', 'Last Name', 'Email' , 'Farme_name', 'house_name' , ' lane id ', 'led id' , 'led.on','led.off'])
+        csv_writer.writerow(['rasp-id', 'date', 'temperature', 'humidity' , 'soil-moisture'])
+   
+        # Write data to the CSV file
+        
+        for sdata in sensor :
+            csv_writer.writerow([sdata.raspberry_id ,sdata.date , sdata.temperature, sdata.humidity, sdata.soil_moisture])
+            print(csv_writer)
+        return response
+            
+        # for user_obj in users:
+        #     csv_writer.writerow([user_obj.username, user_obj.first_name, user_obj.last_name, user_obj.email])
+        # return response
+    except BrokenPipeError as e:
+        print('Download api error>>',e)
+        pass
+    # Handle other exceptions or return a different response
+    return HttpResponse("Error occurred during CSV download.")
+
+
+
+
