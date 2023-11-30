@@ -779,11 +779,11 @@ def delete_house(request, house_id, farm_id):
 
 # download
 @login_required(login_url='/login/')
-def farmdata(request):
+def farm_data_download(request):
     try:
         #Your query
         sensor = data.objects.all()
-        users = User.objects.all()
+       
         # Create a CSV response
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="sensors_data.csv"'
