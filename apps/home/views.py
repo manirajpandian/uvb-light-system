@@ -156,7 +156,7 @@ def house_lights(request):
 
 # MQTT---Crdentials 
 
-broker_address = "52.193.119.75"  # Replace with your local broker address
+broker_address = "52.192.209.112"  # Replace with your local broker address
 port = 1883
 topic_rpi_to_ec2 = "rpi_to_ec2_topic"
 topic_ec2_to_rpi = "ec2_to_rpi_topic"
