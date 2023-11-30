@@ -806,7 +806,7 @@ def delete_house(request, house_id, farm_id):
 
 # download
 @login_required(login_url='/login/')
-def farm_data_download(request):
+def LED_data_download(request):
     try:
         #Your query
         sensor = data.objects.all()
