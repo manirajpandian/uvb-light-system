@@ -239,6 +239,12 @@ def delete_user(request, user_id):
             user_obj = get_object_or_404(User, id=user_id)
             profile_obj = get_object_or_404(Profile, user=user_obj)
 
+            profile_obj = Profile.objects.filter(mapped_under=user_id)
+            for obj in profile_obj:
+                active_user_obj = User.objects.get(id=obj.user_id)
+                active_user_obj.is_active = False
+                active_user_obj.save()
+
             user_obj.delete()
             profile_obj.delete()
             user_delete_success = f'ユーザー{ user_obj.first_name }が正常に削除されました。' 
