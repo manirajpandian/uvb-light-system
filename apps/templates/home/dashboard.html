@@ -116,7 +116,7 @@
   </div>
   {% endif %}
 </div>
-
+{% if user_role_id == '1' or user_role_id == '2' %}
 {% if houses|length > 0 %}
 <div class="row">
 {% for house in houses %}
@@ -151,7 +151,7 @@
     </div>
 {% endif %}
 
-
+{% endif %}
 
 
 
