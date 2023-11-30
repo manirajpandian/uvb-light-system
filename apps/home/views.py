@@ -49,6 +49,7 @@ def index(request,farm_id=None):
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
 
+
         # Admin login active user count
         user_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
 
@@ -73,11 +74,13 @@ def index(request,farm_id=None):
         user_led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
 
         #Admin - Farm Filter and House Display
+        farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
         elif user_role_id == '2':
             profile = get_object_or_404(Profile, user=request.user.id)
             farms = Farm.objects.filter(user_id = profile.mapped_under)
+
         if len(farms) > 0:
             if user_role_id == '2':
                 houses = House.objects.filter(user=current_user_id,is_active=True).select_related('plant')
@@ -99,11 +102,7 @@ def index(request,farm_id=None):
             
                 for house in houses:
                     house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-
-            print("houses",houses)
-            print('role id',user_role_id)
-            print('id',current_user_id)
-            print('farm',farms)    
+  
             context = {
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
@@ -191,6 +190,7 @@ def LED_control(request,farm_id=None):
 
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
         elif user_role_id == '2':
