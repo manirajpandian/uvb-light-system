@@ -73,7 +73,11 @@ def index(request,farm_id=None):
         user_led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
 
         #Admin - Farm Filter and House Display
-        farms = Farm.objects.filter(user_id=request.user.id)
+        if user_role_id == '1':
+            farms = Farm.objects.filter(user_id=request.user.id)
+        elif user_role_id == '2':
+            profile = get_object_or_404(Profile, user=request.user.id)
+            farms = Farm.objects.filter(user_id = profile.mapped_under)
         if len(farms) > 0:
             if user_role_id == '2':
                 houses = House.objects.filter(user=current_user_id,is_active=True).select_related('plant')
@@ -187,7 +191,11 @@ def LED_control(request,farm_id=None):
 
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        farms = Farm.objects.filter(user_id=request.user.id)
+        if user_role_id == '1':
+            farms = Farm.objects.filter(user_id=request.user.id)
+        elif user_role_id == '2':
+            profile = get_object_or_404(Profile, user=request.user.id)
+            farms = Farm.objects.filter(user_id = profile.mapped_under)
     
         def on_message(client, userdata, message):
             sensor_data , latest_stored_date
@@ -272,7 +280,7 @@ def LED_control(request,farm_id=None):
                     houses = House.objects.filter(farm=default_farm,is_active=True,farm__user_id=request.user.id).select_related('plant')
                     selected_farm = default_farm
                     selected_farm_name = selected_farm.farm_name
-
+             
             context = {
                 'segment': 'LED_control',
                 'farms': farms,
@@ -320,9 +328,9 @@ def LED_control(request,farm_id=None):
                         print('button no',led.button_no)
                         led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
-
+               
                 return redirect('LED_control_farm_id', farm_id=farm_id)
-
+    
             return redirect('LED_control')
         else:
             context = {
