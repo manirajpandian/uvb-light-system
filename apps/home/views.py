@@ -708,14 +708,17 @@ def farm_list(request):
             return HttpResponse(html_template.render(context, request))
 
         elif request.method == "POST":
-            form = FarmForm(request.POST)
-            if form.is_valid():
-                farm = form.save(commit=False)
-                farm.user = request.user  # Assuming you have a user field in your Farm model
-                farm.save()
-                # Optionally, you can add a success message
-                # messages.success(request, 'Farm added successfully')
-                return redirect('farm_list')
+            farm_id = request.POST.get('farm_id')
+            farm_name = request.POST.get('farm_name')
+            address = request.POST.get('address')
+
+            farm_obj = Farm.objects.get(farm_id=farm_id)
+            farm_obj.farm_name = farm_name
+            farm_obj.address = address
+            farm_obj.save()
+            message = f"ファーム{farm_obj.farm_name} が更新されました"
+            messages.success(request, message)
+            return redirect('farm_list')
 
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
@@ -758,28 +761,6 @@ def add_farm(request):
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
         return HttpResponseServerError()
-
-  # Edit option (Updating the farm details)
-@login_required(login_url="/login/")
-def update_farm(request, pk):
-    try:
-        show = 'true'
-        farm = Farm.objects.get(farm_id=pk)
-        if request.method == 'POST':
-            form = FarmForm(request.POST, instance=farm)
-            if form.is_valid():
-                form.save()
-                Farm_success_msg = '作物詳細の更新成功しました。'  # Successfully updated of crop details
-                messages.success(request, Farm_success_msg)
-                return redirect('/farm_list')
-
-        context = {"farm": farm, "show": show}
-        return render(request, 'home/farm_list.html', context)
-
-    except BrokenPipeError as e:
-        print('exception BrokenPipeError', e)
-        return HttpResponseServerError()
-
 
 #Delete option (Deleting the farm details)
 @login_required(login_url="/login/")
