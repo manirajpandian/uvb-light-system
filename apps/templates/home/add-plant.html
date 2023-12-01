@@ -183,13 +183,13 @@ document.getElementById('plantForm').addEventListener('submit', function(event) 
         document.getElementById('timeMsg').innerText = '分は 59 を超えてはなりません。';
         event.preventDefault();
     }else if(minute < 0 ){
-        document.getElementById('timeMsg').innerText = '分は 59 を超えてはなりません。';
+        document.getElementById('timeMsg').innerText = '分はマイナスであってはなりません。';
         event.preventDefault();
     }else if(second > 59 ){
         document.getElementById('timeMsg').innerText = '秒は 59 を超えてはなりません。';
         event.preventDefault();
     }else if(second < 0 ){
-        document.getElementById('timeMsg').innerText = '秒は 59 を超えてはなりません。';
+        document.getElementById('timeMsg').innerText = '秒はマイナスであってはなりません。';
         event.preventDefault();
     }
 

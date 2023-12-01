@@ -756,7 +756,7 @@ def update_farm(request, pk):
             form = FarmForm(request.POST, instance=farm)
             if form.is_valid():
                 form.save()
-                Farm_success_msg = '作物詳細の更新成功しました。'  # Successfully updated of crop details
+                Farm_success_msg = '農場詳細の更新成功しました。'  # Successfully updated of farm details
                 messages.success(request, Farm_success_msg)
                 return redirect('/farm_list')
 
