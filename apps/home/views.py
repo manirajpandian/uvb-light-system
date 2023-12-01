@@ -10,12 +10,11 @@ from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PlantForm,FarmForm
-from .models import Plant, Farm, House, Line, Pole, LED
+from .models import Plant, Farm, House, Line, Pole, LED, data , Rasp
 from django.core.paginator import Paginator
 from django.contrib import messages
 from apps.authentication.models import Profile
 from django.contrib.auth.models import User
-
 
 import paho.mqtt.client as mqtt
 import json
@@ -24,8 +23,6 @@ import paho.mqtt.publish as publish
 
 from datetime import date, datetime
 
-
-from .models import data , Rasp
 import paho.mqtt.client as mqtt
 import json
 from django.utils import timezone
@@ -36,10 +33,6 @@ from django.db import IntegrityError
 import csv
 
 
-
-
-
-
 @login_required(login_url="/login/")
 def index(request,farm_id=None):
     try:
@@ -48,7 +41,6 @@ def index(request,farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
-
 
         # Admin login
 
@@ -184,8 +176,6 @@ def house_lights(request):
     return HttpResponse(html_template.render(context, request))
 
 
-
-
 # MQTT---Crdentials 
 
 broker_address = "52.192.209.112"  # Replace with your local broker address
@@ -203,13 +193,10 @@ sensor_data = {
     'soil_moisture': None,
     'raspberry_id': None,
     'date':None
-  
-
 }
 
 latest_stored_date ={}
 current_date = date.today()
-
 
 
 #LED Control - Sensor and LED Access
@@ -325,8 +312,7 @@ def LED_control(request,farm_id=None):
                     houses = House.objects.filter(farm=default_farm,is_active=True).select_related('plant')
                     selected_farm = default_farm
                     selected_farm_name = selected_farm.farm_name
-
-             
+          
             context = {
                 'segment': 'LED_control',
                 'farms': farms,
@@ -438,8 +424,6 @@ def update_plant(request,pk):
 @login_required(login_url="/login/")
 def pages(request):
     context = {}
-    # All resource paths end in .html.
-    # Pick out the html file name from the url. And load that template.
     try:
         load_template = request.path.split('/')[-1]
 
@@ -708,6 +692,12 @@ def farm_list(request):
             return HttpResponse(html_template.render(context, request))
 
         elif request.method == "POST":
+            form = FarmForm(request.POST)
+            if form.is_valid():
+                farm = form.save(commit=False)
+                farm.user = request.user  
+                farm.save()
+                return redirect('farm_list')
             farm_id = request.POST.get('farm_id')
             farm_name = request.POST.get('farm_name')
             address = request.POST.get('address')
@@ -740,8 +730,7 @@ def add_farm(request):
         else:
             form = FarmForm(request.POST)
             if form.is_valid():
-                
-                farm = form.save(commit=False)  # Don't save to the database yet
+                farm = form.save(commit=False)  
                 farm.user = request.user
                 farm.save()
                 messages.success(request, '新しい農場の詳細が追加されました')
@@ -761,7 +750,7 @@ def add_farm(request):
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
         return HttpResponseServerError()
-
+      
 #Delete option (Deleting the farm details)
 @login_required(login_url="/login/")
 def delete_farm(request, farm_id):
@@ -784,9 +773,7 @@ def delete_farm(request, farm_id):
 
                         # Publish data to MQTT
                         publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
-                            
                     house.delete()
-                # Now delete the farm
                 farm.delete()
                 farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
                 messages.success(request, farm_success_msg)
@@ -884,31 +871,20 @@ def delete_house(request, house_id, farm_id):
 @login_required(login_url='/login/')
 def LED_data_download(request):
     try:
-        #Your query
         sensor = data.objects.all()
-       
-        # Create a CSV response
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="sensors_data.csv"'
-        # Create a CSV writer and write the header
         csv_writer = csv.writer(response)
-        # csv_writer.writerow(['Username', 'First Name', 'Last Name', 'Email' , 'Farme_name', 'house_name' , ' lane id ', 'led id' , 'led.on','led.off'])
         csv_writer.writerow(['rasp-id', 'date', 'temperature', 'humidity' , 'soil-moisture'])
-   
-        # Write data to the CSV file
-        
+
         for sdata in sensor :
             csv_writer.writerow([sdata.raspberry_id ,sdata.date , sdata.temperature, sdata.humidity, sdata.soil_moisture])
             print(csv_writer)
         return response
-            
-        # for user_obj in users:
-        #     csv_writer.writerow([user_obj.username, user_obj.first_name, user_obj.last_name, user_obj.email])
-        # return response
+
     except BrokenPipeError as e:
         print('Download api error>>',e)
         pass
-    # Handle other exceptions or return a different response
     return HttpResponse("Error occurred during CSV download.")
 
 
