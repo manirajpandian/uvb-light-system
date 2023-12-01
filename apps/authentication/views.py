@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from .helpers import send_forgot_password_mail
 import datetime
 from django.utils import timezone
+from django.db.models import Q
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -62,9 +63,12 @@ def user_list(request):
     user_role_id = request.session.get('role_id')
     current_user = request.user.id
     try:
-        profile_list = Profile.objects.filter(mapped_under=current_user)
-        user_profile_list = [(profile.user, profile) for profile in profile_list]
-
+        if user_role_id == '0':
+            profile_list = Profile.objects.filter(Q(role_id='0') | Q(role_id='1'))
+            user_profile_list = [(profile.user, profile) for profile in profile_list]
+        else:
+            profile_list = Profile.objects.filter(mapped_under=current_user)
+            user_profile_list = [(profile.user, profile) for profile in profile_list]
         paginator = Paginator(user_profile_list, 5)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)

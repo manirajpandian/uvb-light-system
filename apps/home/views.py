@@ -692,12 +692,6 @@ def farm_list(request):
             return HttpResponse(html_template.render(context, request))
 
         elif request.method == "POST":
-            form = FarmForm(request.POST)
-            if form.is_valid():
-                farm = form.save(commit=False)
-                farm.user = request.user  
-                farm.save()
-                return redirect('farm_list')
             farm_id = request.POST.get('farm_id')
             farm_name = request.POST.get('farm_name')
             address = request.POST.get('address')
