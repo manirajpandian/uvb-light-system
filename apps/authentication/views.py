@@ -63,10 +63,7 @@ def user_list(request):
     current_user = request.user.id
     try:
         profile_list = Profile.objects.filter(mapped_under=current_user)
-        user_profile_list = [
-            (profile.user, profile) for profile in profile_list
-            if not profile.user.is_superuser and request.user.id != profile.user.id
-        ]
+        user_profile_list = [(profile.user, profile) for profile in profile_list]
 
         paginator = Paginator(user_profile_list, 5)
         page_number = request.GET.get('page')

@@ -62,9 +62,10 @@
           <div class="form-group">
             <label for="権限" class="bmd-label-floating">権限</label>
             <select name="role_id" class="form-control" id="roleId">
+              
               {% if user_role_id == '0' %}
-              <option value="0">BEAM TECH スーパー管理者</option>
-              <option value="1">管理者</option>
+              <option {% if show == 'true' and role_id == '0' %} selected {% else %} value="0" {% endif %} >BEAM TECH スーパー管理者</option>
+              <option {% if show == 'true' and role_id == '1' %} selected {% else %} value="1" {% endif %} >管理者</option>
               {% else %}
               <option value="2">ユーザー</option>
               {% endif %}
