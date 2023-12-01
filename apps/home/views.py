@@ -698,6 +698,17 @@ def farm_list(request):
                 farm.user = request.user  
                 farm.save()
                 return redirect('farm_list')
+            farm_id = request.POST.get('farm_id')
+            farm_name = request.POST.get('farm_name')
+            address = request.POST.get('address')
+
+            farm_obj = Farm.objects.get(farm_id=farm_id)
+            farm_obj.farm_name = farm_name
+            farm_obj.address = address
+            farm_obj.save()
+            message = f"ファーム{farm_obj.farm_name} が更新されました"
+            messages.success(request, message)
+            return redirect('farm_list')
 
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
@@ -739,29 +750,7 @@ def add_farm(request):
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
         return HttpResponseServerError()
-
-  # Edit option (Updating the farm details)
-@login_required(login_url="/login/")
-def update_farm(request, pk):
-    try:
-        show = 'true'
-        farm = Farm.objects.get(farm_id=pk)
-        if request.method == 'POST':
-            form = FarmForm(request.POST, instance=farm)
-            if form.is_valid():
-                form.save()
-                Farm_success_msg = '農場詳細の更新成功しました。'  # Successfully updated of farm details
-                messages.success(request, Farm_success_msg)
-                return redirect('/farm_list')
-
-        context = {"farm": farm, "show": show}
-        return render(request, 'home/farm_list.html', context)
-
-    except BrokenPipeError as e:
-        print('exception BrokenPipeError', e)
-        return HttpResponseServerError()
-
-
+      
 #Delete option (Deleting the farm details)
 @login_required(login_url="/login/")
 def delete_farm(request, farm_id):
