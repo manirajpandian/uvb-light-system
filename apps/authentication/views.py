@@ -96,16 +96,16 @@ def user_list(request):
                    active_user_obj.is_active = is_active
                    active_user_obj.save()
 
-                update_success_message = 'ユーザー詳細が正常に更新されました'
+                update_success_message = 'ユーザー情報が正常に更新されました'
                 messages.success(request, update_success_message)
                 return redirect('/user_list')
 
             except User.DoesNotExist:
-                messages.error(request, '指定されたユーザーが存在しません。')
+                messages.error(request, '指定されたユーザーは存在しません')
                 return redirect('/user_list')
 
             except Profile.DoesNotExist:
-                messages.error(request, '指定されたプロファイルが存在しません。')
+                messages.error(request, '指定されたプロファイルは存在しません')
                 return redirect('/user_list')
 
     except BrokenPipeError as e:
@@ -133,7 +133,7 @@ def update_user(request, pk):
             profile_obj.role_id = request.POST.get('role_id')
             profile_obj.save()
 
-            update_success_message = 'ユーザー詳細が正常に更新されました'
+            update_success_message = 'ユーザー情報が正常に更新されました'
             messages.success(request, update_success_message)
             return redirect('/user_list')
 
@@ -297,7 +297,7 @@ def change_password(request, token):
                 return redirect(f'/change_password/{token}')
 
             if profile_obj.token_expiration_time and timezone.now() > profile_obj.token_expiration_time:
-                messages.error(request, 'パスワード再設定リンクの有効期限が切れました。新しいパスワードをリクエストしてください。')
+                messages.error(request, 'パスワード再設定リンクの有効期限が切れました。新しいパスワードを作成してください。')
                 return redirect(f'/change_password/{token}')
             
             else:
@@ -306,7 +306,7 @@ def change_password(request, token):
                 user_obj.is_active = True
                 user_obj.save()
 
-                messages.success(request, 'パスワードの変更に成功しました。新しいパスワードでログインできます。')
+                messages.success(request, 'パスワードの変更に成功しました。新しいパスワードでログインが可能です')
                 return redirect('/login/')
 
     except Exception as e:
