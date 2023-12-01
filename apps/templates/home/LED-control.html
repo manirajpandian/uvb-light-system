@@ -159,14 +159,16 @@
           {% else %}
               <p class="dropdown-item text-warning">農場がありません</p>
               {% endif %}
-              {% endif %}
+              
       </div>
   </div>
+  {% endif %}
 </div>
 
 
+
+  {% if houses|length > 0 %}
   <div class="accordion mt-4" id="accordionExample">
-    {% if houses|length > 0 %}
       {% for house in houses %}
       <h4 class="mt-4">{{ house.house_name }}</h4>
       <div style="display: inline-block; margin-left: 20px;">
@@ -238,18 +240,22 @@
                     </table>
                 </div>
             </div>
-        </div>
+          </div> 
     {% endfor %}
-</div>        
           {% endfor %}
+          
+          </div>
+        </div>
+        {% else %}
+        <div class="text-center">
+          <h4 class="text-warning">ハウスがありません</h4>
       </div>
-      {% else %}
-      <div class="text-center">
-        <h4 class="text-warning">ハウスがありません</h4>
+          {% endif %}
+
     </div>
-  </div>
-      {% endif %}
-</div>
+ 
+
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
