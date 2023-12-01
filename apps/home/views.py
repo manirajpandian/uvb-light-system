@@ -493,7 +493,20 @@ def house_list(request, farm_id=None):
                         house.is_active = False  # Set to False
                         house.save()
 
-                        LED.objects.filter(pole__line__house_id=house.house_id).update(is_on=False)
+                        leds = LED.objects.filter(pole__line__house_id=house.house_id)
+                        for led in leds:
+                            button_no = led.button_no
+
+                            payload = {
+                                "button_no": button_no,
+                                "status": False,
+                            }
+
+                            print(f"Button No: {button_no}")
+
+                            # Publish data to MQTT
+                            publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                        
                         house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
                         messages.success(request, house_success_msg)
             
@@ -758,6 +771,19 @@ def delete_farm(request, farm_id):
                 farm = get_object_or_404(Farm, pk=farm_id)
                 houses_to_delete = House.objects.filter(farm=farm)
                 for house in houses_to_delete:
+                    leds = LED.objects.filter(pole__line__house=house)
+                    print(leds)
+                    for led in leds :
+                        button_no = led.button_no
+                        payload = {
+                            "button_no": button_no,
+                            "status": False,
+                        }
+
+                        print(f"Button No: {button_no}")
+
+                        # Publish data to MQTT
+                        publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
                     house.delete()
                 farm.delete()
                 farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
@@ -822,6 +848,24 @@ def delete_house(request, house_id, farm_id):
         if request.method == 'POST':
             if house_id:
                 house = get_object_or_404(House, pk=house_id)
+                print("----------house",house)
+                # leds = LED.objects.filter(pole__line__house_house_id=house)
+                leds = LED.objects.filter(pole__line__house=house)
+
+                print('----------------------------leds',leds)
+                for led in leds:
+                    button_no = led.button_no
+
+                    payload = {
+                        "button_no": button_no,
+                        "status": False,
+                    }
+
+                    print(f"Button No: {button_no}")
+
+                    # Publish data to MQTT
+                    publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+
                 house.delete()
                 house_success_msg = f'{house.house_name}ハウスが正常に削除されました。'     # House successfully deleted
                 messages.success(request, house_success_msg)  
