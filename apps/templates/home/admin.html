@@ -92,9 +92,14 @@
                         <td>{{ user.id }}</td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.email }}</td>
-                        <td>{% if user.is_superuser %} BEAM TECH スーパー管理者
-                          {% elif profile.role_id == "1" %} 管理者
-                          {% else %} ユーザー {% endif %}</td>
+                        <td>{% if user.is_superuser %} 
+                          BEAM TECH スーパー管理者
+                          {% elif profile.role_id == "1" %} 
+                          管理者
+                          {% else %} 
+                          ユーザー 
+                          {% endif %}
+                        </td>
                         <td>
                           {% if user.is_superuser %}
                           スーパー

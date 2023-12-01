@@ -215,9 +215,14 @@ def add_user(request):
 
             send_mail(subject, message, from_email, recipient_list)
 
-            user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False)
-            user_obj.set_password('Test@123')
-            user_obj.save()
+            if role_id == '0':
+                user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False, is_superuser=True)
+                user_obj.set_password('Test@123')
+                user_obj.save()
+            else:
+                user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False)
+                user_obj.set_password('Test@123')
+                user_obj.save()
 
             profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
             profile_obj.save()
