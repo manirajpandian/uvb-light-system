@@ -166,30 +166,30 @@ document.getElementById('plantForm').addEventListener('submit', function(event) 
         document.getElementById('distanceMsg').innerText = '距離を入力してください。';
         event.preventDefault();
         } else if (distanceInput <= 0){
-            document.getElementById('distanceMsg').innerText = '距離は0より大きくなければなりません。';
+            document.getElementById('distanceMsg').innerText = '距離は0mより大きい数値を入力してください';
             event.preventDefault();
         } else if (distanceInput > 50){
-            document.getElementById('distanceMsg').innerText = '距離は50を超えてはなりません。';
+            document.getElementById('distanceMsg').innerText = '距離は50mを超える数値を入力できません';
             event.preventDefault();
         }
     
     if (hour < 0 ){
-        document.getElementById('timeMsg').innerText = '時間はマイナスであってはなりません。';
+        document.getElementById('timeMsg').innerText = '時間はマイナスでは入力できません';
         event.preventDefault(); 
     }else if(hour > 99 ){
-        document.getElementById('timeMsg').innerText = '時間は 99 を超えてはなりません。';
+        document.getElementById('timeMsg').innerText = '時間は99を超えてはなりません';
         event.preventDefault();
     }else if(minute > 59 ){
-        document.getElementById('timeMsg').innerText = '分は 59 を超えてはなりません。';
+        document.getElementById('timeMsg').innerText = '分は59分を超えてはなりません';
         event.preventDefault();
     }else if(minute < 0 ){
-        document.getElementById('timeMsg').innerText = '分はマイナスであってはなりません。';
+        document.getElementById('timeMsg').innerText = '分はマイナスは入力できません';
         event.preventDefault();
     }else if(second > 59 ){
-        document.getElementById('timeMsg').innerText = '秒は 59 を超えてはなりません。';
+        document.getElementById('timeMsg').innerText = '秒は59秒を超えてはなりません';
         event.preventDefault();
     }else if(second < 0 ){
-        document.getElementById('timeMsg').innerText = '秒はマイナスであってはなりません。';
+        document.getElementById('timeMsg').innerText = '秒はマイナスは入力できません';
         event.preventDefault();
     }
 

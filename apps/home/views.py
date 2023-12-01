@@ -409,7 +409,7 @@ def update_plant(request,pk):
             form = PlantForm(request.POST, instance=plant)
             if form.is_valid():
                 form.save()
-                plant_success_msg = '作物詳細の更新成功しました。'  #Successfully updated of crop details
+                plant_success_msg = '作物詳細の更新が成功しました'  #Successfully updated of crop details
                 messages.success(request, plant_success_msg)
                 return redirect('/plant_setting')
         else:
@@ -643,7 +643,7 @@ def update_house(request, house_id):
             if house_name == '':
                 context = {
             'segment': 'update_house',
-            'errorMessage': 'ハウス名は空であってはなりません',
+            'errorMessage': 'ハウス名は空欄であってはなりません',
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
             'choice_user': choice_user,
@@ -802,7 +802,7 @@ def add_plant(request):
             if form.is_valid():
 
                 form.save()
-                plant_success_msg = '新しい植物の詳細が追加されました'  #New plant details has been added
+                plant_success_msg = '新しい作物の詳細が追加されました'  #New plant details has been added
                 messages.success(request, plant_success_msg)
                 return redirect('/plant_setting')  
     except BrokenPipeError as e:

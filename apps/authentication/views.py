@@ -327,7 +327,7 @@ def forgot_password(request):
             if not User.objects.filter(email=email).first():
                 loading = False
                 request.session['email'] = email
-                request.session['forgot_password_message'] = 'メールが存在しません'
+                request.session['forgot_password_message'] = 'このメールが存在しません'
                 return redirect('/forgot_password/')
             
             user_obj = User.objects.get(email=email)
@@ -387,7 +387,7 @@ def user_profile(request):
             password = request.POST.get('password')
             
             if not first_name:
-                update_message = '氏名は空であってはならない'
+                update_message = '氏名を入力してください'
                 messages.error(request, update_message)
                 return redirect('/user_profile')
             elif not password:
