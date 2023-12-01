@@ -752,16 +752,6 @@ def delete_farm(request, farm_id):
                         publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
                             
                     house.delete()
-                # Get all houses associated with the farm
-                
-                
-                
-                # houses_to_delete = House.objects.filter(farm=farm)
-                # for house in houses_to_delete:
-                #     # You may want to add additional logic here before deleting each house
-                #     # For example, turning off any associated LEDs, etc.
-                        
-                #     house.delete()
                 # Now delete the farm
                 farm.delete()
                 farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
