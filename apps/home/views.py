@@ -43,47 +43,33 @@ def index(request,farm_id=None):
         user_role_id = request.session.get('role_id')
 
         # Admin login
-
-        # Active user count
-        user_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
-
-        #Farm count
-        farm_count = Farm.objects.filter(user__id=current_user_id).count()
-
+        if user_role_id =='1':
+            admin_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
+        #Farm count  
+            farm_count = Farm.objects.filter(user__id=current_user_id).count()
         #Active House count 
-        house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
-
+            house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
+        #Active and Inactive LED count
+            led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,pole__line__house__is_active=True).count()
+        #User login
+        elif user_role_id =='0': 
+            admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
+         #Farm count  
+            farm_count = Farm.objects.all().count()
+            super_plant_count = Plant.objects.all().count()
+         #Active House count 
+            house_count = House.objects.filter(is_active=True).count()
         #Active and Inactive LED count 
-        led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
-        led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,pole__line__house__is_active=True).count()
+            led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
 
-        #User Login
-
-        # House count
-        user_house_count = House.objects.filter(user=current_user_id,is_active=True).count()
-
-        #Led On and Off count
-        user_led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
-        user_led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
-
-        #Super Admin Login
-
-        #Admin count
-        admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
-
-        #Farm count
-        super_farm_count = Farm.objects.all().count()
-
-        #House count
-        super_house_count = House.objects.filter(is_active=True).count()
-
-        #LED count
-        super_led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
-        super_led_off_count = LED.objects.filter(pole__line__house__is_active=True).count()
-
-        #Plant count
-        super_plant_count = Plant.objects.all().count()
-
+        elif user_role_id =='2' :
+        #Active House count 
+            house_count = House.objects.filter(user=current_user_id,is_active=True).count()
+        #Active and Inactive LED count 
+            led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
 
         #Farm Filter and House Display
         farms = []
@@ -121,7 +107,7 @@ def index(request,farm_id=None):
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
-                'user_count': user_count,
+                'user_count': admin_count,
                 'admin_count': admin_count,
                 'farm_count':farm_count,
                 'house_count':house_count,
@@ -130,13 +116,13 @@ def index(request,farm_id=None):
                 'farms': farms,
                 'houses': houses,
                 'selected_farm_name': selected_farm_name,
-                'user_house_count' : user_house_count,
-                'user_led_on_count' :  user_led_on_count,
-                'user_led_full_count':user_led_full_count,
-                'super_farm_count':super_farm_count,
-                'super_house_count':super_house_count,
-                'super_led_on_count':super_led_on_count,
-                'super_led_off_count':super_led_off_count,
+                'user_house_count' : house_count,
+                'user_led_on_count' : led_on_count,
+                'user_led_full_count':led_full_count,
+                'super_farm_count':farm_count,
+                'super_house_count':house_count,
+                'super_led_on_count':led_on_count,
+                'super_led_off_count':led_full_count,
                 'super_plant_count':super_plant_count,
                 }
             if request.method == "GET":
@@ -335,7 +321,6 @@ def LED_control(request,farm_id=None):
 
                 if led_id:
                     led = LED.objects.get(pk=led_id)
-                    
                     if led.is_on:  
                         led.is_on = False  # Set to False
                         led.led_off_date = timezone.now() 

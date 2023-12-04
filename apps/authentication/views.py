@@ -46,11 +46,11 @@ def login_view(request):
                     else:
                         msg = '無効な認証'
                 else:
-                    msg = 'メールが不正です'
+                    msg = 'メールが間違ってあります'
             else:
-                msg = ' 農場IDが不正です'
+                msg = 'IDが間違ってあります'
         else:
-            msg = 'バリデーションエラー'
+            msg = 'メールやパスワードが間違ってあります'
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
     email = request.session.pop('email',None)

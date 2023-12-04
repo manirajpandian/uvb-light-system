@@ -107,7 +107,7 @@
 <!--Add Modal trigger-->
 
   <button type="button" class="btn btn-success" name="search" data-toggle="modal" data-target="#addFarmModal"
-    data-whatever="@mdo"><span class="material-icons">add_circle
+  ><span class="material-icons">add_circle
     </span>&nbsp;&nbsp;
     追加
   </button>
@@ -249,12 +249,12 @@
             <input type="hidden" name="farm_id" id="editFarmId">
           <div class="my-4 form-group bmd-form-group is-filled">
             <label for="farm_name" class="bmd-label-floating">農場名</label>
-            <input type="text" class="form-control" id="farm_name" name="farm_name" value="{{ farm.farm_name }} " required />
+            <input type="text" class="form-control" id="farm_name" name="farm_name" maxlength=30 value="{{ farm.farm_name }} " required />
             <span class="text-danger" id="editFarmNameSpn"></span>
           </div>
           <div class="my-4 form-group">
             <label for="address" class="bmd-label-floating">住所</label>
-            <input type="text" class="form-control" id="address" name="address" value="{{ farm.address }} " required />
+            <input type="text" class="form-control" id="address" name="address" maxlength=150 value="{{ farm.address }} " required />
             <span class="text-danger" id="editAddressSpn"></span>
           </div>
         </div>
@@ -284,13 +284,13 @@
         <div class="modal-body">
           <div class="my-4 form-group">
             <label for="farm_name" class="bmd-label-floating">農場名</label>
-            <input type="text" class="form-control" id="add_farm_name" name="farm_name" />
+            <input type="text" class="form-control" id="add_farm_name" maxlength=30 name="farm_name" />
             <span class="text-danger" id="farmNameMsg"></span>
           </div>
 
           <div class="my-4 form-group">
             <label for="address" class="bmd-label-floating">住所</label>
-            <input type="text" class="form-control" id="add_address" name="address" />
+            <input type="text" class="form-control" id="add_address" maxlength=150 name="address" />
             <span class="text-danger" id="addressMsg"></span>
           </div>
         </div>
