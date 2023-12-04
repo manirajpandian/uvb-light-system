@@ -77,9 +77,9 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-end justify-content-between">
-         <div class="justify-content-start w-50 d-none d-md-block "><h3 class="my-2">{% if user_id %}{{ selected_user_name }}{% else %}{{ selected_farm_name }}{% endif %}</h3>
+         <div class="justify-content-start w-50 d-none d-md-block "><h3 class="my-2">{% if user_role_id == '0' %}{{ selected_user_name }}{% else %}{{ selected_farm_name }}{% endif %}</h3>
          </div>
-      {% if user_role_id == '0'%}
+      {% if user_role_id == '0' %}
          <div class="d-flex align-items-center justify-content-end">
           <div class="dropdown my-2">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
