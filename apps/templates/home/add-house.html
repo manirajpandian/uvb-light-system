@@ -925,7 +925,7 @@
         $('#registerBtn').click(function (e) {
             if (laneCountDisplay.value == '' || poleCountDisplay.value == '' || ledCountDisplay.value == '' || arrayPolePLC == '' ||  arrayLED == '' || document.getElementById('houseNameReg').value == '' || document.getElementById('plantIdReg').value == '' || document.getElementById('farmNameReg').value == ''){
                 e.preventDefault();
-                document.getElementById('regMsg').innerText = '一部のフィールドが空です';
+                document.getElementById('regMsg').innerText = '一部の項目が空欄です';
                 setTimeout(function () {
             document.getElementById('regMsg').innerText = '';
         }, 3000);
@@ -1055,7 +1055,7 @@ if (!buttonClicked){
     arrayLED.value = null
           
             if (customlean < 0 || isNaN(customlean) || customlean == ''){
-                document.getElementById('customleanMsg').innerText = '有効なライン値を入力してください。';
+                document.getElementById('customleanMsg').innerText = '有効なライン数を入力してください。';
             }
             
             else if (customlean > 0){
@@ -1071,7 +1071,7 @@ if (!buttonClicked){
         }
     });
     if (invalidPoleInputFound) {
-        document.getElementById('poleMsg').innerText = '有効なポール値を入力してください。';
+        document.getElementById('poleMsg').innerText = '有効なポール本数を入力してください。';
             }
             else{
                 document.getElementById('poleMsg').innerText = '';
@@ -1086,7 +1086,7 @@ if (!buttonClicked){
         }
     });
     if (invalidLedInputFound) {
-        document.getElementById('poleMsg').innerText = '有効なLED値を入力してください。';
+        document.getElementById('poleMsg').innerText = '有効なLED数を入力してください。';
             }
         
     else {
@@ -1153,7 +1153,7 @@ document.getElementById('firststep').addEventListener('click', function() {
             document.getElementById('housenameMsg').innerText = 'ハウス名を入力してください。';
         }
         else if (plantname == ''){
-            document.getElementById('plantnameMsg').innerText = '植物を選択してください。';
+            document.getElementById('plantnameMsg').innerText = '作物を選択してください。';
         }
         else if (farmname == ''){
             document.getElementById('farmnameMsg').innerText = '農場を選択してください。';

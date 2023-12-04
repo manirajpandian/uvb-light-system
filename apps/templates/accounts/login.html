@@ -76,7 +76,7 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
-                <label class="bmd-label-floating">農場ID</label>
+                <label class="bmd-label-floating">ID</label>
                 {{ form.username }}
               </div>
               <span class="text-danger" id="userSpan"></span>
@@ -117,7 +117,7 @@
               <!-- Remember Me Checkbox -->
               <div class="form-check">
                 <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" name="remember" style="size:10px;"> ログイン状態を維持する
+                  <input class="form-check-input" id='rememberId' type="checkbox" style="size:10px;"> ログイン状態を維持する
                   <span class="form-check-sign">
                     <span class="check custom-checkmark"></span>
                   </span>
@@ -160,7 +160,7 @@
                     <div class="form-group">
                       <label class="bmd-label-floating">メール</label>
                       <input type="email" name="email" class="form-control" id="FPEmail" {% if email %}
-                        value="{{ email }}" {% endif %} >
+                        value="{{ email }}" {% endif %}>
                     </div>
                     <span class="text-danger" id="emailErrorSpan"></span>
                   </div>
@@ -184,102 +184,126 @@
 {% block javascripts %}
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-  var username = document.getElementById('id_username');
-  var email = document.getElementById('id_email');
-  var password = document.getElementById('id_password');
-  var loginBtn = document.getElementById('id_loginBtn');
-  var form = document.getElementById('id_form');
-  const emailSpan = document.getElementById('emailErrorSpan');
+  document.addEventListener("DOMContentLoaded", function () {
+    var username = document.getElementById('id_username');
+    var email = document.getElementById('id_email');
+    var password = document.getElementById('id_password');
+    var rememberMe = document.getElementById('rememberId')
+    var loginBtn = document.getElementById('id_loginBtn');
+    var form = document.getElementById('id_form');
+    const emailSpan = document.getElementById('emailErrorSpan');
+    var emailErrorSpan = document.getElementById('emailSpan')
 
-  function showError(element, message, event) {
-    element.innerText = message;
-    event.preventDefault();
-    return false; // Added return statement to prevent form submission
-  }
-  
-  loginBtn.addEventListener('click', function (event) {
-    var userSpan = document.getElementById('userSpan');
-    var emailSpan = document.getElementById('emailSpan');
-    var passwordSpan = document.getElementById('passwordSpan');
-  
-    if (!username.value) {
-      if (showError(userSpan, '農場ID入力してください。', event)) {
-        event.preventDefault();
-        return false; // Stop further execution if there's an error
-      }
-    }
-    if (!email.value) {
-      if (showError(emailSpan, 'メールを入力してください。', event)) {
-        event.preventDefault();
-        return false;
-      }
-    }
-    if (!password.value) {
-      if (showError(passwordSpan, 'パスワードを入力してください。', event)) {
-        event.preventDefault();
-        return false;
-      }
-    }
-  else{form.submit();}
-    
-  });
+    var storedUsername = localStorage.getItem('username')
+    var storedEmail = localStorage.getItem('email')
+    var storedPassword = localStorage.getItem('password')
+    var storedRemberme = localStorage.getItem('remeberme')
 
-
-  [username, email, password].forEach((input) => {
-    input.addEventListener('input', function () {
+    username.addEventListener('input', function () {
       userSpan.innerText = '';
-      var invalidEmailError = document.getElementById('invalidEmailError')
-      if(invalidEmailError){invalidEmailError.innerText = '';}
+    });
+    email.addEventListener('input', function () {
+      console.log('object');
+      emailErrorSpan.innerText = '';
+      document.getElementById('invalidEmailError').remove()
+    })
+    password.addEventListener('input', function () {
+      passwordSpan.innerText = '';
+    })
+    if (storedUsername && storedEmail && storedPassword && storedRemberme) {
+      username.value = storedUsername
+      email.value = storedEmail
+      password.value = storedPassword
+      rememberMe.checked = (storedRemberme == 'true' ? true : false)
+    }
+    rememberMe.addEventListener('click', function (e) {
+      if (storedUsername && storedEmail && storedPassword && storedRemberme) {
+        username.value = '';
+        email.value = '';
+        password.value = '';
+        localStorage.removeItem('username')
+        localStorage.removeItem('email')
+        localStorage.removeItem('password')
+        localStorage.removeItem('remeberme')
+      }
+    })
+
+    loginBtn.addEventListener('click', function () {
+      var userSpan = document.getElementById('userSpan');
+      var emailSpan = document.getElementById('emailSpan');
+      var passwordSpan = document.getElementById('passwordSpan');
+
+      if (!username.value) {
+        userSpan.innerText = '農場ID入力してください。'
+        event.preventDefault();
+      }
+      if (!email.value) {
+        emailSpan.innerText = 'メールを入力してください。'
+        event.preventDefault();
+      }
+      if (!password.value) {
+        passwordSpan.innerText = 'パスワードを入力してください。'
+        event.preventDefault();
+        return false;
+      }
+      else {
+
+        if (rememberMe.checked) {
+          localStorage.setItem('username', username.value)
+          localStorage.setItem('email', email.value)
+          localStorage.setItem('password', password.value)
+          localStorage.setItem('remeberme', rememberMe.checked)
+        }
+        form.submit();
+      }
+
+    });
+
+    var forgotPasswordMessage = ''
+    var forgotPasswordMessage = "{{ forgot_password_message }}";
+
+    $(document).ready(function () {
+      if (forgotPasswordMessage !== 'None') {
+        $("#ForgotModal").modal("show");
+      }
+    });
+
+    const forgotButton = document.getElementById("forgotModal");
+    const forgotForm = document.getElementById("forgotForm");
+    const emailInput = document.getElementById('FPEmail');
+
+    forgotButton.addEventListener("click", function () {
+      $("#ForgotModal").modal("show");
+    });
+
+    document.getElementById('FPEmail').addEventListener('input', function () {
       emailSpan.innerText = '';
+      var forgot_password_messageSpan = document.getElementById('forgot_password_message');
+      if (forgot_password_messageSpan) {
+        forgot_password_messageSpan.innerText = '';
+      }
+    });
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    document.getElementById("emailSendBtn").addEventListener("click", function () {
+      if (!emailInput.value) {
+        showError(emailSpan, 'メールアドレスを入力してください。');
+        $("#ForgotModal").modal("show");
+      } else if (!emailRegex.test(emailInput.value)) {
+        showError(emailSpan, '有効なメールアドレスを入力してください。');
+        $("#ForgotModal").modal("show");
+      } else {
+        forgotForm.action = '/forgot_password';
+        forgotForm.submit();
+        const loading = true;
+        if (loading) {
+          openSweetAlert();
+        } else {
+          closeSweetAlert();
+        }
+      }
     });
   });
-
-  var forgotPasswordMessage = ''
-  var forgotPasswordMessage = "{{ forgot_password_message }}";
-
-  $(document).ready(function () {
-    if (forgotPasswordMessage !== 'None') {
-      $("#ForgotModal").modal("show");
-    }
-  });
-
-  const forgotButton = document.getElementById("forgotModal");
-  const forgotForm = document.getElementById("forgotForm");
-  const emailInput = document.getElementById('FPEmail');
-
-  forgotButton.addEventListener("click", function () {
-    $("#ForgotModal").modal("show");
-  });
-
-  document.getElementById('FPEmail').addEventListener('input', function () {
-    emailSpan.innerText = '';
-    var forgot_password_messageSpan = document.getElementById('forgot_password_message');
-    if (forgot_password_messageSpan) {
-      forgot_password_messageSpan.innerText = '';
-    }
-  });
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  document.getElementById("emailSendBtn").addEventListener("click", function () {
-    if (!emailInput.value) {
-      showError(emailSpan, 'メールアドレスを入力してください。');
-      $("#ForgotModal").modal("show");
-    } else if (!emailRegex.test(emailInput.value)) {
-      showError(emailSpan, '有効なメールアドレスを入力してください。');
-      $("#ForgotModal").modal("show");
-    } else {
-      forgotForm.action = '/forgot_password';
-      forgotForm.submit();
-      const loading = true; // Replace with your actual loading variable
-      if (loading) {
-        openSweetAlert();
-      } else {
-        closeSweetAlert();
-      }
-    }
-  });
-});
 
 </script>
 {% endblock javascripts %}

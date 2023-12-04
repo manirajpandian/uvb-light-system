@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from .helpers import send_forgot_password_mail
 import datetime
 from django.utils import timezone
+from django.db.models import Q
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -45,11 +46,11 @@ def login_view(request):
                     else:
                         msg = '無効な認証'
                 else:
-                    msg = 'メールが不正です'
+                    msg = 'メールが間違ってあります'
             else:
-                msg = ' 農場IDが不正です'
+                msg = 'IDが間違ってあります'
         else:
-            msg = 'バリデーションエラー'
+            msg = 'メールやパスワードが間違ってあります'
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
     email = request.session.pop('email',None)
@@ -62,12 +63,12 @@ def user_list(request):
     user_role_id = request.session.get('role_id')
     current_user = request.user.id
     try:
-        profile_list = Profile.objects.filter(mapped_under=current_user)
-        user_profile_list = [
-            (profile.user, profile) for profile in profile_list
-            if not profile.user.is_superuser and request.user.id != profile.user.id
-        ]
-
+        if user_role_id == '0':
+            profile_list = Profile.objects.filter(Q(role_id='0') | Q(role_id='1'))
+            user_profile_list = [(profile.user, profile) for profile in profile_list]
+        else:
+            profile_list = Profile.objects.filter(mapped_under=current_user)
+            user_profile_list = [(profile.user, profile) for profile in profile_list]
         paginator = Paginator(user_profile_list, 5)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
@@ -95,16 +96,16 @@ def user_list(request):
                    active_user_obj.is_active = is_active
                    active_user_obj.save()
 
-                update_success_message = 'ユーザー詳細が正常に更新されました'
+                update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
                 messages.success(request, update_success_message)
                 return redirect('/user_list')
 
             except User.DoesNotExist:
-                messages.error(request, '指定されたユーザーが存在しません。')
+                messages.error(request, '指定されたユーザーは存在しません')
                 return redirect('/user_list')
 
             except Profile.DoesNotExist:
-                messages.error(request, '指定されたプロファイルが存在しません。')
+                messages.error(request, '指定されたプロファイルは存在しません')
                 return redirect('/user_list')
 
     except BrokenPipeError as e:
@@ -130,9 +131,10 @@ def update_user(request, pk):
 
             # Update profile data
             profile_obj.role_id = request.POST.get('role_id')
+            profile_obj.address = request.POST.get('address')
             profile_obj.save()
 
-            update_success_message = 'ユーザー詳細が正常に更新されました'
+            update_success_message = 'ユーザー情報が正常に更新されました'
             messages.success(request, update_success_message)
             return redirect('/user_list')
 
@@ -141,6 +143,7 @@ def update_user(request, pk):
             'show': 'true',
             'first_name': user_obj.first_name,
             'role_id': profile_obj.role_id,
+            'address':profile_obj.address,
             'user_profile_image': user_profile_image,
             'user_role_id':user_role_id
         }
@@ -163,13 +166,15 @@ def add_user(request):
             context = {
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
-                    'loading':loading
+                    'loading':loading,
+                    'address_block':'none'
                     }
             return render(request, 'home/add-user.html', context)
         else:
             first_name = request.POST['first_name']
             email = request.POST['email']
             role_id = request.POST['role_id']
+            address = request.POST['address']
             user_id = request.user.id
             base_url = settings.BASE_URL
             loading = True
@@ -183,9 +188,11 @@ def add_user(request):
                     'role_id': role_id,
                     'user_id':user_id,
                     'user_profile_image': user_profile_image,
+                    'address':address,
                     'user_role_id':user_role_id,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
-                    'loading':loading
+                    'loading':loading,
+                    'address_block':'block'
                 }
                 return render(request, 'home/add-user.html', context)
 
@@ -215,11 +222,16 @@ def add_user(request):
 
             send_mail(subject, message, from_email, recipient_list)
 
-            user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False)
-            user_obj.set_password('Test@123')
-            user_obj.save()
+            if role_id == '0':
+                user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False, is_superuser=True)
+                user_obj.set_password('Test@123')
+                user_obj.save()
+            else:
+                user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False)
+                user_obj.set_password('Test@123')
+                user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time, address = address)
             profile_obj.save()
 
             loading = False
@@ -291,7 +303,7 @@ def change_password(request, token):
                 return redirect(f'/change_password/{token}')
 
             if profile_obj.token_expiration_time and timezone.now() > profile_obj.token_expiration_time:
-                messages.error(request, 'パスワード再設定リンクの有効期限が切れました。新しいパスワードをリクエストしてください。')
+                messages.error(request, 'パスワード再設定リンクの有効期限が切れました。新しいパスワードを作成してください。')
                 return redirect(f'/change_password/{token}')
             
             else:
@@ -300,7 +312,7 @@ def change_password(request, token):
                 user_obj.is_active = True
                 user_obj.save()
 
-                messages.success(request, 'パスワードの変更に成功しました。新しいパスワードでログインできます。')
+                messages.success(request, 'パスワードの変更に成功しました。新しいパスワードでログインが可能です')
                 return redirect('/login/')
 
     except Exception as e:
@@ -325,18 +337,16 @@ def forgot_password(request):
             if not User.objects.filter(email=email).first():
                 loading = False
                 request.session['email'] = email
-                request.session['forgot_password_message'] = 'メールが存在しません'
+                request.session['forgot_password_message'] = 'このメールが存在しません'
                 return redirect('/forgot_password/')
             
             user_obj = User.objects.get(email=email)
-            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
             token = str(uuid.uuid4())
             
             # Set expiration time for the token (24 hours from now)
             expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
-            user_obj.username = farm_id
-            user_obj.save()
+            farm_id = user_obj.username
 
             profile_obj = Profile.objects.get(user=user_obj)
             profile_obj.forget_password_token = token
@@ -385,7 +395,7 @@ def user_profile(request):
             password = request.POST.get('password')
             
             if not first_name:
-                update_message = '氏名は空であってはならない'
+                update_message = '氏名を入力してください'
                 messages.error(request, update_message)
                 return redirect('/user_profile')
             elif not password:

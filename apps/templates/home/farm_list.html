@@ -102,12 +102,10 @@
 {% endblock stylesheets %}
 {% block content %}
 
-<div class="flex-container">
-  <h3>農場管理</h3>
+<div class="flex-container justify-content-end">
 <!--Add Modal trigger-->
-
   <button type="button" class="btn btn-success" name="search" data-toggle="modal" data-target="#addFarmModal"
-    data-whatever="@mdo"><span class="material-icons">add_circle
+  ><span class="material-icons">add_circle
     </span>&nbsp;&nbsp;
     追加
   </button>
@@ -140,17 +138,12 @@
                 <td>{{ farm.address }}</td>
 
                 <td>
-<!--Update Modal trigger-->
-                  <a id="updatedButton" data-toggle="modal" data-farm-id="{{farm.farm_id}}"
-                    data-farm-name='{{ farm.farm_name }}' style="color: #ff9800;" data-farm-address='{{ farm.address }}'
-                    data-target="#updateFarmModal" >
+                <!--Update Modal trigger-->
+                  <a id="updatedButton" style="cursor: pointer;" class="text-warning" data-toggle="modal" data-edit-farm-id="{{farm.farm_id}}" data-farm-name='{{ farm.farm_name }}' data-farm-address='{{ farm.address }}' data-target="#updateFarmModal" >
                     <span>編集</span> 
                   </a>&nbsp; &nbsp;|&nbsp;&nbsp;
-                  <span class="text-danger deleteButton" data-farm-id="{{ farm.farm_id }}"
-                    data-farm-name="{{ farm.farm_name }}" style="color: #ff9800;"
-                    data-farm-address='{{ farm.address }}'>削除</span>
+                  <span class="text-danger deleteButton" style="cursor: pointer;" data-farm-id="{{ farm.farm_id }}" data-farm-name="{{ farm.farm_name }}" data-farm-address='{{ farm.address }}'>削除</span>
                 </td>
-
                 {% endfor %}
             </tbody>
             {% else %}
@@ -240,10 +233,9 @@
 <!--Update Modal-->
 <div class="modal fade" id="updateFarmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
   aria-hidden="true">
-
-
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
+      <form method="POST" id="updateFormSubmit" autocomplete="off">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">編集</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -251,21 +243,22 @@
           </button>
         </div>
         <div class="modal-body">
-          <form method="POST" id="updateFormSubmit" autocomplete="off">
             {% csrf_token %}
+            <input type="hidden" name="farm_id" id="editFarmId">
           <div class="my-4 form-group bmd-form-group is-filled">
             <label for="farm_name" class="bmd-label-floating">農場名</label>
-            <input type="text" class="form-control" id="farm_name" name="farm_name" value="{{ farm.farm_name }} " required />
+            <input type="text" class="form-control" id="farm_name" name="farm_name" maxlength=30 value="{{ farm.farm_name }} " required />
+            <span class="text-danger" id="editFarmNameSpn"></span>
           </div>
           <div class="my-4 form-group">
             <label for="address" class="bmd-label-floating">住所</label>
-            <input type="text" class="form-control" id="address" name="address" value="{{ farm.address }} " required />
-            <input type="hidden" name="farm_id" value="{{ farm.farm_id }}">
+            <input type="text" class="form-control" id="address" name="address" maxlength=150 value="{{ farm.address }} " required />
+            <span class="text-danger" id="editAddressSpn"></span>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">戻る</button>
-          <button type="submit" class="btn btn-success">変更</button>
+          <button type="button" id="editButton" class="btn btn-success">変更</button>
         </div>
      </form>
       </div>
@@ -289,13 +282,13 @@
         <div class="modal-body">
           <div class="my-4 form-group">
             <label for="farm_name" class="bmd-label-floating">農場名</label>
-            <input type="text" class="form-control" id="add_farm_name" name="farm_name" />
+            <input type="text" class="form-control" id="add_farm_name" maxlength=30 name="farm_name" />
             <span class="text-danger" id="farmNameMsg"></span>
           </div>
 
           <div class="my-4 form-group">
             <label for="address" class="bmd-label-floating">住所</label>
-            <input type="text" class="form-control" id="add_address" name="address" />
+            <input type="text" class="form-control" id="add_address" maxlength=150 name="address" />
             <span class="text-danger" id="addressMsg"></span>
           </div>
         </div>
@@ -355,29 +348,56 @@
     const deleteForm = document.getElementById("deleteForm");
     const updateForm = document.getElementById("updateFormSubmit");
     const updatedButton = document.querySelectorAll("#updatedButton");
+    const editInput = document.getElementById('farm_name')
+    const editAddress = document.getElementById('address')
+    const editButton = document.getElementById('editButton')
     let currentFarmId;
+
+    editInput.addEventListener('input',function(){
+      document.getElementById('editFarmNameSpn').innerText=''
+    })
+    editAddress.addEventListener('input',function(){
+      document.getElementById('editAddressSpn').innerText=''
+    })
+    editButton.addEventListener('click', function (event) {
+    if (!editInput.value) {
+        document.getElementById('editFarmNameSpn').innerText = '農場名を入力してください。';
+        event.preventDefault();
+    } else if (editInput.value.length > 30) {
+        document.getElementById('editFarmNameSpn').innerText = '農場名は30文字を超えてはなりません。';
+        event.preventDefault();
+    }
+
+    if (!editAddress.value) {
+        document.getElementById('editAddressSpn').innerText = '住所を入力してください。';
+        event.preventDefault();
+    } else if (editAddress.value.length > 150) {
+        document.getElementById('editAddressSpn').innerText = '住所は150文字を超えてはなりません。';
+        event.preventDefault();
+    }
+    if (editInput.value && editInput.value.length <= 30 && editAddress.value && editAddress.value.length <= 150) {
+        updateFormSubmit.submit();
+    }
+});
+
+
   
     updatedButton.forEach(function (button) {
       button.addEventListener("click", function () {
-        let farmId = this.getAttribute("data-farm-id");
+        let farmId = this.getAttribute("data-edit-farm-id");
         let farmName = this.getAttribute("data-farm-name");
         let address = this.getAttribute("data-farm-address");
 
         // Set values in the form fields
         document.getElementById("farm_name").value = farmName;
         document.getElementById("address").value = address;
+        document.getElementById("editFarmId").value = farmId;
 
         // Set currentFarmId
         currentFarmId = farmId;
 
         $("#updateFarmModal").modal("show");
       });
-    });
-
-    updateForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      this.action = `/update_farm/${currentFarmId}/`;
-      this.submit();
     });
 
     deleteForm.addEventListener("submit", function (event) {

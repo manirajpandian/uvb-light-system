@@ -18,7 +18,6 @@ urlpatterns = [
     path('add_house',views.add_house,name="add_house"),
     path('farm_list',views.farm_list, name="farm_list"),
     path('add_farm',views.add_farm, name='add_farm'),
-    path('update_farm/<int:pk>/',views.update_farm, name='update_farm'),
     path('delete_farm/<int:farm_id>/', views.delete_farm, name='delete_farm'),
     path('update_house/<str:house_id>', views.update_house, name='update_house'),
     path('house_lights',views.house_lights, name='house_lights'),

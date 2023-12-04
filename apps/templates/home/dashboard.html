@@ -15,9 +15,24 @@
 
 </style>
 {% endblock stylesheets %} {% block content %}
-
-
-<h3>ダッシュボード</h3>
+<div class="d-flex align-items-center justify-content-end justify-content-end mb-3">
+{% if user_role_id == '0'%}
+  <div class="dropdown my-2">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+     <span>農家フィルター</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      {% if users_list|length > 0 %}
+      {% for user in users_list %}
+          <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.first_name }}</a>
+      {% endfor %}
+      {% else %}
+      <p class="dropdown-item text-warning">農家がありません</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
 <div class="row justify-content-start">
 {% if  user_role_id == '1' %}
   <div class="col-lg-3">
@@ -36,73 +51,63 @@
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
-        <h3 class="text-center">管理者の数</h3> 
+        <h3 class="text-center">農家の数</h3> 
       </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
         <h1 class="card-title">{{ admin_count }}</h1>
       </div>
     </div>
   </div>
+  <div class="col-lg-3">
+    <div class="card text-center custom-card-height color1">
+      <div class="card-header"> 
+        <h3 class="text-center">作物の数</h3> 
+      </div>
+      <div class="card-body d-flex flex-column justify-content-center align-items-center">
+        <h1 class="card-title">{{ super_plant_count }}</h1>
+      </div>
+    </div>
+  </div>
   {% endif %}
-  {% if  user_role_id == '1' %}
+  {% if  user_role_id == '1' or user_role_id == '0' %}
   <div class="col-lg-3 ">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
         <h3 class="text-center">農場の数</h3> 
       </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">{{ farm_count }}</h1>
+        <h1 class="card-title">{% if  user_role_id == '1' %}{{ farm_count }}{% elif user_role_id == '0' %}{{ super_farm_count }}{% endif %}</h1>
       </div>
     </div>
   </div>
-
+  {% endif %}
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> <h3 class="text-center">ハウスの数</h3> </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">{{ house_count }}</h1>
+        <h1 class="card-title">{% if  user_role_id == '1' %}{{ house_count }}{% elif user_role_id == '0' %}{{ super_house_count }}{% elif user_role_id == '2' %}{{ user_house_count }}{% endif %}</h1>
       </div>
     </div>
   </div>
-
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> <h3 class="text-center">使用LEDのONの数</h3> </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
-        <h1 class="card-title">{{ led_on_count }}<span style="font-size:30px;">/{{ led_full_count }}</span></h1>
+        <h1 class="card-title">{% if  user_role_id == '1' %}{{ led_on_count }}{% elif user_role_id == '0' %}{{ super_led_on_count }}{% elif user_role_id == '2' %}{{ user_led_on_count }}{% endif %}<span style="font-size:30px;">
+          /{% if  user_role_id == '1' %}{{ led_full_count }}{% elif user_role_id == '0' %}{{ super_led_off_count }}{% elif user_role_id == '2' %}{{ user_led_full_count }}{% endif %}</span></h1>
       </div>
     </div>
 </div>
-{% endif %}
-{% if  user_role_id == '2' %}
-<div class="col-lg-3">
-  <div class="card text-center custom-card-height color1">
-    <div class="card-header"> <h3 class="text-center">ハウスの数</h3> </div>
-    <div class="card-body d-flex flex-column justify-content-center align-items-center">
-      <h1 class="card-title">{{ user_house_count }}</h1>
-    </div>
-  </div>
-</div>
-<div class="col-lg-3">
-  <div class="card text-center custom-card-height color1">
-    <div class="card-header"> <h3 class="text-center">使用LEDのONの数</h3> </div>
-    <div class="card-body d-flex flex-column justify-content-center align-items-center">
-      <h1 class="card-title">{{ user_led_on_count }}<span style="font-size:30px;">/{{ user_led_full_count }}</span></h1>
-    </div>
-  </div>
-</div>
-{% endif %}
 </div>
 <br>
 
 <div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
   <h3>{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
-  {% if user_role_id == '1'%}
+  {% if user_role_id == '1' or user_role_id == '0'%}
   <div class="dropdown my-2">
     <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
      <span>農場フィルター</span>
     </button>
-   
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       {% if farms|length > 0 %}
       {% for farm in farms %}
@@ -116,12 +121,12 @@
   </div>
   {% endif %}
 </div>
-{% if user_role_id == '1' or user_role_id == '2' %}
+
 {% if houses|length > 0 %}
 <div class="row">
 {% for house in houses %}
 <div class="col-lg-3 col-md-6 col-sm-6">
-    <!-- <a href="/house_lights/{{ house.house_id }}"> -->
+    <a href="{% url 'LED_control_farm_id' farm_id=house.farm_id %}?house={{ house.house_id }}">
     <div class="card card-stats" style="cursor: pointer;">
         <div class="card-header card-header-success card-header-icon">
             <div class="card-icon"><i class="material-icons">warehouse</i>{{ house.house_name }}</div>
@@ -142,7 +147,7 @@
             <div class="stats"><i class="material-icons">update</i> 現在</div>
         </div>
     </div>
-    <!-- </a> -->
+    </a>
 </div>
 {% endfor %}
 </div>
@@ -152,7 +157,7 @@
     </div>
 {% endif %}
 
-{% endif %}
+
 
 
 

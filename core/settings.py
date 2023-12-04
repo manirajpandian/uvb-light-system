@@ -7,6 +7,9 @@ import os
 from decouple import config
 from unipath import Path
 from django.db.models import BigAutoField
+import locale
+from django.utils import timezone
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -90,7 +93,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', 
-        'NAME': 'postgre_7',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': 'localhost',  # Replace with your PostgreSQL server's address if necessary
@@ -120,9 +123,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGE_CODE = 'ja'
+TIME_ZONE = 'Asia/Tokyo'
 
-# TIME_ZONE = 'UTC'
-TIME_ZONE = 'Asia/Kolkata'
+#LANGUAGE_CODE = 'en-us'
+
 
 USE_I18N = True
 
