@@ -70,6 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.tz', 
+                 'django.middleware.locale.LocaleMiddleware',
             ],
         },
     },
@@ -89,7 +91,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', 
-        'NAME': 'postgres_6',
+        'NAME': 'newdb',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': 'localhost',  # Replace with your PostgreSQL server's address if necessary
@@ -118,15 +120,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 
 TIME_ZONE = 'UTC'
+# TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 #############################################################
 # SRC: https://devcenter.heroku.com/articles/django-assets

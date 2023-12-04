@@ -26,16 +26,14 @@ from datetime import date, datetime
 
 
 from .models import data , Rasp
-import paho.mqtt.client as mqtt
 import json
 from django.utils import timezone
 import paho.mqtt.publish as publish
-
-from datetime import date, datetime
 from django.db import IntegrityError
 import csv
 
-
+import pytz
+from django.utils import timezone
 
 
 
@@ -102,7 +100,7 @@ def index(request,farm_id=None):
             
                 for house in houses:
                     house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-  
+           
             context = {
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
@@ -307,6 +305,7 @@ def LED_control(request,farm_id=None):
                     if led.is_on:  
                         led.is_on = False  # Set to False
                         led.led_off_date = timezone.now() 
+                       
                         led.save()
                         print('button no',led.button_no)
                         button_data = led.button_no
@@ -320,6 +319,7 @@ def LED_control(request,farm_id=None):
                     else:
                         led.is_on = True  # Set to True
                         led.led_on_date = timezone.now() 
+                        
                         led.save()
                         button_data = led.button_no
                         Relay_data = False
