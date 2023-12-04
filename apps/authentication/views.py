@@ -44,7 +44,7 @@ def login_view(request):
                         request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
                         return redirect("/")
                     else:
-                        msg = 'メールやパスワードが間違ってあります'
+                        msg = 'このユーザーは無効です。UVB管理者に連絡してください'
                 else:
                     msg = 'メールやパスワードが間違ってあります'
             else:
