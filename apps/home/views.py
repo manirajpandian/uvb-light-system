@@ -84,7 +84,10 @@ def index(request,farm_id=None):
         #Plant count
         super_plant_count = Plant.objects.all().count()
 
-
+        #Users Filter
+        users_list = User.objects.filter(profile__role_id='1')
+        user_id = request.GET.get('user')
+    
         #Farm Filter and House Display
         farms = []
         if user_role_id == '1':
@@ -93,7 +96,7 @@ def index(request,farm_id=None):
             profile = get_object_or_404(Profile, user=request.user.id)
             farms = Farm.objects.filter(user_id = profile.mapped_under)
         else:
-            farms = Farm.objects.all()
+            farms = Farm.objects.filter(user_id=user_id)
 
         if len(farms) > 0:
             if user_role_id == '2':
@@ -121,15 +124,18 @@ def index(request,farm_id=None):
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
+                'users_list':users_list,
+                'farms': farms,
+                'houses': houses,
+                'selected_farm_name': selected_farm_name,
+
+
                 'user_count': user_count,
                 'admin_count': admin_count,
                 'farm_count':farm_count,
                 'house_count':house_count,
                 'led_on_count':led_on_count,
                 'led_full_count':led_full_count,
-                'farms': farms,
-                'houses': houses,
-                'selected_farm_name': selected_farm_name,
                 'user_house_count' : user_house_count,
                 'user_led_on_count' :  user_led_on_count,
                 'user_led_full_count':user_led_full_count,
@@ -138,6 +144,7 @@ def index(request,farm_id=None):
                 'super_led_on_count':super_led_on_count,
                 'super_led_off_count':super_led_off_count,
                 'super_plant_count':super_plant_count,
+               
                 }
             if request.method == "GET":
                 html_template = loader.get_template('home/dashboard.html')
@@ -162,6 +169,7 @@ def index(request,farm_id=None):
                'super_led_on_count':super_led_on_count,
                'super_led_off_count':super_led_off_count,
                'super_plant_count':super_plant_count,
+               'users_list':users_list,
                }
             html_template = loader.get_template('home/dashboard.html')
             return HttpResponse(html_template.render(context, request))
@@ -204,19 +212,13 @@ current_date = date.today()
 
 #LED Control - Sensor and LED Access
 def LED_control(request,farm_id=None):
+   
     try:
         global sensor_data , latest_stored_date
 
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        farms = []
-        if user_role_id == '1':
-            farms = Farm.objects.filter(user_id=request.user.id)
-        elif user_role_id == '2':
-            profile = get_object_or_404(Profile, user=request.user.id)
-            farms = Farm.objects.filter(user_id = profile.mapped_under)
-        else:
-            farms = Farm.objects.all()
+        
     
         def on_message(client, userdata, message):
             sensor_data , latest_stored_date
@@ -284,34 +286,59 @@ def LED_control(request,farm_id=None):
 
         # Start the MQTT loop in the background
         mqtt_client.loop_start()
-        
-        if len(farms) > 0:
-            if user_role_id == '2':
-                houses = House.objects.filter(user=request.user.id,is_active=True).select_related('plant')
-                farms = None
-                selected_farm_name = None
-            elif user_role_id == '1':
-                selected_farm_id = request.GET.get('farm_id') or farm_id
-                if selected_farm_id:
-                    houses = House.objects.filter(farm_id=selected_farm_id,is_active=True,farm__user_id=request.user.id).select_related('plant')
-                    selected_farm = Farm.objects.get(pk=selected_farm_id)
-                    selected_farm_name = selected_farm.farm_name  
-                else:
-                    default_farm = farms.first()
-                    houses = House.objects.filter(farm=default_farm,is_active=True,farm__user_id=request.user.id).select_related('plant')
-                    selected_farm = default_farm
-                    selected_farm_name = selected_farm.farm_name
+
+
+        users_list = User.objects.filter(profile__role_id='1')
+        user_id = request.GET.get('user') 
+   
+        farms = []
+        if user_role_id == '1':
+            farms = Farm.objects.filter(user_id=request.user.id)
+        elif user_role_id == '2':
+            profile = get_object_or_404(Profile, user=request.user.id)
+            farms = Farm.objects.filter(user_id = profile.mapped_under)
+        else:
+            if user_id:
+                farms = Farm.objects.filter(user_id = user_id)
             else:
-                selected_farm_id = request.GET.get('farm_id') or farm_id
-                if selected_farm_id:
-                    houses = House.objects.filter(farm_id=selected_farm_id,is_active=True).select_related('plant')
-                    selected_farm = Farm.objects.get(pk=selected_farm_id)
-                    selected_farm_name = selected_farm.farm_name  
+                farms = Farm.objects.all()
+            
+        if len(farms) > 0:
+            selected_farm_id = request.GET.get('farm_id') or farm_id
+            house_id = request.GET.get('house')
+            
+            if house_id:
+                houses = House.objects.filter(is_active=True,house_id=house_id).select_related('plant')
+                selected_farm = Farm.objects.get(pk=selected_farm_id)
+                selected_farm_name = selected_farm.farm_name
+            else:    
+                if user_role_id == '2':
+                    houses = House.objects.filter(user=request.user.id,is_active=True).select_related('plant')
+                    farms = None
+                    selected_farm_name = None
+                elif user_role_id == '1':
+                    
+                    if selected_farm_id:
+                        houses = House.objects.filter(farm_id=selected_farm_id,is_active=True,farm__user_id=request.user.id).select_related('plant')
+                        selected_farm = Farm.objects.get(pk=selected_farm_id)
+                        selected_farm_name = selected_farm.farm_name 
+                        
+                    else:
+                        default_farm = farms.first()
+                        houses = House.objects.filter(farm=default_farm,is_active=True,farm__user_id=request.user.id).select_related('plant')
+                        selected_farm = default_farm
+                        selected_farm_name = selected_farm.farm_name
                 else:
-                    default_farm = farms.first()
-                    houses = House.objects.filter(farm=default_farm,is_active=True).select_related('plant')
-                    selected_farm = default_farm
-                    selected_farm_name = selected_farm.farm_name
+
+                    if selected_farm_id:
+                        houses = House.objects.filter(farm_id=selected_farm_id,is_active=True).select_related('plant')
+                        selected_farm = Farm.objects.get(pk=selected_farm_id)
+                        selected_farm_name = selected_farm.farm_name 
+                    else:
+                        default_farm = farms.first()
+                        houses = House.objects.filter(farm=default_farm,is_active=True).select_related('plant')
+                        selected_farm = default_farm
+                        selected_farm_name = selected_farm.farm_name
           
             context = {
                 'segment': 'LED_control',
@@ -324,6 +351,7 @@ def LED_control(request,farm_id=None):
                 'humidity': sensor_data['humidity'],
                 'soil_moisture': sensor_data['soil_moisture'],
                 'Rbi': sensor_data['raspberry_id'],
+                'users_list':users_list,
                 }  
             if request.method == "GET":
                 html_template = loader.get_template('home/LED-control.html')
@@ -449,11 +477,20 @@ def house_list(request, farm_id=None):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        users_list = User.objects.filter(profile__role_id='1')
+        user_id = request.GET.get('user')
+        
         farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
         elif user_role_id == '0':
-            farms = Farm.objects.all()
+            
+            if user_id:
+                farms = Farm.objects.filter(user_id = user_id)
+                selected_user_name = User.objects.get(pk=user_id).first_name
+            else:
+                farms = Farm.objects.all()
+                selected_user_name = None
 
         if len(farms) > 0:
             selected_farm_id = request.GET.get('farm_id') or farm_id
@@ -476,7 +513,10 @@ def house_list(request, farm_id=None):
                 'page': page,
                 'selected_farm_id': selected_farm_id,
                 'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id
+                'user_role_id':user_role_id,
+                'users_list':users_list,
+                'user_id':user_id,
+                'selected_user_name':selected_user_name,
                 }
             if request.method == "GET":
                 html_template = loader.get_template('home/house-list.html')
@@ -541,6 +581,9 @@ def add_house(request):
     choice_user = [profile.user for profile in mapped_profiles]
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+        
+    
+    
     context = {'segment':'add_house', 
             'choice_plant': choice_plant, 
             'choice_farm': choice_farm, 

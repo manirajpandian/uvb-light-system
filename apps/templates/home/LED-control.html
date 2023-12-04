@@ -142,6 +142,24 @@
   <p>このアプリケーションは横向きモードで最適に動作します。</p>
 </div>
 <div id="mainContainer">
+  <div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
+  {% if user_role_id == '0'%}
+  <div class="dropdown my-2">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+     <span>農家フィルター</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      {% if users_list|length > 0 %}
+      {% for user in users_list %}
+          <a class="dropdown-item" href="{% url 'LED_control' %}?user={{ user.id }}">{{ user.first_name }}</a>
+      {% endfor %}
+      {% else %}
+      <p class="dropdown-item text-warning">農家がありません</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
   <div class="d-flex align-items-center justify-content-end justify-content-between">
     <h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
     {% if user_role_id == '1' or user_role_id == '0' %}
