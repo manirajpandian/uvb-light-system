@@ -90,10 +90,10 @@
     }
   }
 </style>
-  <div class="d-flex align-items-center justify-content-end justify-content-between w-100">
-    <div class="justify-content-start w-50"><h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
+  <div class="d-flex align-items-center justify-content-end justify-content-between">
+    <div class="justify-content-start w-50 d-none d-md-block"><h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
     {% if user_role_id == '0'%}
-    <div class="d-flex align-items-center justify-content-end w-25">
+    <div class="d-flex align-items-center justify-content-end ">
     <div class="dropdown my-2">
       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
        <span>農家フィルター</span>
@@ -111,7 +111,7 @@
   </div>
     {% endif %}
     {% if user_role_id == '1' or user_role_id == '0' %}
-    <div class="d-flex align-items-center justify-content-end w-25">
+    <div class="d-flex align-items-center justify-content-end ">
     <div class="dropdown my-2">
       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -156,8 +156,10 @@
       </div>
     
       <a href="{% url 'LED_data_download' %}">
-      <span class="material-icons" style="margin-left: 20px">sim_card_download</span>
-  </a>
+          <span class="material-icons" style="margin-left: 20px">sim_card_download</span>
+      </a>
+      <br>
+      <br>
     
 
       <div class="accordion" id="accordionExample">

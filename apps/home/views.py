@@ -15,19 +15,10 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from apps.authentication.models import Profile
 from django.contrib.auth.models import User
-
 import paho.mqtt.client as mqtt
 import json
 from django.utils import timezone
 import paho.mqtt.publish as publish
-
-from datetime import date, datetime
-
-import paho.mqtt.client as mqtt
-import json
-from django.utils import timezone
-import paho.mqtt.publish as publish
-
 from datetime import date, datetime
 from django.db import IntegrityError
 import csv
@@ -42,53 +33,109 @@ def index(request,farm_id=None):
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
 
-        # Admin login
-
-        # Active user count
+        # Admin login active user count
         user_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
 
-        #Farm count
+        #Super Admin login active admin count
+        admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
+
+        #Farm count under the current admin ID
         farm_count = Farm.objects.filter(user__id=current_user_id).count()
 
-        #Active House count 
+        #Active House count under the current admin ID
         house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
 
-        #Active and Inactive LED count 
+        #Active and Inactive LED count under the current admin ID
         led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
         led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,pole__line__house__is_active=True).count()
 
-        #User Login
-
-        # House count
+        #User House count
         user_house_count = House.objects.filter(user=current_user_id,is_active=True).count()
 
-        #Led On and Off count
+        #User Led On and Off count
         user_led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
         user_led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
+        
+        # Assuming you want to retrieve this data for all Raspberry Pi instances
+        raspberries = Rasp.objects.all()
 
-        #Super Admin Login
+        dashboard_sensor_data = {
+            'temperature': None,
+            'humidity': None,
+            'soil_moisture': None,
+            'raspberry_id': None,
+            'date': None
+        }
 
-        #Admin count
-        admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
+        # Assuming you want data for the first Raspberry instance, you can use first()
+        first_raspberry = raspberries.first()
 
-        #Farm count
-        super_farm_count = Farm.objects.all().count()
+        if first_raspberry:
+            # Fetch data for the first Raspberry instance
+            first_data_entry = data.objects.filter(raspberry_id=first_raspberry).order_by('date').first()
+           
 
-        #House count
-        super_house_count = House.objects.filter(is_active=True).count()
+            if first_data_entry:
+                # Extract relevant information
+                temperature = first_data_entry.temperature
+                humidity = first_data_entry.humidity
+                soil_moisture = first_data_entry.soil_moisture
 
-        #LED count
-        super_led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
-        super_led_off_count = LED.objects.filter(pole__line__house__is_active=True).count()
+                # Store the information in the dictionary
+                dashboard_sensor_data = {
+                    'temperature': temperature,
+                    'humidity': humidity,
+                    'soil_moisture': soil_moisture,
+                    'raspberry_id': first_raspberry.rbi,  # Include the raspberry_id in the result
+                    'date': first_data_entry.date
+                }
+        else:
+            # Handle the case where no Raspberry instances are available
+            dashboard_sensor_data = {
+                'temperature': None,
+                'humidity': None,
+                'soil_moisture': None,
+                'raspberry_id': None,
+                'date': None
+            }
 
-        #Plant count
-        super_plant_count = Plant.objects.all().count()
+        
+        
+        #Admin - Farm Filter and House Display
+        # Admin login
+        if user_role_id =='1':
+            admin_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
+        #Farm count  
+            farm_count = Farm.objects.filter(user__id=current_user_id).count()
+        #Active House count 
+            house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
+        #Active and Inactive LED count
+            led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,pole__line__house__is_active=True).count()
+        #User login
+        elif user_role_id =='0': 
+            admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
+         #Farm count  
+            farm_count = Farm.objects.all().count()
+            super_plant_count = Plant.objects.all().count()
+         #Active House count 
+            house_count = House.objects.filter(is_active=True).count()
+        #Active and Inactive LED count 
+            led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
+
+        elif user_role_id =='2' :
+        #Active House count 
+            house_count = House.objects.filter(user=current_user_id,is_active=True).count()
+        #Active and Inactive LED count 
+            led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
 
         #Users Filter
         users_list = User.objects.filter(profile__role_id='1')
         user_id = request.GET.get('user')
-    
         #Farm Filter and House Display
+
         farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
@@ -119,32 +166,25 @@ def index(request,farm_id=None):
             
                 for house in houses:
                     house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-  
+            
             context = {
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
+                'user_count': admin_count,
                 'users_list':users_list,
                 'farms': farms,
                 'houses': houses,
                 'selected_farm_name': selected_farm_name,
-
-
-                'user_count': user_count,
                 'admin_count': admin_count,
                 'farm_count':farm_count,
                 'house_count':house_count,
                 'led_on_count':led_on_count,
-                'led_full_count':led_full_count,
-                'user_house_count' : user_house_count,
-                'user_led_on_count' :  user_led_on_count,
-                'user_led_full_count':user_led_full_count,
-                'super_farm_count':super_farm_count,
-                'super_house_count':super_house_count,
-                'super_led_on_count':super_led_on_count,
-                'super_led_off_count':super_led_off_count,
-                'super_plant_count':super_plant_count,
-               
+                'temperature': dashboard_sensor_data['temperature'],
+                'humidity': dashboard_sensor_data['humidity'],
+                'soil_moisture': dashboard_sensor_data['soil_moisture'],
+                'rbi':dashboard_sensor_data['raspberry_id'],
+                'led_full_count':led_full_count,            
                 }
             if request.method == "GET":
                 html_template = loader.get_template('home/dashboard.html')
@@ -153,24 +193,23 @@ def index(request,farm_id=None):
     
         else:
             context = {'segment': 'dashboard',
-               'user_profile_image': user_profile_image,
-               'user_role_id':user_role_id,
-               'user_count': user_count,
-               'admin_count': admin_count,
-               'farm_count':farm_count,
-               'house_count':house_count,
-               'led_on_count':led_on_count,
-               'led_full_count':led_full_count,
-               'user_house_count':user_house_count,
-               'user_led_on_count': user_led_on_count,
-               'user_led_full_count':user_led_full_count,
-               'super_farm_count':super_farm_count,
-               'super_house_count':super_house_count,
-               'super_led_on_count':super_led_on_count,
-               'super_led_off_count':super_led_off_count,
-               'super_plant_count':super_plant_count,
-               'users_list':users_list,
-               }
+                'user_profile_image': user_profile_image,
+                'user_role_id':user_role_id,
+                'user_count': admin_count,
+                'users_list':users_list,
+                'farms': farms,
+                'houses': houses,
+                'selected_farm_name': selected_farm_name,
+                'admin_count': admin_count,
+                'farm_count':farm_count,
+                'house_count':house_count,
+                'led_on_count':led_on_count,
+                'led_full_count':led_full_count, 
+               'temperature': dashboard_sensor_data['temperature'],
+                'humidity': dashboard_sensor_data['humidity'],
+                'soil_moisture': dashboard_sensor_data['soil_moisture'],
+                'rbi':dashboard_sensor_data['raspberry_id']
+              }
             html_template = loader.get_template('home/dashboard.html')
             return HttpResponse(html_template.render(context, request))
     except BrokenPipeError as e:
@@ -363,16 +402,17 @@ def LED_control(request,farm_id=None):
 
                 if led_id:
                     led = LED.objects.get(pk=led_id)
-                    
                     if led.is_on:  
                         led.is_on = False  # Set to False
                         led.led_off_date = timezone.now() 
+                       
                         led.save()
                         print('button no',led.button_no)
                         button_data = led.button_no
                         Relay_data= True
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                       
                         
                         led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
@@ -380,6 +420,7 @@ def LED_control(request,farm_id=None):
                     else:
                         led.is_on = True  # Set to True
                         led.led_on_date = timezone.now() 
+                        
                         led.save()
                         button_data = led.button_no
                         Relay_data = False
@@ -451,13 +492,22 @@ def update_plant(request,pk):
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = {}
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context = {
+        'user_profile_image': user_profile_image,
+        'user_role_id':user_role_id  
+    }
     try:
+        user_profile_image = request.session.get('user_profile_image')
+        user_role_id = request.session.get('role_id')
+        print(user_profile_image, user_role_id)
         load_template = request.path.split('/')[-1]
 
         if load_template == 'admin':
             return HttpResponseRedirect(reverse('admin:index'))
         context['segment'] = load_template
+        print("test", context)
 
         html_template = loader.get_template('home/' + load_template)
         return HttpResponse(html_template.render(context, request))
