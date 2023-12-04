@@ -44,9 +44,9 @@ def login_view(request):
                         request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
                         return redirect("/")
                     else:
-                        msg = '無効な認証'
+                        msg = 'メールやパスワードが間違ってあります'
                 else:
-                    msg = 'メールが間違ってあります'
+                    msg = 'メールやパスワードが間違ってあります'
             else:
                 msg = 'IDが間違ってあります'
         else:
