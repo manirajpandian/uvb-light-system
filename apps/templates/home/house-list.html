@@ -67,12 +67,11 @@
 
 
 <div class="flex-container justify-content-end">
-  {% if user_id %}
-  <a href="/add_house"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+    {% if user_id %}
+  <a href="{% if user_role_id == '0' %}{% url 'add_house' %}?user={{ user_id }}{% elif user_role_id == '1' %}{% url 'add_house' %}{% endif %}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
  {% endif %}
 </div>
-
 <div class=" row">
   <div class="col-md-12">
     <div class="card">
@@ -80,6 +79,7 @@
         <div class="d-flex align-items-center justify-content-end justify-content-between">
          <div class="justify-content-start w-50 d-none d-md-block "><h3 class="my-2">{% if user_id %}{{ selected_user_name }}{% else %}{{ selected_farm_name }}{% endif %}</h3>
          </div>
+      {% if user_role_id == '0'%}
          <div class="d-flex align-items-center justify-content-end">
           <div class="dropdown my-2">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
@@ -97,6 +97,7 @@
             </div>
           </div>
         </div>
+    {% endif %}
         <div class="d-flex align-items-center justify-content-end">
           <div class="dropdown my-2">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"

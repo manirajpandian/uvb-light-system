@@ -528,13 +528,12 @@ def house_list(request, farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         users_list = User.objects.filter(profile__role_id='1')
-        user_id = request.GET.get('user')
+        user_id = request.GET.get('user') or users_list.first().id
         
         farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
         elif user_role_id == '0':
-            
             if user_id:
                 farms = Farm.objects.filter(user_id = user_id)
                 selected_user_name = User.objects.get(pk=user_id).first_name
@@ -622,17 +621,23 @@ def house_list(request, farm_id=None):
 
 @login_required(login_url="/login/")
 def add_house(request):
-    choice_plant = Plant.objects.all()
-    choice_farm = Farm.objects.filter(user_id=request.user.id)
-    if request.user.is_authenticated:
-        current_user_id = request.user.id
-        mapped_profiles = Profile.objects.filter(mapped_under=current_user_id,user__is_active=True)
-        
-    choice_user = [profile.user for profile in mapped_profiles]
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
-        
+    user_id = request.GET.get('user')
+    choice_plant = Plant.objects.all()
+    if user_role_id == '0':
+        choice_farm = Farm.objects.filter(user_id=user_id)
+    elif user_role_id == '1':
+        choice_farm = Farm.objects.filter(user_id=request.user.id)
     
+    if request.user.is_authenticated:
+        if user_role_id == '1':
+            current_user_id = request.user.id
+        elif user_role_id == '0':
+            current_user_id = user_id
+        mapped_profiles = Profile.objects.filter(mapped_under=current_user_id,user__is_active=True)
+            
+    choice_user = [profile.user for profile in mapped_profiles]
     
     context = {'segment':'add_house', 
             'choice_plant': choice_plant, 
@@ -711,7 +716,7 @@ def update_house(request, house_id):
         house_obj = House.objects.filter(house_id=house_id).first()
         
         if request.user.is_authenticated:
-            current_user_id = request.user.id
+            current_user_id = Farm.objects.get(houses__house_id=house_id).user.id
             mapped_profiles = Profile.objects.filter(mapped_under=current_user_id)
             choice_user = [profile.user for profile in mapped_profiles]
         else:
