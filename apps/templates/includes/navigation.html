@@ -1,7 +1,31 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
   <div class="container-fluid">
-    <div class="navbar-wrapper">
+    <div class="navbar-wrapper ml-3">
+      {% if 'dashboard' in segment or 'house_lights' in segment %}
+      <h3>ダッシュボード</h3>
+      {% endif %}
+      {% if 'LED_control' in segment %} 
+      <h3>LED管理</h3>
+      {% endif %}
+      {% if 'house_list' in request.path or 'add_house' in request.path or 'update_house' in segment %} 
+      <h3>ハウス管理</h3>
+      {% endif %}
+      {% if '/farm_list' in request.path %} 
+      <h3>農場管理</h3>
+      {% endif %}
+
+      {% if 'plant_settings' in segment or 'add_plant' in request.path or 'update_plant' in request.path %} 
+      <h3>作物設定</h3>
+      {% endif %}
+
+      {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} 
+      {% if user_role_id == '0' %}
+      <h3>農家・管理者</h3>
+      {% else %}
+      <h3>ユーザー管理</h3>
+      {% endif %}
+      {% endif %}
     </div>
     {% if request.path != '/login/' %}
     <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index"
@@ -15,14 +39,11 @@
 
     <div class="collapse navbar-collapse justify-content-end">
       {% if request.user.is_authenticated %}
-      {% if request.path != '/LED-control.html' %}
-      <form class="navbar-form">
-      </form>
-      {% endif %}
+      
       {% if request.path != '/login/' %}
       <ul class="navbar-nav">
         {% if 'change_password' not in request.path %}
-        <p class="text-center">{{ user.first_name }}</p>
+        <span class="text-center">{{ user.first_name }}</span>
         <li class="nav-item dropdown">
           <a class="nav-link d-flex align-items-center justify-content-center" href="#" id="navbarDropdownProfile"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
