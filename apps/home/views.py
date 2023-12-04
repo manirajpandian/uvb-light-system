@@ -70,7 +70,52 @@ def index(request,farm_id=None):
         #User Led On and Off count
         user_led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
         user_led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()
+        
+        # Assuming you want to retrieve this data for all Raspberry Pi instances
+        raspberries = Rasp.objects.all()
 
+        dashboard_sensor_data = {
+            'temperature': None,
+            'humidity': None,
+            'soil_moisture': None,
+            'raspberry_id': None,
+            'date': None
+        }
+
+        # Assuming you want data for the first Raspberry instance, you can use first()
+        first_raspberry = raspberries.first()
+
+        if first_raspberry:
+            # Fetch data for the first Raspberry instance
+            first_data_entry = data.objects.filter(raspberry_id=first_raspberry).order_by('date').first()
+           
+
+            if first_data_entry:
+                # Extract relevant information
+                temperature = first_data_entry.temperature
+                humidity = first_data_entry.humidity
+                soil_moisture = first_data_entry.soil_moisture
+
+                # Store the information in the dictionary
+                dashboard_sensor_data = {
+                    'temperature': temperature,
+                    'humidity': humidity,
+                    'soil_moisture': soil_moisture,
+                    'raspberry_id': first_raspberry.rbi,  # Include the raspberry_id in the result
+                    'date': first_data_entry.date
+                }
+        else:
+            # Handle the case where no Raspberry instances are available
+            dashboard_sensor_data = {
+                'temperature': None,
+                'humidity': None,
+                'soil_moisture': None,
+                'raspberry_id': None,
+                'date': None
+            }
+
+        
+        
         #Admin - Farm Filter and House Display
         farms = []
         if user_role_id == '1':
@@ -100,7 +145,7 @@ def index(request,farm_id=None):
             
                 for house in houses:
                     house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-           
+            
             context = {
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
@@ -116,7 +161,11 @@ def index(request,farm_id=None):
                 'selected_farm_name': selected_farm_name,
                 'user_house_count' : user_house_count,
                 'user_led_on_count' :  user_led_on_count,
-                'user_led_full_count':user_led_full_count
+                'user_led_full_count':user_led_full_count,
+                'temperature': dashboard_sensor_data['temperature'],
+                'humidity': dashboard_sensor_data['humidity'],
+                'soil_moisture': dashboard_sensor_data['soil_moisture'],
+                'rbi':dashboard_sensor_data['raspberry_id']
                 }
             if request.method == "GET":
                 html_template = loader.get_template('home/dashboard.html')
@@ -135,7 +184,11 @@ def index(request,farm_id=None):
                'led_full_count':led_full_count,
                'user_house_count':user_house_count,
                'user_led_on_count': user_led_on_count,
-               'user_led_full_count':user_led_full_count
+               'user_led_full_count':user_led_full_count,
+               'temperature': dashboard_sensor_data['temperature'],
+                'humidity': dashboard_sensor_data['humidity'],
+                'soil_moisture': dashboard_sensor_data['soil_moisture'],
+                'rbi':dashboard_sensor_data['raspberry_id']
                }
             html_template = loader.get_template('home/dashboard.html')
             return HttpResponse(html_template.render(context, request))
@@ -312,6 +365,7 @@ def LED_control(request,farm_id=None):
                         Relay_data= True
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                       
                         
                         led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
@@ -391,15 +445,26 @@ def update_plant(request,pk):
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = {}
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context = {
+        'user_profile_image': user_profile_image,
+        'user_role_id':user_role_id  
+    }
+   
+   
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
     try:
+        user_profile_image = request.session.get('user_profile_image')
+        user_role_id = request.session.get('role_id')
+        print(user_profile_image, user_role_id)
         load_template = request.path.split('/')[-1]
 
         if load_template == 'admin':
             return HttpResponseRedirect(reverse('admin:index'))
         context['segment'] = load_template
+        print("test", context)
 
         html_template = loader.get_template('home/' + load_template)
         return HttpResponse(html_template.render(context, request))

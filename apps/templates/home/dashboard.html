@@ -126,22 +126,11 @@
         <div class="card-header card-header-success card-header-icon">
             <div class="card-icon"><i class="material-icons">warehouse</i>{{ house.house_name }}</div>
             <p class="card-category">温度 / 湿度</p>
-            {% comment %} <div class="row">
-              <h4 class="card-title" style="display: flex; align-items: center; justify-content: end; flex-wrap: wrap;">
-                  <span class="material-icons text-success">router</span>0℃ /
-                  <span class="material-icons text-danger">device_thermostat</span>0℃ /
-                  <span class="material-icons text-info">opacity</span>0% /
-                  <span class="material-icons text-success">grass</span>0%
-              </h4>
-          </div>
-           {% endcomment %}
-           <div class="row">
             <h4 class="card-title" style="display: flex; align-items: center; justify-content: end; flex-wrap: wrap;">
-                <span class="material-icons text-success">router</span>0℃ <span class="material-icons text-danger">device_thermostat</span>0℃ <span class="material-icons text-info">opacity</span>0% <span class="material-icons text-success">grass</span>0%
+                <span class="material-icons text-danger">device_thermostat</span> {{temperature}} 
+                <span class="material-icons text-success">router</span> {{rbi}}
+               
             </h4>
-        </div>
-        
-          
             <br>
             <br>
             <div class="card-title d-flex justify-content-between">
