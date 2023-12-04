@@ -183,7 +183,7 @@ def index(request,farm_id=None):
                 'temperature': dashboard_sensor_data['temperature'],
                 'humidity': dashboard_sensor_data['humidity'],
                 'soil_moisture': dashboard_sensor_data['soil_moisture'],
-                'rbi':dashboard_sensor_data['raspberry_id']
+                'rbi':dashboard_sensor_data['raspberry_id'],
                 'led_full_count':led_full_count,            
                 }
             if request.method == "GET":
