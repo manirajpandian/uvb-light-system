@@ -12,6 +12,7 @@ class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
 class Profile(models.Model):
+    address = models.CharField(max_length=150,null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     forget_password_token = models.CharField(max_length=100, null=True)
     role_id = models.CharField(max_length=100, null=True)

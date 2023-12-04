@@ -142,7 +142,6 @@
   <p>このアプリケーションは横向きモードで最適に動作します。</p>
 </div>
 <div id="mainContainer">
-  <h3>LED管理</h3>
   <div class="d-flex align-items-center justify-content-end justify-content-between">
     <h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
     {% if user_role_id == '1' or user_role_id == '0' %}
@@ -228,10 +227,10 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="led_id" value="{{ led.led_id }}">
                                             <input type="hidden" name="farm_id" value="{{ house.farm.farm_id }}">
-                                            無 &nbsp; <label class="switch">
+                                            OFF &nbsp; <label class="switch">
                                               <input type="checkbox" class="colorToggle" {% if led.is_on %}checked{% endif %} >
                                               <span class="slider round"></span>
-                                            </label> &nbsp;有
+                                            </label> &nbsp;ON
                                           </form>
                                     </tr>
                                 {% endfor %}

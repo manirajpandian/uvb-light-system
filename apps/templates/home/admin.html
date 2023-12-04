@@ -65,8 +65,7 @@
 </style>
 {% endblock stylesheets %}
 {% block content %}
-<div class="flex-container">
-  <h3>管理者</h3>
+<div class="flex-container justify-content-end">
   <a href="/add_user"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
 </div>
@@ -80,8 +79,8 @@
                     <thead class="text-primary-emphasis table-success">
                       <th>ID</th>
                       <th>⽒名</th>
-                      <th>メール</th>
-                      <th>権限</th>
+                      <th class="text-break">メール</th>
+                      <th class="d-none d-md-block">権限</th>
                       <th>ステイタス</th>
                       <th>アクション</th>
                     </thead>
@@ -89,13 +88,13 @@
                     <tbody>
                       {% for user, profile in page.object_list %}
                       <tr>
-                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
                         <td>{{ user.first_name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{% if profile.role_id == "0" %} 
+                        <td class="text-break">{{ user.email }}</td>
+                        <td class="d-none d-md-block">{% if profile.role_id == "0" %} 
                           スーパー
                           {% elif profile.role_id == "1" %} 
-                          管理者
+                          農家
                           {% else %} 
                           ユーザー 
                           {% endif %}
@@ -104,7 +103,7 @@
                           {% if profile.role_id == "0" %} 
                           スーパー
                           {% else %}
-                          <form method="POST" action="" autocomplete="off">
+                          <form method="POST" action="" autocomplete="on">
                             {% csrf_token %}
                             <input type="hidden" name="user_id" value="{{ user.id }}">
                             {% if user.is_active %}
@@ -201,7 +200,7 @@
                           </button>
                         </div>
                         <div class="modal-body">
-                          ユーザー<span class="text-danger" id="userNameSpan"></span> を削除してもよろしいですか？
+                          <span class="text-danger" id="userNameSpan2"></span> を削除してもよろしいですか？
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
@@ -242,12 +241,15 @@
             const deleteButtons = document.querySelectorAll(".deleteButton");
             const deleteForm = document.getElementById("deleteForm");
             const userNameSpan = document.getElementById("userNameSpan");
+            const userNameSpan2 = document.getElementById("userNameSpan2");
 
             deleteButtons.forEach(function (button) {
               button.addEventListener("click", function () {
                 currentUserId = this.getAttribute("data-user-id");
                 const userName = this.getAttribute("data-first-name");
                 userNameSpan.innerHTML = userName;
+                userNameSpan2.innerHTML = userName;
+
                 $("#userDeleteModal").modal("show");
               });
             });
