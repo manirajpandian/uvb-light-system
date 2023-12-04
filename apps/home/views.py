@@ -33,7 +33,10 @@ def index(request,farm_id=None):
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
         plant_count = None
-               # Admin login
+        admin_count = None
+        farm_count = None
+
+        # Admin login
         if user_role_id =='1':
             admin_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
             total_admin = User.objects.filter(profile__role_id=2,profile__mapped_under=current_user_id).count()
@@ -108,7 +111,7 @@ def index(request,farm_id=None):
 
         #Users Filter
         users_list = User.objects.filter(profile__role_id='1')
-        user_id = request.GET.get('user') or users_list.first().id
+        user_id = request.GET.get('user')
         
         #Farm Filter and House Display
         farms = []
@@ -118,7 +121,10 @@ def index(request,farm_id=None):
             profile = get_object_or_404(Profile, user=request.user.id)
             farms = Farm.objects.filter(user_id = profile.mapped_under)
         else:
-            farms = Farm.objects.filter(user_id=user_id)
+            if user_id:
+                farms = Farm.objects.filter(user_id=user_id)
+            else:
+                farms = Farm.objects.all()
 
         if len(farms) > 0:
             if user_role_id == '2':
@@ -175,8 +181,6 @@ def index(request,farm_id=None):
                 'admin_count': admin_count,
                 'users_list':users_list,
                 'farms': farms,
-                'houses': houses,
-                'selected_farm_name': selected_farm_name,
                 'farm_count':farm_count,
                 'house_count':house_count,
                 'led_on_count':led_on_count,
@@ -506,7 +510,7 @@ def house_list(request, farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         users_list = User.objects.filter(profile__role_id='1')
-        user_id = request.GET.get('user') or users_list.first().id
+        user_id = request.GET.get('user')
         
         farms = []
         if user_role_id == '1':

@@ -68,8 +68,13 @@
 
 <div class="flex-container justify-content-end">
     {% if user_id %}
-  <a href="{% if user_role_id == '0' %}{% url 'add_house' %}?user={{ user_id }}{% elif user_role_id == '1' %}{% url 'add_house' %}{% endif %}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
-    </span>&nbsp;&nbsp;追加</button></a>
+  <a href="{% url 'add_house' %}?user={{ user_id }}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+    </span>&nbsp;&nbsp;追加</button>
+  </a>
+  {% else %}
+  <a href="{% url 'add_house' %}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+  </span>&nbsp;&nbsp;追加</button>
+</a>
  {% endif %}
 </div>
 <div class=" row">
