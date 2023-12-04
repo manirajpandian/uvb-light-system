@@ -64,13 +64,12 @@
   }
 </style>
 
-<div class="flex-container">
-  <h3>ハウス管理</h3>
-  {% if user_id %}
+
+{% if user_id %}
+<div class="flex-container justify-content-end">
   <a href="/add_house"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button></a>
-  {% endif %}
-</div>
+ {% endif %}
 
 
 <div class=" row">

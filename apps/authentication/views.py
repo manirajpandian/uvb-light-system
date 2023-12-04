@@ -96,7 +96,7 @@ def user_list(request):
                    active_user_obj.is_active = is_active
                    active_user_obj.save()
 
-                update_success_message = 'ユーザー情報が正常に更新されました'
+                update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
                 messages.success(request, update_success_message)
                 return redirect('/user_list')
 
@@ -131,6 +131,7 @@ def update_user(request, pk):
 
             # Update profile data
             profile_obj.role_id = request.POST.get('role_id')
+            profile_obj.address = request.POST.get('address')
             profile_obj.save()
 
             update_success_message = 'ユーザー情報が正常に更新されました'
@@ -142,6 +143,7 @@ def update_user(request, pk):
             'show': 'true',
             'first_name': user_obj.first_name,
             'role_id': profile_obj.role_id,
+            'address':profile_obj.address,
             'user_profile_image': user_profile_image,
             'user_role_id':user_role_id
         }
@@ -164,13 +166,15 @@ def add_user(request):
             context = {
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
-                    'loading':loading
+                    'loading':loading,
+                    'address_block':'none'
                     }
             return render(request, 'home/add-user.html', context)
         else:
             first_name = request.POST['first_name']
             email = request.POST['email']
             role_id = request.POST['role_id']
+            address = request.POST['address']
             user_id = request.user.id
             base_url = settings.BASE_URL
             loading = True
@@ -184,9 +188,11 @@ def add_user(request):
                     'role_id': role_id,
                     'user_id':user_id,
                     'user_profile_image': user_profile_image,
+                    'address':address,
                     'user_role_id':user_role_id,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
-                    'loading':loading
+                    'loading':loading,
+                    'address_block':'block'
                 }
                 return render(request, 'home/add-user.html', context)
 
@@ -225,7 +231,7 @@ def add_user(request):
                 user_obj.set_password('Test@123')
                 user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time, address = address)
             profile_obj.save()
 
             loading = False
@@ -335,14 +341,12 @@ def forgot_password(request):
                 return redirect('/forgot_password/')
             
             user_obj = User.objects.get(email=email)
-            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
             token = str(uuid.uuid4())
             
             # Set expiration time for the token (24 hours from now)
             expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
-            user_obj.username = farm_id
-            user_obj.save()
+            farm_id = user_obj.username
 
             profile_obj = Profile.objects.get(user=user_obj)
             profile_obj.forget_password_token = token

@@ -37,7 +37,7 @@
 
         <div class="text-center">
           <h6 class="">
-            <b class="text-gray">農場ID: </b><span>{{ id }}</span>
+            <b class="text-gray">ID: </b><span>{{ id }}</span>
           </h6>
         </div>
         <!-- Form for getting the input fields  -->
@@ -64,7 +64,7 @@
               <div class="form-group">
                 <label class="bmd-label-floating">役割</label>
                 <input type="text" name="role_id" class="form-control" {% if user_role_id == "0" %}
-                  value="BEAM TECH スーパー管理者" {% elif user_role_id == "1" %} value="管理者" {% else %} value="ユーザー" {% endif %}
+                  value="BEAM TECH スーパー管理者" {% elif user_role_id == "1" %} value="農家" {% else %} value="ユーザー" {% endif %}
                   disabled>
               </div>
             </div>

@@ -15,7 +15,11 @@
 {% endblock stylesheets %}{% block content %}
 <nav aria-label="breadcrumb" role="navigation">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/user_list">管理者</a></li>
+    {% if user_role_id == '0' %}
+    <li class="breadcrumb-item"><a href="/user_list">農家・管理者</a></li>
+    {% else %}
+    <li class="breadcrumb-item"><a href="/user_list">ユーザー管理</a></li>
+    {% endif %}
     {% if show == 'true' %}
     <li class="breadcrumb-item" aria-current="page">編集</li>
     {% else %}
@@ -36,7 +40,7 @@
       <div class="row">
         <div class="col-md-6 my-4">
           <div class="form-group">
-            <label for="userName" class="bmd-label-floating">⽒名</label>
+            <label for="userName" class="bmd-label-floating">⽒名<span class="text-danger">*</span></label>
             <input type="text" id="username" class="form-control" name="first_name" 
             {% if show == 'true' %}value="{{ user_obj.first_name }}" {% else %} value="{{ first_name }}" {% endif %} maxlength="30">
           </div>
@@ -45,11 +49,11 @@
         <div class="col-md-6 my-4">
           <div class="form-group">
             {% if show == 'true' %}
-            <label for="email" class="bmd-label-floating">メール</label>
+            <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>
             <input type="text" class="form-control" name="email" value="{{ user_obj.email }}" disabled>
 
             {% else %}
-            <label for="email" class="bmd-label-floating">メール</label>
+            <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>
             <input type="email" id="email" class="form-control" name="email" value="{{ email }}"
               maxlength="253">
             {% endif %}
@@ -58,19 +62,27 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 my-4">
+        <div class="col-md-6 my-3">
           <div class="form-group">
-            <label for="権限" class="bmd-label-floating">権限</label>
+            <label for="権限" class="bmd-label-floating">権限<span class="text-danger">*</span></label>
             <select name="role_id" class="form-control" id="roleId">
               
               {% if user_role_id == '0' %}
-              <option {% if show == 'true' and role_id == '0' %} selected {% else %} value="0" {% endif %} >BEAM TECH スーパー管理者</option>
-              <option {% if show == 'true' and role_id == '1' %} selected {% else %} value="1" {% endif %} >管理者</option>
+              <option {% if role_id == '0' %} selected  {% endif %} value="0">BEAM TECH スーパー管理者</option>
+              <option {% if role_id == '1' %} selected  {% endif %} value="1">農家</option>
               {% else %}
               <option value="2">ユーザー</option>
               {% endif %}
             </select>
           </div>
+        </div>
+        <div class="col-md-6 my-4 mt-5" id="addressId">
+          <div class="form-group">
+            <label for="address" class="bmd-label-floating">住所</label>
+            <input type="text" id="address" class="form-control" name="address" 
+            {% if show == 'true' %}value="{{ address }}" {% else %} value="{{ address }}" {% endif %} maxlength="150">
+          </div>
+          <span class="text-danger" id="addressMsg"></span>
         </div>
       </div>
 
@@ -90,14 +102,23 @@
 {% block javascripts %}
 <script>
   var loading = '{{ loading }}'
-  console.log('loading>>',loading)
+  var address_block = '{{ address_block }}'
+  console.log('address_block>>',address_block)
+  document.getElementById('addressId').style.display = address_block
   setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
-      successMessage.style.transition = 'opacity 2s'; // Adjust the duration as needed (2s in this example)
+      successMessage.style.transition = 'opacity 2s';
       successMessage.style.opacity = '0';
     }
   }, 5000);
+  document.getElementById('roleId').addEventListener('input', function(){
+    let roleId = this.value;
+    if(roleId == '1' || roleId == '2'){
+      document.getElementById('addressId').style.display = 'block'
+    }
+    console.log("roleId",roleId);
+  })
   document.getElementById('username').addEventListener('input', function () {
     document.getElementById('userNameMsg').innerText = '';
   });
@@ -117,12 +138,12 @@
 
     if (userInput === '') {
       document.getElementById('userNameMsg').innerText = '氏名を入力してください。';
-      event.preventDefault(); // Prevent form submission
+      event.preventDefault();
     }
 
     if (emailInput === '') {
       document.getElementById('emailMsg').innerText = 'メールを入力してください。';
-      event.preventDefault(); // Prevent form submission
+      event.preventDefault();
     }
     else if (!emailRegex.test(emailInput)) {
       document.getElementById('emailMsg').innerText = '有効なメールアドレスを入力してください。';

@@ -143,7 +143,6 @@
 </div>
 <div id="mainContainer">
   <div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
-  <h3>LED管理</h3>
   {% if user_role_id == '0'%}
   <div class="dropdown my-2">
     <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -246,10 +245,10 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="led_id" value="{{ led.led_id }}">
                                             <input type="hidden" name="farm_id" value="{{ house.farm.farm_id }}">
-                                            無 &nbsp; <label class="switch">
+                                            OFF &nbsp; <label class="switch">
                                               <input type="checkbox" class="colorToggle" {% if led.is_on %}checked{% endif %} >
                                               <span class="slider round"></span>
-                                            </label> &nbsp;有
+                                            </label> &nbsp;ON
                                           </form>
                                     </tr>
                                 {% endfor %}

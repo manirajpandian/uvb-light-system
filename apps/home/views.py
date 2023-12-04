@@ -374,7 +374,7 @@ def LED_control(request,farm_id=None):
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         
-                        led_success_msg = f"{led.led_id} LEDは無効化されました。"       #Led is set to OFF
+                        led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
             
                     else:
@@ -387,7 +387,7 @@ def LED_control(request,farm_id=None):
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         
                         print('button no',led.button_no)
-                        led_success_msg = f"{led.led_id} LEDが活性化されました。"       #LED is set to ON
+                        led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
                
                 return redirect('LED_control_farm_id', farm_id=farm_id)
