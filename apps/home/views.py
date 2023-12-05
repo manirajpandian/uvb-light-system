@@ -22,6 +22,7 @@ import paho.mqtt.publish as publish
 from datetime import date, datetime
 from django.db import IntegrityError
 import csv
+from django.db import transaction
 
 
 @login_required(login_url="/login/")
@@ -215,6 +216,7 @@ topic_ec2_to_rpi = "ec2_to_rpi_topic"
 mqtt_username = "dht"
 mqtt_password = "dht123"
 
+
 # LED Control - Sensor and LED Access
 sensor_data = {
     'temperature': None,
@@ -240,7 +242,7 @@ def LED_control(request,farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         
-    
+        @transaction.atomic
         def on_message(client, userdata, message):
             sensor_data , latest_stored_date
     
@@ -391,7 +393,7 @@ def LED_control(request,farm_id=None):
                         led.save()
                         print('button no',led.button_no)
                         button_data = led.button_no
-                        Relay_data= True
+                        Relay_data= False
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                        
@@ -405,7 +407,7 @@ def LED_control(request,farm_id=None):
                         
                         led.save()
                         button_data = led.button_no
-                        Relay_data = False
+                        Relay_data = True 
                         # Publish button_no data to the topic
                         publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         
@@ -568,17 +570,11 @@ def house_list(request, farm_id=None):
                         leds = LED.objects.filter(pole__line__house_id=house.house_id)
                         for led in leds:
                             button_no = led.button_no
-
-                            payload = {
-                                "button_no": button_no,
-                                "status": False,
-                            }
-
                             print(f"Button No: {button_no}")
-
                             # Publish data to MQTT
-                            publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
-                        
+                            publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no, "status": False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                            led.is_on = False
+                            led.save() 
                         house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
                         messages.success(request, house_success_msg)
             
@@ -839,15 +835,14 @@ def delete_farm(request, farm_id):
                     print(leds)
                     for led in leds :
                         button_no = led.button_no
-                        payload = {
-                            "button_no": button_no,
-                            "status": False,
-                        }
+                        
 
                         print(f"Button No: {button_no}")
 
                         # Publish data to MQTT
-                        publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                        
+                        publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no,"status": False,}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                     
                     house.delete()
                 farm.delete()
                 farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
@@ -920,16 +915,14 @@ def delete_house(request, house_id, farm_id):
                 for led in leds:
                     button_no = led.button_no
 
-                    payload = {
-                        "button_no": button_no,
-                        "status": False,
-                    }
+                   
 
                     print(f"Button No: {button_no}")
 
                     # Publish data to MQTT
-                    publish.single(topic_ec2_to_rpi,json.dumps(payload),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
-
+                    publish.single(topic_ec2_to_rpi,json.dumps( {"button_no": button_no,"status":False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                                      
+                
                 house.delete()
                 house_success_msg = f'{house.house_name}ハウスが正常に削除されました。'     # House successfully deleted
                 messages.success(request, house_success_msg)  
