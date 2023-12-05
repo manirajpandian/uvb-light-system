@@ -139,7 +139,7 @@
               {% for house in page.object_list %}
               <tr>
                 <td>{{ house.house_name }}</td>
-                <td>{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">プラント未割り当て</span>{% endif %}</td>
+                <td>{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">作物が未割り当て</span>{% endif %}</td>
                 <td>{{ house.user.first_name }}</td>
                 <td>{{ house.total_line_count }}</td>
                 <td>{{ house.total_pole_count }}</td>
