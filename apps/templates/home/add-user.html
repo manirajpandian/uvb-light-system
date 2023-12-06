@@ -16,7 +16,7 @@
 <nav aria-label="breadcrumb" role="navigation">
   <ol class="breadcrumb">
     {% if user_role_id == '0' %}
-    <li class="breadcrumb-item"><a href="/user_list">農家・管理者</a></li>
+    <li class="breadcrumb-item"><a href="/user_list">管理者</a></li>
     {% else %}
     <li class="breadcrumb-item"><a href="/user_list">ユーザー管理</a></li>
     {% endif %}
@@ -69,23 +69,13 @@
               
               {% if user_role_id == '0' %}
               <option {% if role_id == '0' %} selected  {% endif %} value="0">BEAM TECH スーパー管理者</option>
-              <option {% if role_id == '1' %} selected  {% endif %} value="1">農家</option>
               {% else %}
               <option value="2">ユーザー</option>
               {% endif %}
             </select>
           </div>
         </div>
-        <div class="col-md-6 my-4 mt-5" id="addressId">
-          <div class="form-group">
-            <label for="address" class="bmd-label-floating">住所</label>
-            <input type="text" id="address" class="form-control" name="address" 
-            {% if show == 'true' %}value="{{ address }}" {% else %} value="{{ address }}" {% endif %} maxlength="150">
-          </div>
-          <span class="text-danger" id="addressMsg"></span>
-        </div>
       </div>
-
       <div class="center-container">
         <a onclick='goBack()' href="#">
           <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
@@ -102,9 +92,6 @@
 {% block javascripts %}
 <script>
   var loading = '{{ loading }}'
-  var address_block = '{{ address_block }}'
-  console.log('address_block>>',address_block)
-  document.getElementById('addressId').style.display = address_block
   setTimeout(function () {
     var successMessage = document.getElementById('successMessage');
     if (successMessage) {
@@ -112,13 +99,7 @@
       successMessage.style.opacity = '0';
     }
   }, 5000);
-  document.getElementById('roleId').addEventListener('input', function(){
-    let roleId = this.value;
-    if(roleId == '1' || roleId == '2'){
-      document.getElementById('addressId').style.display = 'block'
-    }
-    console.log("roleId",roleId);
-  })
+
   document.getElementById('username').addEventListener('input', function () {
     document.getElementById('userNameMsg').innerText = '';
   });
@@ -150,7 +131,6 @@
       event.preventDefault();
     }
     else{
-      console.log('loading>>>',loading)
       if (loading) {
         openSweetAlert();
       } else {

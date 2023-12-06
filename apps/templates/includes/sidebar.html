@@ -44,13 +44,22 @@
         <p>作物設定</p>
       </a>
       {% endif %}
+      {% if user_role_id == '0' %}
+      <li
+        class="nav-item {% if '/farmer_list' in request.path or '/add_farmer' in request.path or '/update_user' in request.path %} active {% endif %}">
+        <a class="nav-link" href="/farmer_list">
+          <i class="material-icons">manage_accounts</i>
+          <p>農家</p>
+        </a>
+      </li>
+      {% endif %}
       {% if user_role_id == '0' or user_role_id == '1' %}
       <li
         class="nav-item {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} active {% endif %}">
         <a class="nav-link" href="/user_list">
-          <i class="material-icons">manage_accounts</i>
+          <i class="material-icons"> admin_panel_settings</i>
           {% if user_role_id == '0' %}
-          <p>農家・管理者</p>
+          <p>管理者</p>
           {% else %}
           <p>ユーザー管理</p>
           {% endif %}
