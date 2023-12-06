@@ -104,11 +104,20 @@
 
 <div class="flex-container justify-content-end">
 <!--Add Modal trigger-->
+{% if user_id %}
+  <button type="button" class="btn btn-success" name="search" data-toggle="modal" id="add" data-target="#addFarmModal" data-user-id = "{{ user_id }}"><span class="material-icons">add_circle
+    </span>&nbsp;&nbsp;
+    追加
+  </button>
+  {% else %}
+  {% if user_role_id == '1' %}
   <button type="button" class="btn btn-success" name="search" data-toggle="modal" data-target="#addFarmModal"
   ><span class="material-icons">add_circle
     </span>&nbsp;&nbsp;
     追加
   </button>
+  {% endif %}
+  {% endif %}
 </div> 
 {% if farm_success_msg %}
 <div class="text-center text-success" id="successMessage">
@@ -118,11 +127,34 @@
 </div>
 {% endif %}
 
-
 <div class="row">
   <div class="col-md-12">
     <div class="card">
       <div class="card-body">
+        
+        {% if user_role_id == '0' %}
+        <div class="d-flex align-items-center justify-content-between">
+          <h3 class="my-2"> {% if selected_user_name %}{{ selected_user_name }}{% endif %}</h3>
+
+          <div class="dropdown my-2">
+           <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+             aria-haspopup="true" aria-expanded="false">
+             <span>農家フィルター</span>
+           </button>
+           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+             {% if users_list|length > 0 %}
+             {% for user in users_list %}
+             <a class="dropdown-item" href="{% url 'farm_list' %}?user={{ user.id }}">{{ user.first_name }}</a>
+             {% endfor %}
+             {% else %}
+             <p class="dropdown-item text-warning">農家がありません</p>
+             {% endif %}
+           </div>
+       </div>
+      </div>
+   {% endif %}
+
+
         <div class="table-responsive">
           <table class="table table-striped">
             <thead class="text-primary-emphasis table-success mr-1">
@@ -291,6 +323,7 @@
             <input type="text" class="form-control" id="add_address" maxlength=150 name="address" />
             <span class="text-danger" id="addressMsg"></span>
           </div>
+          <input type="hidden" name="user_id" id="user_id" value="">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -319,9 +352,13 @@
       document.getElementById('addressMsg').innerText = '';
     });
 
+
     document.getElementById('addFormSubmit').addEventListener('submit', function (event) {
       var AddInput = document.getElementById('add_farm_name').value;
       var AddressInput = document.getElementById('add_address').value;
+
+      const userId = document.getElementById('add').getAttribute('data-user-id');
+      document.getElementById('user_id').value = userId;
 
       document.getElementById('farmNameMsg').innerText = '';
 
