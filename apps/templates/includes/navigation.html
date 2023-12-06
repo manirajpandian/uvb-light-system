@@ -19,9 +19,13 @@
       <h3>作物設定</h3>
       {% endif %}
 
+      {% if '/farmer_list' in request.path or '/add_farmer' in request.path or '/update_user' in request.path %}
+      <h3>農家</h3>
+      {% endif %}
+
       {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} 
       {% if user_role_id == '0' %}
-      <h3>農家・管理者</h3>
+      <h3>管理者</h3>
       {% else %}
       <h3>ユーザー管理</h3>
       {% endif %}

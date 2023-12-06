@@ -4,7 +4,7 @@
 """
 
 from django.urls import path
-from .views import login_view, add_user, change_password, user_list, update_user, delete_user, forgot_password, user_profile
+from .views import login_view, add_user, change_password, user_list, update_user, delete_user, forgot_password, user_profile, farmer_list, add_farmer, delete_farmer
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -19,6 +19,9 @@ urlpatterns = [
     path('forgot_password', forgot_password, name="forgot_password"),
     path('change_password/<str:token>', change_password, name="change_password"),
     path('user_profile', user_profile, name="user_profile"),
+    path('farmer_list', farmer_list, name='farmer_list'),
+    path('add_farmer', add_farmer, name='add_farmer'),
+    path('delete_farmer/<str:user_id>/', delete_farmer, name='delete_farmer'),
 ]
 
 if settings.DEBUG:

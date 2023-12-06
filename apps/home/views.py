@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PlantForm,FarmForm
+from .forms import PlantForm
 from .models import Plant, Farm, House, Line, Pole, LED, data , Rasp
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -23,6 +23,7 @@ from datetime import date, datetime
 from django.db import IntegrityError
 import csv
 from django.db import transaction
+from django.http import JsonResponse
 
 
 @login_required(login_url="/login/")
@@ -432,13 +433,15 @@ def LED_control(request,farm_id=None):
 
 
 
-    #List of plant (settings.html)
+#List of plant (settings.html)
 @login_required(login_url="/login/")
 def plant_setting(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         plant_list = Plant.objects.all().order_by('plant_id')
+        for plant in plant_list:
+            plant.active_houses_count = plant.house_set.filter(is_active=True).count()
         page = Paginator(plant_list, 5)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
@@ -747,13 +750,21 @@ def update_house(request, house_id):
 @login_required(login_url="/login/")
 def farm_list(request):
     try:
+        user_profile_image = request.session.get('user_profile_image')
+        user_role_id = request.session.get('role_id')
         if request.method == "GET":
-            user_profile_image = request.session.get('user_profile_image')
-            user_role_id = request.session.get('role_id')
+            users_list = User.objects.filter(profile__role_id='1')
+            user_id = request.GET.get('user')
+            selected_user_name = None
             if user_role_id == '1':
                 farm_list = Farm.objects.filter(user_id = request.user.id).order_by('farm_id')
             elif user_role_id == '0':
-                 farm_list = Farm.objects.all().order_by('farm_id')
+                if user_id:
+                    farm_list = Farm.objects.filter(user_id = user_id)
+                    selected_user_name = User.objects.get(pk=user_id).first_name
+                else:
+                    farm_list = Farm.objects.all()
+                    
             page_number = request.GET.get('page', 1)
             paginator = Paginator(farm_list, 5)
             page = paginator.get_page(page_number)
@@ -763,6 +774,9 @@ def farm_list(request):
                 'page': page,
                 'user_profile_image': user_profile_image,
                 'user_role_id': user_role_id,
+                'users_list':users_list,
+                'user_id':user_id,
+                'selected_user_name':selected_user_name,
             }
 
             html_template = loader.get_template('home/farm_list.html')
@@ -772,14 +786,16 @@ def farm_list(request):
             farm_id = request.POST.get('farm_id')
             farm_name = request.POST.get('farm_name')
             address = request.POST.get('address')
-
             farm_obj = Farm.objects.get(farm_id=farm_id)
             farm_obj.farm_name = farm_name
             farm_obj.address = address
             farm_obj.save()
-            message = f"ファーム{farm_obj.farm_name} が更新されました"
+            message = f"農場{farm_obj.farm_name} が更新されました"
             messages.success(request, message)
-            return redirect('farm_list')
+            if user_role_id == '1':
+                return redirect('farm_list')
+            elif user_role_id == '0':
+                return redirect(f'/farm_list?user={farm_obj.user_id}')
 
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
@@ -796,26 +812,25 @@ def add_farm(request):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
 
-        if request.method == "GET":
-            form = FarmForm()
-        else:
-            form = FarmForm(request.POST)
-            if form.is_valid():
-                farm = form.save(commit=False)  
-                farm.user = request.user
-                farm.save()
-                messages.success(request, '新しい農場の詳細が追加されました')
-                return redirect('/farm_list')
-
-        farm_list = Farm.objects.filter(user_id=request.user.id).order_by('farm_id')
+        if request.method == 'POST':
+            farm_name = request.POST.get('farm_name')
+            address = request.POST.get('address')
+            if user_role_id == '0':
+                user = request.POST.get('user_id') 
+                url = reverse('farm_list') + f'?user={user}'
+            elif user_role_id == '1':
+                user = request.user.id
+                url = reverse('farm_list')
+            farm = Farm(farm_name=farm_name, address=address,user_id=user)
+            farm.save()
+            messages.success(request, '新しい農場の詳細が追加されました')
+            return redirect(url)
+          
         context = {
             'segment': 'farm_list',
-            'farm_list': farm_list,
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
-            'form': form,
         }
-
         return render(request, 'home/farm_list.html', context)
 
     except BrokenPipeError as e:
@@ -826,6 +841,7 @@ def add_farm(request):
 @login_required(login_url="/login/")
 def delete_farm(request, farm_id):
     try: 
+        user_role_id = request.session.get('role_id')
         if request.method == 'POST':
             if farm_id:
                 farm = get_object_or_404(Farm, pk=farm_id)
@@ -835,10 +851,8 @@ def delete_farm(request, farm_id):
                     print(leds)
                     for led in leds :
                         button_no = led.button_no
-                        
 
                         print(f"Button No: {button_no}")
-
                         # Publish data to MQTT
                         
                         publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no,"status": False,}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
@@ -847,18 +861,23 @@ def delete_farm(request, farm_id):
                 farm.delete()
                 farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
                 messages.success(request, farm_success_msg)
-                return redirect('/farm_list')
+                if user_role_id == '1':
+                    return redirect('farm_list')
+                elif user_role_id == '0':
+                    return redirect(f'/farm_list?user={farm.user_id}')
             else:
                 farm_success_msg = '農場が提供されていないです。'  # Farm was not in the list.
                 messages.success(request, farm_success_msg)
-                return redirect('/farm_list')
+                if user_role_id == '1':
+                    return redirect('farm_list')
+                elif user_role_id == '0':
+                    return redirect(f'/farm_list?user={farm.user_id}')
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
 
 
 # Add New Plant 
-
 @login_required(login_url="/login/")
 def add_plant(request):
     try: 
@@ -886,15 +905,12 @@ def delete_plant(request, plant_id):
         if request.method == 'POST':
             if plant_id:
                 plant = get_object_or_404(Plant, pk=plant_id)
-                for house in plant.house_set.filter(farm__user_id=request.user.id):
-                    house.is_active = False
-                    house.save()
                 plant.delete()
                 plant_success_msg = '作物が正常に削除されました。'     #Crop successfully deleted
                 messages.success(request, plant_success_msg)
                 return redirect('/plant_setting')
             else:
-                plant_success_msg = '作物が提供されていないです。'     #Crop was not in the list.
+                plant_success_msg = '作物の削除中にエラーがありました。'     #Error in deleting the plant.
                 messages.success(request, plant_success_msg)
                 return redirect('/plant_setting')
     except BrokenPipeError as e:

@@ -12,10 +12,10 @@ from django.contrib import messages
 import uuid
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import Profile
+from .models import Profile, Company
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from .helpers import send_forgot_password_mail
+from .helpers import send_forgot_password_mail, add_new_user_mail
 import datetime
 from django.utils import timezone
 from django.db.models import Q
@@ -44,7 +44,7 @@ def login_view(request):
                         request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
                         return redirect("/")
                     else:
-                        msg = 'このユーザーは無効です。UVB管理者に連絡してください'
+                        msg = 'メールやパスワードが間違ってあります'
                 else:
                     msg = 'メールやパスワードが間違ってあります'
             else:
@@ -174,9 +174,7 @@ def add_user(request):
             first_name = request.POST['first_name']
             email = request.POST['email']
             role_id = request.POST['role_id']
-            address = request.POST['address']
             user_id = request.user.id
-            base_url = settings.BASE_URL
             loading = True
             expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
@@ -188,7 +186,6 @@ def add_user(request):
                     'role_id': role_id,
                     'user_id':user_id,
                     'user_profile_image': user_profile_image,
-                    'address':address,
                     'user_role_id':user_role_id,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
                     'loading':loading,
@@ -198,29 +195,9 @@ def add_user(request):
 
             farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
             token = str(uuid.uuid4())
-            link = f'{base_url}change_password/{token}'
-            subject = 'パスワードの設定'
-            message = f'''
-            光防除システム管理サイトログイン
 
-            光防除システム管理サイトへようこそ！
-            下記の「パスワードの設定」をクリックして進んでください。
-
-            パスワードの設定：{link}
-
-            ★！現段階ではまた登録は完了しておりません！★
-            ※ご本人様確認のため、上記URLへ「24時間以内」にアクセスしアカウントの本登録を完了いただけますようお願いいたします。
-
-            農場ID：{farm_id}
-            ID：{email}
-
-            ご不明な点がございましたら、このメールへご返信いただくか、
-            info@beam~ までご連絡ください。'''
-            
-            from_email = settings.EMAIL_HOST_USER
-            recipient_list = [email]
-
-            send_mail(subject, message, from_email, recipient_list)
+            # mail sending fuction 
+            add_new_user_mail(email, farm_id, token)
 
             if role_id == '0':
                 user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False, is_superuser=True)
@@ -231,7 +208,7 @@ def add_user(request):
                 user_obj.set_password('Test@123')
                 user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time, address = address)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
             profile_obj.save()
 
             loading = False
@@ -418,3 +395,132 @@ def user_profile(request):
 
     return render(request, 'home/page-user.html',  context)
 
+# farmer list 
+def farmer_list(request):
+    try:
+        user_profile_image = request.session.get('user_profile_image')
+        user_role_id = request.session.get('role_id')
+        company_obj = Company.objects.order_by('id')
+        company_list = [(company.user, company) for company in company_obj]
+        print('company_list',company_list)
+        paginator = Paginator(company_list, 5)
+        page_number = request.GET.get('page')
+        page = paginator.get_page(page_number)
+        loading = False
+        context = {'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id,
+            'loading':loading,
+            'company_list':company_list,
+            'page':page
+            }
+        if request.method == "POST":
+            user_id = request.POST.get('user_id')
+            is_active = request.POST.get('is_active')
+            try:
+                user_obj = User.objects.get(id=user_id)
+
+                # Deactivate the main user
+                user_obj.is_active = is_active
+                user_obj.save()
+
+                # Get all profile objects mapped under the user_id
+                profile_obj = Profile.objects.filter(mapped_under=user_id)
+                for obj in profile_obj:
+                   active_user_obj = User.objects.get(id=obj.user_id)
+                   active_user_obj.is_active = is_active
+                   active_user_obj.save()
+
+                update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
+                messages.success(request, update_success_message)
+                return redirect('/farmer_list')
+
+            except User.DoesNotExist:
+                messages.error(request, '指定されたユーザーは存在しません')
+                return redirect('/farmer_list')
+
+            except Profile.DoesNotExist:
+                messages.error(request, '指定されたプロファイルは存在しません')
+                return redirect('/farmer_list')
+        return render(request, 'home/farmer-list.html',context)
+
+    except Exception as e:
+        print(e)
+    return render(request, 'home/farmer-list.html')
+
+def add_farmer(request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    loading = False
+    try:
+        if request.method == 'POST':
+            company_name = request.POST.get('company_name')
+            user_name = request.POST.get('user_name')
+            email = request.POST.get('email')
+            address = request.POST.get('address')
+            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
+            token = str(uuid.uuid4())
+            expiration_time = timezone.now() + datetime.timedelta(hours=24)
+            loading = True
+            if User.objects.filter(email=email).exists():
+                loading = False
+                context = {
+                    'email': email,
+                    'company_name':company_name,
+                    'user_name':user_name,
+                    'address':address,
+                    'user_profile_image': user_profile_image,
+                    'user_role_id':user_role_id,
+                    'error_message':"このメールはすでに存在します。別のメールをお試しください。",
+                    'loading':loading,
+                    'show':'true'
+                }
+                return render(request, 'home/farmer-list.html', context)
+            # mail sending fuction 
+            loading = True
+            add_new_user_mail(email, farm_id, token)
+
+            user_obj = User(username = farm_id, first_name = user_name, email = email, is_active=False)
+            user_obj.set_password('Test@123')
+            user_obj.save()
+
+            profile_obj = Profile.objects.create(user = user_obj, role_id = '1', mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
+            profile_obj.save()
+
+            company_obj = Company.objects.create(user = user_obj, company_name = company_name, company_address = address)
+            company_obj.save()
+            loading = False
+            message = '農家が正常に追加されました！'
+            messages.success(request, message)
+            return redirect('/farmer_list')
+    except Exception as e:
+        print(e)
+    return render(request, 'home/farmer-list.html')
+
+# delete user 
+@login_required(login_url="/login/")
+def delete_farmer(request, user_id):
+    try:
+        if request.method == 'POST':
+            user_obj = get_object_or_404(User, id=user_id)
+            profile_obj = get_object_or_404(Profile, user=user_obj)
+
+            profile_obj = Profile.objects.filter(mapped_under=user_id)
+            for obj in profile_obj:
+                active_user_obj = User.objects.get(id=obj.user_id)
+                active_user_obj.is_active = False
+                active_user_obj.save()
+            company_obj = Company.objects.filter(user_id=user_id)
+            user_obj.delete()
+            profile_obj.delete()
+            company_obj.delete()
+            user_delete_success = f'{ user_obj.first_name }が正常に削除されました。' 
+            messages.success(request, user_delete_success)
+            return redirect('/farmer_list')
+        else:
+            user_delete_success = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
+            messages.success(request, user_delete_success)
+            return redirect('/farmer_list')
+
+    except Exception as e:
+        print(e)
+    return redirect('/farmer_list')

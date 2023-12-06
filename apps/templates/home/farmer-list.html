@@ -1,0 +1,359 @@
+{% extends "layouts/base.html" %} {% block title %} 農家 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 19px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 15px;
+    width: 15px;
+    left: 4px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  .switch input:checked+.slider {
+    background-color: #66bb6a;
+  }
+
+  .switch input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(16px);
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-end">
+    <button type="button" name="search" class="btn btn-success" data-toggle="modal" data-target="#addFarmer"><span
+            class="material-icons"">add_circle</span>&nbsp;&nbsp;追加</button>
+</div>
+
+<!-- table  -->
+<div class=" card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="text-primary-emphasis table-success">
+                            <th>ID</th>
+                            <th>会社名</th>
+                            <th>担当</th>
+                            <th>住所</th>
+                            <th>ステイタス</th>
+                            <th>アクション</th>
+                        </thead>
+                        {% if page.object_list|length > 0 %}
+                        <tbody>
+                        {% for user, company in page.object_list %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ company.company_name }}</td>
+                                <td>{{ user.first_name }}</td>
+                                <td>{{ company.company_address }}</td>
+                                <td>
+                                    <form method="POST" action="" autocomplete="on">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        {% if user.is_active %}
+                                        <input type="hidden" name="is_active" value="False">
+                                        {% else %}
+                                        <input type="hidden" name="is_active" value="True">
+                                        {% endif %}
+                                        無 <label class="switch">
+                                          <input type="checkbox" class="colorToggle" {% if user.is_active %}checked{% endif %}
+                                            onclick="this.form.submit()" />
+                                          <span class="slider round"></span>
+                                        </label> 有
+                                      </form>
+                                </td>
+                                <td>
+                                    <a class="text-warning" data-toggle="modal" data-target="#addFarmer" data-user-id="{{ user.id }}"
+                                    data-csrf-token="{{ csrf_token }}"
+                                    data-first-name="{{ company.company_name }}"><span>編集</span></a>
+                                    &nbsp; &nbsp;|&nbsp;&nbsp;
+                                    <a href="#" data-toggle="modal" class="text-danger deleteButton"
+                                      data-target="#farmerDeleteModal" data-user-id="{{ user.id }}"
+                                      data-csrf-token="{{ csrf_token }}"
+                                      data-first-name="{{ company.company_name }}"><span>削除</span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <tbody>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-warning">データがありません</td>
+                            <td></td>
+                          </tr>
+                        </tbody>
+                        {% endif %}
+                      </table>
+                      <!--Delete Modal -->
+                  <div class="modal fade" id="farmerDeleteModal" tabindex="-1" role="dialog"
+                  aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><span class="text-danger"
+                            id="userNameSpan"></span> - 削除</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <span class="text-danger" id="userNameSpan2"></span> を削除してもよろしいですか？
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                        <form id="deleteForm" method="POST">
+                          {% csrf_token %}
+                          <button type="button" id="deleteButton" class="btn btn-danger">削除</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                      <!-- Pagination Section  -->
+                  <div class="flex-container">
+                    <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
+                    <nav aria-label="...">
+                      <ul class="pagination justify-content-end">
+                        <li class="page-item">
+                          {% if page.has_previous %}
+                          <a class="page-link" href="?page=1" tabindex="-1">最初</a>
+                          {% endif %}
+                        </li>
+                        <li class="page-item">
+                          {% if page.has_previous %}
+                          <a class="page-link" href="?page={{ page.previous_page_number }}">前</a>
+                          {% endif %}
+                        </li>
+                        {% for num_page in page.paginator.page_range %}
+                        {% if page.number == num_page %}
+                        <li class="page-item active">
+                          <span class="page-link">{{ num_page }}<span class="sr-only">(current)</span></span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                          <a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        <li class="page-item">
+                          {% if page.has_next %}
+                          <a class="page-link" href="?page={{ page.next_page_number }}">次</a>
+                          {% endif %}
+                        </li>
+                        <li class="page-item">
+                          {% if page.has_next %}
+                          <a class="page-link" href="?page={{ page.paginator.num_pages }}">最後</a>
+                          {% endif %}
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+            </div>
+</div>
+<!--Add Modal-->
+<div class=" modal fade" id="addFarmer" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">追加</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" id="addForm" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {% if error_message %}
+                    <span id="errorMessage" class="text-danger">{{ error_message }}</span>
+                    {% endif %}
+                    <div class="my-4 form-group">
+                        <label for="company_name" class="bmd-label-floating">会社名</label>
+                        <input type="text" class="form-control" id="companyName" maxlength=80 name="company_name"
+                            value="{{ company_name }}" />
+                        <span class="text-danger" id="companyNameMsg"></span>
+                    </div>
+                    <div class="my-4 form-group">
+                        <label for="email" class="bmd-label-floating">メール</label>
+                        <input type="email" class="form-control" id="email" maxlength=250 name="email"
+                            value="{{ email }}" />
+                        <span class="text-danger" id="emailMsg"></span>
+                    </div>
+                    <div class="my-4 form-group">
+                        <label for="user_name" class="bmd-label-floating">担当</label>
+                        <input type="text" class="form-control" id="userName" maxlength=30 name="user_name"
+                            value="{{ user_name }}" />
+                        <span class="text-danger" id="userNameMsg"></span>
+                    </div>
+
+                    <div class="my-4 form-group">
+                        <label for="address" class="bmd-label-floating">住所</label>
+                        <input type="text" class="form-control" id="address" maxlength=150 name="address"
+                            value="{{ address }}" />
+                        <span id="addressCount">{% if show == 'true' %}<span id='editRemarkCount'></span>{% else %}0{% endif %}</span>/<span>150</span>字
+                        <div><span class="text-danger" id="addressMsg"></span></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        戻る
+                    </button>
+                    <button type="button" id="addButton" class="btn btn-success">
+                        追加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    var companyName = document.getElementById('companyName')
+    var email = document.getElementById('email')
+    var userName = document.getElementById('userName')
+    var address = document.getElementById('address')
+    var addressCountSpan = document.getElementById('addressCount');
+    var companyNameMsg = document.getElementById('companyNameMsg')
+    var emailMsg = document.getElementById('emailMsg')
+    var userNameMsg = document.getElementById('userNameMsg')
+    var addressMsg = document.getElementById('addressMsg')
+    var form = document.getElementById('addForm')
+    var addButton = document.getElementById('addButton')
+    var error_message = '{{ error_message }}'
+    var loading = '{{ loading }}'
+
+    document.addEventListener("DOMContentLoaded", function () {
+            const deleteButtons = document.querySelectorAll(".deleteButton");
+            const deleteForm = document.getElementById("deleteForm");
+            const userNameSpan = document.getElementById("userNameSpan");
+            const userNameSpan2 = document.getElementById("userNameSpan2");
+
+            deleteButtons.forEach(function (button) {
+              button.addEventListener("click", function () {
+                currentUserId = this.getAttribute("data-user-id");
+                const userName = this.getAttribute("data-first-name");
+                userNameSpan.innerHTML = userName;
+                userNameSpan2.innerHTML = userName;
+
+                $("#farmerDeleteModal").modal("show");
+              });
+            });
+
+            document.getElementById("deleteButton").addEventListener("click", function () {
+              deleteForm.action = `/delete_farmer/${currentUserId}/`;
+              deleteForm.submit();
+            });
+          });
+
+    if (error_message) {
+        $("#addFarmer").modal("show");
+    }
+    if (address.value) {
+        document.getElementById('editRemarkCount').textContent = address.value.length
+    }
+    address.addEventListener("input", function (event) {
+        let charCount = address.value.length;
+        addressCountSpan.textContent = charCount;
+        if (charCount > 80) {
+            addressCountSpan.style.color = 'orange'
+        }
+        if (charCount > 120) {
+            addressCountSpan.style.color = 'red'
+        }
+    });
+    companyName.addEventListener('input', function () {
+        companyNameMsg.innerText = '';
+    });
+    email.addEventListener('input', function () {
+        emailMsg.innerText = '';
+    });
+    userName.addEventListener('input', function () {
+        userNameMsg.innerText = '';
+    });
+    address.addEventListener('input', function () {
+        addressMsg.innerText = '';
+    });
+    addButton.addEventListener('click', function (event) {
+        companyNameMsg.innerText = '';
+        emailMsg.innerText = '';
+        userNameMsg.innerText = '';
+        addressMsg.innerText = '';
+
+        if (companyName.value === '') {
+            companyNameMsg.innerText = '会社名を入力してください。';
+            event.preventDefault();
+        }
+        if (email.value === '') {
+            emailMsg.innerText = 'メールを入力してください。';
+            event.preventDefault();
+        }
+        if (userName.value === '') {
+            userNameMsg.innerText = '担当を入力してください。';
+            event.preventDefault();
+        }
+        if (address.value === '') {
+            addressMsg.innerText = '住所を入力してください。';
+            event.preventDefault();
+        }
+        else if (companyName.value && email.value && userName.value && address.value) {
+            form.action = `/add_farmer`;
+            form.submit();
+            if (loading) {
+                openSweetAlert();
+            } else {
+                closeSweetAlert();
+            }
+        }
+    })
+
+</script>
+{% endblock javascripts %}
