@@ -64,7 +64,7 @@ def user_list(request):
     current_user = request.user.id
     try:
         if user_role_id == '0':
-            profile_list = Profile.objects.filter(Q(role_id='0') | Q(role_id='1'))
+            profile_list = Profile.objects.filter(Q(role_id='0'))
             user_profile_list = [(profile.user, profile) for profile in profile_list]
         else:
             profile_list = Profile.objects.filter(mapped_under=current_user)
