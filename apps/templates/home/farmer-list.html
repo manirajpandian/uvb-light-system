@@ -75,6 +75,7 @@
                             <th>ID</th>
                             <th>会社名</th>
                             <th>担当</th>
+                            <th>メール</th>
                             <th>住所</th>
                             <th>ステイタス</th>
                             <th>アクション</th>
@@ -86,6 +87,7 @@
                                 <td>{{ user.username }}</td>
                                 <td>{{ company.company_name }}</td>
                                 <td>{{ user.first_name }}</td>
+                                <td>{{ user.email }}</td>
                                 <td>{{ company.company_address }}</td>
                                 <td>
                                     <form method="POST" action="" autocomplete="on">
@@ -125,6 +127,7 @@
                             <td></td>
                             <td></td>
                             <td class="text-warning">データがありません</td>
+                            <td></td>
                             <td></td>
                           </tr>
                         </tbody>
