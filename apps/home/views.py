@@ -24,6 +24,7 @@ from django.db import IntegrityError
 import csv
 from django.db import transaction
 from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 
 @login_required(login_url="/login/")
@@ -123,7 +124,10 @@ def index(request,farm_id=None):
         #Users Filter
         users_list = User.objects.filter(profile__role_id='1')
         for user in users_list:
-            user.company = Company.objects.get(user=user)
+            try:
+                user.company = Company.objects.get(user=user)
+            except ObjectDoesNotExist:
+                user.company = None 
        
         user_id = request.GET.get('user')
         
