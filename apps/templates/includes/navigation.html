@@ -44,6 +44,8 @@
       {% if request.user.is_authenticated %}
       {% if request.path != '/login/' or 'change_password' not in request.path %}
       <ul class="navbar-nav">
+        {% if 'change_password' not in request.path %}
+        <span class="text-center">{{ user_company }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
         <span class="text-center d-none d-sm-none d-md-none d-lg-block">{{ user.first_name }}</span>
         <li class="nav-item dropdown">
           <a class="nav-link d-flex align-items-center justify-content-center" href="#" id="navbarDropdownProfile"
