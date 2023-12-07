@@ -100,9 +100,6 @@
                           {% endif %}
                         </td>
                         <td>
-                          {% if profile.role_id == "0" %} 
-                          スーパー
-                          {% else %}
                           <form method="POST" action="" autocomplete="on">
                             {% csrf_token %}
                             <input type="hidden" name="user_id" value="{{ user.id }}">
@@ -117,19 +114,14 @@
                               <span class="slider round"></span>
                             </label> 有
                           </form>
-                          {% endif %}
                         </td>
                         <td>
-                          {% if profile.role_id == "0" %} 
-                          スーパー
-                          {% else %}
                           <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
                           &nbsp; &nbsp;|&nbsp;&nbsp;
                           <a href="#" data-toggle="modal" class="text-danger deleteButton"
                             data-target="#userDeleteModal" data-user-id="{{ user.id }}"
                             data-csrf-token="{{ csrf_token }}"
                             data-first-name="{{ user.first_name }}"><span>削除</span></a>
-                            {% endif %}
                         </td>
                       </tr>
                       {% endfor %}

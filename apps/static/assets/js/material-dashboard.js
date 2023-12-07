@@ -479,7 +479,17 @@ md = {
       nav_content =
         '<ul class="nav navbar-nav nav-mobile-menu">' + nav_content + "</ul>";
 
-      navbar_form = $("nav").find(".navbar-form").get(0).outerHTML;
+        var navbarFormElement = $("nav").find(".navbar-form").get(0);
+
+        // Check if the element is found before accessing its outerHTML
+        if (navbarFormElement) {
+            var navbar_form = navbarFormElement.outerHTML;
+            // Now you can use navbar_form without errors
+        } else {
+            // Handle the case where the element is not found
+            console.log("Element with class '.navbar-form' not found.");
+        }
+      
 
       $sidebar_nav = $sidebar_wrapper.find(" > .nav");
 

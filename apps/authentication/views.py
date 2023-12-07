@@ -64,7 +64,7 @@ def user_list(request):
     current_user = request.user.id
     try:
         if user_role_id == '0':
-            profile_list = Profile.objects.filter(Q(role_id='0'))
+            profile_list = Profile.objects.filter(~Q(user_id=current_user), Q(role_id='0'))
             user_profile_list = [(profile.user, profile) for profile in profile_list]
         else:
             profile_list = Profile.objects.filter(mapped_under=current_user)
@@ -396,13 +396,13 @@ def user_profile(request):
     return render(request, 'home/page-user.html',  context)
 
 # farmer list 
+@login_required(login_url="/login/")
 def farmer_list(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         company_obj = Company.objects.order_by('id')
         company_list = [(company.user, company) for company in company_obj]
-        print('company_list',company_list)
         paginator = Paginator(company_list, 5)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
@@ -447,6 +447,8 @@ def farmer_list(request):
         print(e)
     return render(request, 'home/farmer-list.html')
 
+# add new farmer 
+@login_required(login_url="/login/")
 def add_farmer(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
@@ -496,7 +498,7 @@ def add_farmer(request):
         print(e)
     return render(request, 'home/farmer-list.html')
 
-# delete user 
+# delete farmer 
 @login_required(login_url="/login/")
 def delete_farmer(request, user_id):
     try:
@@ -513,14 +515,40 @@ def delete_farmer(request, user_id):
             user_obj.delete()
             profile_obj.delete()
             company_obj.delete()
-            user_delete_success = f'{ user_obj.first_name }が正常に削除されました。' 
-            messages.success(request, user_delete_success)
+            messages = f'{ user_obj.first_name }が正常に削除されました。' 
+            messages.success(request, messages)
             return redirect('/farmer_list')
         else:
-            user_delete_success = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
-            messages.success(request, user_delete_success)
+            messages = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
+            messages.success(request, messages)
             return redirect('/farmer_list')
 
     except Exception as e:
         print(e)
+    return redirect('/farmer_list')
+
+
+# update farmer 
+@login_required(login_url='/login/')
+def update_farmer(request, user_id):
+    try:
+        if request.method == 'POST':
+            # check if the user is already exist or not
+            user_obj = get_object_or_404(User, id=user_id)
+            company_obj = get_object_or_404(Company, user_id=user_id)
+            company_name = request.POST.get('company_name')
+            user_name = request.POST.get('user_name')
+            address = request.POST.get('address')
+            user_obj.first_name = user_name
+            company_obj.company_name = company_name
+            company_obj.company_address = address
+            company_obj.save()
+            user_obj.save()
+
+            update_success_message = f'{company_obj.company_name}の情報が正常に更新されました'
+            messages.success(request, update_success_message)
+            return redirect('/farmer_list')
+
+    except Exception as e:
+        print('update farmer>>>',e)
     return redirect('/farmer_list')
