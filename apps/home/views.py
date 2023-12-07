@@ -35,7 +35,7 @@ def index(request,farm_id=None):
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
         if user_role_id == '0':
-            user_company = 'BEAM Tech'
+            user_company = 'BEAM TECH'
         elif user_role_id == '1' :
             user_company = Company.objects.get(user_id=request.user.id).company_name
         else:
