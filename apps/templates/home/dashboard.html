@@ -24,7 +24,7 @@
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       {% if users_list|length > 0 %}
       {% for user in users_list %}
-          <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.first_name }}</a>
+          <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
       {% endfor %}
       {% else %}
       <p class="dropdown-item text-warning">農家がありません</p>
@@ -38,7 +38,7 @@
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
-        <h3 class="text-center">ユーザーの数</h3> 
+        <h3 class="text-center">有効な農家の数</h3> 
       </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
         <h1 class="card-title">
@@ -75,7 +75,7 @@
   
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
-      <div class="card-header"> <h3 class="text-center">ハウスの数</h3> </div>
+      <div class="card-header"> <h3 class="text-center">有効なハウスの数</h3> </div>
       <div class="card-body d-flex flex-column justify-content-center align-items-center">
         <h1 class="card-title">{{ house_count }}</h1>
       </div>

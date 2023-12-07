@@ -72,9 +72,11 @@
     </span>&nbsp;&nbsp;追加</button>
   </a>
   {% else %}
+  {% if user_role_id == '1' %}
   <a href="{% url 'add_house' %}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
   </span>&nbsp;&nbsp;追加</button>
 </a>
+{% endif %}
  {% endif %}
 </div>
 <div class=" row">
@@ -82,7 +84,12 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-end justify-content-between">
-         <div class="justify-content-start w-50 d-none d-md-block "><h3 class="my-2">{% if user_role_id == '0' %}{{ selected_user_name }}{% else %}{{ selected_farm_name }}{% endif %}</h3>
+         <div class="justify-content-start w-50 d-none d-md-block ">
+          {% if user_role_id == '0' %}
+          <h3 class="my-2">{% if selected_user_name %}{{ selected_user_name }}{% endif %}</h3>
+          {% elif user_role_id == '1' %}
+          <h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
+          {% endif %}
          </div>
       {% if user_role_id == '0' %}
          <div class="d-flex align-items-center justify-content-end">
@@ -94,7 +101,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               {% if users_list|length > 0 %}
               {% for user in users_list %}
-              <a class="dropdown-item" href="{% url 'house_list' %}?user={{ user.id }}">{{ user.first_name }}</a>
+              <a class="dropdown-item" href="{% url 'house_list' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
               {% endfor %}
               {% else %}
               <p class="dropdown-item text-warning">農家がありません</p>

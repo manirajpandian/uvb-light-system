@@ -13,7 +13,7 @@ from .forms import PlantForm
 from .models import Plant, Farm, House, Line, Pole, LED, data , Rasp
 from django.core.paginator import Paginator
 from django.contrib import messages
-from apps.authentication.models import Profile
+from apps.authentication.models import Profile,Company
 from django.contrib.auth.models import User
 import paho.mqtt.client as mqtt
 import json
@@ -113,6 +113,9 @@ def index(request,farm_id=None):
 
         #Users Filter
         users_list = User.objects.filter(profile__role_id='1')
+        for user in users_list:
+            user.company = Company.objects.get(user=user)
+       
         user_id = request.GET.get('user')
         
         #Farm Filter and House Display
@@ -313,6 +316,8 @@ def LED_control(request,farm_id=None):
 
 
         users_list = User.objects.filter(profile__role_id='1')
+        for user in users_list:
+            user.company = Company.objects.get(user=user)
         user_id = request.GET.get('user') 
    
         farms = []
@@ -515,19 +520,20 @@ def house_list(request, farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         users_list = User.objects.filter(profile__role_id='1')
+        for user in users_list:
+            user.company = Company.objects.get(user=user)
         user_id = request.GET.get('user')
-        
+        selected_user_name = None
         farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
-            selected_user_name = None
+            
         elif user_role_id == '0':
             if user_id:
                 farms = Farm.objects.filter(user_id = user_id)
-                selected_user_name = User.objects.get(pk=user_id).first_name
+                selected_user_name = Company.objects.get(user_id=user_id).company_name
             else:
-                farms = Farm.objects.all()
-                selected_user_name = None
+                farms = Farm.objects.all()                
 
         if len(farms) > 0:
             selected_farm_id = request.GET.get('farm_id') or farm_id
@@ -754,6 +760,8 @@ def farm_list(request):
         user_role_id = request.session.get('role_id')
         if request.method == "GET":
             users_list = User.objects.filter(profile__role_id='1')
+            for user in users_list:
+                user.company = Company.objects.get(user=user)
             user_id = request.GET.get('user')
             selected_user_name = None
             if user_role_id == '1':
@@ -761,7 +769,7 @@ def farm_list(request):
             elif user_role_id == '0':
                 if user_id:
                     farm_list = Farm.objects.filter(user_id = user_id)
-                    selected_user_name = User.objects.get(pk=user_id).first_name
+                    selected_user_name = Company.objects.get(user_id=user_id).company_name
                 else:
                     farm_list = Farm.objects.all()
                     
