@@ -61,6 +61,7 @@ def login_view(request):
 def user_list(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     current_user = request.user.id
     try:
         if user_role_id == '0':
@@ -77,6 +78,7 @@ def user_list(request):
                    'user_profile_list': user_profile_list,
                    'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                 }
 
         if request.method == "POST":
@@ -120,6 +122,7 @@ def user_list(request):
 def update_user(request, pk):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     try:
         user_obj = get_object_or_404(User, id=pk)
         profile_obj = get_object_or_404(Profile, user_id=pk)
@@ -145,7 +148,8 @@ def update_user(request, pk):
             'role_id': profile_obj.role_id,
             'address':profile_obj.address,
             'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
+            'user_role_id':user_role_id,
+            'user_company':user_company,
         }
         return render(request, 'home/add-user.html', context)
 
@@ -160,12 +164,14 @@ def update_user(request, pk):
 def add_user(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     loading = False
     try:
         if request.method == "GET":
             context = {
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                     'loading':loading,
                     'address_block':'none'
                     }
@@ -187,6 +193,7 @@ def add_user(request):
                     'user_id':user_id,
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
                     'loading':loading,
                     'address_block':'block'
@@ -347,9 +354,11 @@ def forgot_password(request):
 def user_profile(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     context={
         'user_profile_image': user_profile_image,
-        'user_role_id':user_role_id
+        'user_role_id':user_role_id,
+        'user_company':user_company,
         }
     try:
         current_user_id = request.user.id
@@ -363,7 +372,8 @@ def user_profile(request):
             'email': user_obj.email,
             'profile_image': profile_obj.image or None,
             'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
+            'user_role_id':user_role_id,
+            'user_company':user_company,
         }
 
         if request.method == 'POST':
@@ -400,6 +410,7 @@ def farmer_list(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
         company_obj = Company.objects.order_by('id')
         company_list = [(company.user, company) for company in company_obj]
         print('company_list',company_list)
@@ -409,6 +420,7 @@ def farmer_list(request):
         loading = False
         context = {'user_profile_image': user_profile_image,
             'user_role_id':user_role_id,
+            'user_company':user_company,
             'loading':loading,
             'company_list':company_list,
             'page':page
@@ -450,6 +462,7 @@ def farmer_list(request):
 def add_farmer(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     loading = False
     try:
         if request.method == 'POST':
@@ -470,6 +483,7 @@ def add_farmer(request):
                     'address':address,
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
                     'loading':loading,
                     'show':'true'
