@@ -46,7 +46,7 @@
       {% endif %}
       {% if user_role_id == '0' %}
       <li
-        class="nav-item {% if '/farmer_list' in request.path or '/add_farmer' in request.path or '/update_user' in request.path %} active {% endif %}">
+        class="nav-item {% if '/farmer_list' in request.path %} active {% endif %}">
         <a class="nav-link" href="/farmer_list">
           <i class="material-icons">manage_accounts</i>
           <p>農家</p>
