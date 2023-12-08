@@ -87,14 +87,11 @@
   }
 
 #marquee {
-   
-    font-size: 1em;
-    color: #9c27b0;
-    font-family: Arial;
-    font-weight: bold;
-    border: none; /* Add this line to remove any border */
-    padding: 0; /* Add this line to remove any padding */
-    margin: 0; /* Add this line to remove any margin */
+  font-size: 1em;
+  font-family: Arial;
+  border: none; 
+  padding: 0; 
+  margin: 0; 
 }
 
 
@@ -144,8 +141,8 @@
 
 
 {% if message%}
-<div id="marquee"> <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
-  Your Raspberry pi is Not connected please connect and try again !!
+<div id="marquee" class='text-danger'> <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+  Raspberry pi が接続されていません。接続してもう一度お試しください。
   </marquee>
   </div>
 {%endif%}
@@ -154,6 +151,7 @@
       {% for house in houses %}
       <div class="d-inline-flex align-items-center">
         <h3 class="m-0">{{ house.house_name }}</h3>
+
         <i class="material-icons text-success ml-3">router</i>
         <span class="ml-1">{{Rbi}}</span>
           <i class="material-icons text-danger ml-3">device_thermostat</i>
@@ -165,7 +163,8 @@
 
           <a href="{% url 'LED_data_download' %}" class="ml-3">
             <span class="material-icons">sim_card_download</span>
-        </a>
+          </a>
+          
       </div>
       <div id="accordion">
         {% for line in house.lines.all %}
