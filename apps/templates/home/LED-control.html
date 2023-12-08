@@ -89,7 +89,21 @@
       left: 50%;
     }
   }
+
+#marquee {
+   
+    font-size: 1em;
+    color: #9c27b0;
+    font-family: Arial;
+    font-weight: bold;
+    border: none; /* Add this line to remove any border */
+    padding: 0; /* Add this line to remove any padding */
+    margin: 0; /* Add this line to remove any margin */
+}
+
+
 </style>
+
   <div class="d-flex align-items-center justify-content-end justify-content-between">
     <div class="justify-content-start w-50 d-none d-md-block"><h3 class="my-2">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
     {% if user_role_id == '0'%}
@@ -133,6 +147,12 @@
 </div>
 
 
+{% if message%}
+<div id="marquee"> <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+  Your Raspberry pi is Not connected please connect and try again !!
+  </marquee>
+  </div>
+{%endif%}
 
   {% if houses|length > 0 %}
   <div class="accordion mt-4" id="accordionExample">

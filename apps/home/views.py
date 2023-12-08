@@ -224,7 +224,8 @@ sensor_data = {
     'humidity': None,
     'soil_moisture': None,
     'raspberry_id': None,
-    'date':None
+    'date':None,
+    'led_count':4
 }
 
 latest_stored_date ={}
@@ -245,7 +246,7 @@ def LED_control(request,farm_id=None):
         
         @transaction.atomic
         def on_message(client, userdata, message):
-            sensor_data , latest_stored_date
+            sensor_data , latest_stored_date , payload
     
             payload = json.loads(message.payload.decode())
             print(f"Received message from MQTT: {payload}")
@@ -293,6 +294,9 @@ def LED_control(request,farm_id=None):
 
                     # Update the latest stored date for the current Raspberry Pi ID
                 latest_stored_date[raspberry_id] = sensor_data['date']
+                
+            elif payload == None:
+                print('8888888888878787878888888888883003002000020220234uu0234u1u412-')
             else:
                 print("Invalid date provided in sensor data.")
 
@@ -376,8 +380,16 @@ def LED_control(request,farm_id=None):
                 'soil_moisture': sensor_data['soil_moisture'],
                 'Rbi': sensor_data['raspberry_id'],
                 'users_list':users_list,
+                'led_count':sensor_data['led_count'],
+                'message':None
+                
                 }  
             if request.method == "GET":
+                if context['temperature'] or context ['humidity'] or context['soil_moisture'] is None:
+                    context['message'] = "Raspberry pi "
+                    html_template = loader.get_template('home/LED-control.html')
+                    
+                    return HttpResponse(html_template.render(context, request))
                 html_template = loader.get_template('home/LED-control.html')
                 return HttpResponse(html_template.render(context, request))
         
@@ -395,12 +407,18 @@ def LED_control(request,farm_id=None):
                         print('button no',led.button_no)
                         button_data = led.button_no
                         Relay_data= False
-                        # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                       
+                        if button_data > sensor_data['led_count']:
+                            led_success_msg = f"raspberry pi is not connected to that {led.led_id} "       #Led is set to OFF
+                            messages.error(request, led_success_msg)
+                            print("onnn")
+                        else:
+                            # Publish button_no data to the topic
+                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         
-                        led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
-                        messages.success(request, led_success_msg)
+                            
+                            
+                            led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
+                            messages.success(request, led_success_msg)
             
                     else:
                         led.is_on = True  # Set to True
@@ -409,12 +427,18 @@ def LED_control(request,farm_id=None):
                         led.save()
                         button_data = led.button_no
                         Relay_data = True 
-                        # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
                         
-                        print('button no',led.button_no)
-                        led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
-                        messages.success(request, led_success_msg)
+                        if button_data > sensor_data['led_count']:
+                            led_success_msg = f"raspberry pi is not connected to that {led.led_id}"       #Led is set to OFF
+                            messages.error(request, led_success_msg)
+                           
+                        else:  
+                        # Publish button_no data to the topic
+                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                            
+                            print('button no',led.button_no)
+                            led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
+                            messages.success(request, led_success_msg)
                
                 return redirect('LED_control_farm_id', farm_id=farm_id)
     
@@ -974,3 +998,73 @@ def LED_data_download(request):
 
 
 
+def RPI_settings(request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    context = {'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,}
+    return render(request, 'home/RPI_settings.html',context)
+    
+def raspberryid(request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    if request.method == 'POST':
+        # Get the manual ID from the form data
+        manual_id = request.POST.get('manual_id', '')
+
+        # Do something with the manual_id, e.g., store it in the session
+        request.session['manual_raspberry_id'] = manual_id
+        broker_address = 'localhost'
+        port = 1883
+        topic = "sensor_data_topic"
+        id_topic = "id_topic"
+        
+        
+        def on_connect(client, userdata, flags, rc):
+            print("Connected with result code " + str(rc))
+            client.subscribe(topic)
+            client.subscribe(id_topic)
+
+        def on_message(client, userdata, msg):
+            received_data = msg.payload.decode()
+            
+            if msg.topic == id_topic:
+                # Handle ID message
+                received_id = received_data.split(",")[0].strip()
+                print(f"Received ID from publisher: {received_id}")
+                client.publish(topic, f"ID: {received_id}")
+                print(f"ID Sent to publisher: {received_id}")
+            elif msg.topic == topic:
+                # Handle sensor data message
+                # print(f"Received Data: {received_data}")
+                pass
+
+        client = mqtt.Client()
+        client.on_connect = on_connect
+        client.on_message = on_message
+
+        client.connect(broker_address, port, 60)
+
+        client.loop_start()
+
+        # # Manually assign an ID and publish it
+        # manual_id = input("Enter ID to assign: ")
+        client.publish(id_topic, manual_id)
+        print(f"Manually Assigned ID Published: {manual_id}")
+
+        
+
+        # Set a status message to display on the RPI_settings page
+        status_message = f"Manually Assigned ID Published: {manual_id}"
+        context = {'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'status': status_message}
+        
+        # Render the RPI_settings page with the status message
+        return render(request, 'home/RPI_settings.html', context)
+
+    return render(request, 'home/RPI_settings.html')
+        
+        
+        
+    
