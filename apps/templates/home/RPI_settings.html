@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} RPI_settings{% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+   <h5> Welcome to RPI_settings </h5>
+
+   <!-- Form for entering manual ID -->
+   <form method="post" action="{% url 'raspberryid' %}">
+       {% csrf_token %}
+       <label for="manual_id">Enter ID to assign:</label>
+       <input type="text" name="manual_id" required>
+       <button type="submit">Submit</button>
+   </form>
+
+   {% if status %}
+       <p>{{ status }}</p>
+   {% endif %}
+
+   <!-- Display entered IDs in a table -->
+   {% if entered_ids %}
+       <h6>Entered IDs:</h6>
+       <table>
+           <thead>
+               <tr>
+                   <th>S.No</th>
+                   <th>Raspberry Pi ID</th>
+               </tr>
+           </thead>
+           <tbody>
+             
+  
+                       
+                       <td>{{entered_ids}}</td>
+                   </tr>
+         
+           </tbody>
+       </table>
+   {% endif %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

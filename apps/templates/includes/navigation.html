@@ -23,6 +23,14 @@
       <h3>農家</h3>
       {% endif %}
 
+      {% if '/RPI_settings' in request.path or '/RPI_settings' in request.path or '/RPI_settings' in request.path %}
+      <h3>RPI設定</h3>
+      {% endif %}
+
+      {% if '/raspberryid' in request.path or '/raspberryid' in request.path or '/raspberryid' in request.path %}
+      <h3>RPI設定</h3>
+      {% endif %}
+
       {% if '/user_list' in request.path or '/add_user' in request.path or '/update_user' in request.path %} 
       {% if user_role_id == '0' %}
       <h3>管理者</h3>
