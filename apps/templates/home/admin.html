@@ -77,7 +77,9 @@
                 <div class="table-responsive">
                   <table class="table table-striped">
                     <thead class="text-primary-emphasis table-success">
+                      {% if user_role_id == '0' %}
                       <th>ID</th>
+                      {% endif %}
                       <th>⽒名</th>
                       <th class="text-break">メール</th>
                       <th class="d-none d-md-block">権限</th>
@@ -88,7 +90,9 @@
                     <tbody>
                       {% for user, profile in page.object_list %}
                       <tr>
+                        {% if user_role_id == '0' %}
                         <td>{{ profile.username }}</td>
+                        {% endif %}
                         <td>{{ user.first_name }}</td>
                         <td class="text-break">{{ user.email }}</td>
                         <td class="d-none d-md-block">{% if profile.role_id == "0" %} 
@@ -101,7 +105,7 @@
                         </td>
                         <td>
                           {% if user.is_staff or current_user_id == user.id %}
-                          なし
+                          不可能
                           {% else %}
                           <form method="POST" action="" autocomplete="on">
                             {% csrf_token %}
@@ -121,7 +125,7 @@
                         </td>
                         <td>
                           {% if user.is_staff or current_user_id == user.id %}
-                          なし
+                          不可能
                           {% else %}
                           <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
                           &nbsp; &nbsp;|&nbsp;&nbsp;

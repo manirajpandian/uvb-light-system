@@ -8,13 +8,14 @@ from .forms import LoginForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 import uuid
-from .models import Profile, Company
+from .models import Profile, Company, Farm, House
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .helpers import send_forgot_password_mail, add_new_user_mail
 import datetime
 from django.utils import timezone
 from django.db.models import Q
+import random
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -212,9 +213,20 @@ def add_user(request):
             company_obj = get_object_or_404(Company, user_id=user_id)
             user_company_name = company_obj.company_name
             user_company_address = company_obj.company_address
-            if role_id == '0':
-                farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
+            def generate_farm_id():
+                return "UVB" + ''.join(str(random.randint(0, 9)) for _ in range(6))
 
+            def generate_unique_farm_id(existing_ids):
+                new_farm_id = generate_farm_id()
+                while new_farm_id in existing_ids:
+                    new_farm_id = generate_farm_id()
+                return new_farm_id
+
+            existing_farm_ids = set()
+
+            if role_id == '0':
+                farm_id = generate_unique_farm_id(existing_farm_ids)
+                existing_farm_ids.add(farm_id)
             else:
                 farm_id = company_id
             
@@ -228,7 +240,7 @@ def add_user(request):
                 user_obj.set_password('Test@123')
                 user_obj.save()
             else:
-                user_obj = User(username = str(uuid.uuid4())[:10].upper(), first_name = first_name, email = email, is_active=False)
+                user_obj = User(username = str(uuid.uuid4())[:9].upper(), first_name = first_name, email = email, is_active=False)
                 user_obj.set_password('Test@123')
                 user_obj.save()
 
@@ -463,10 +475,22 @@ def farmer_list(request):
 
                 # Get all profile objects mapped under the user_id
                 profile_obj = Profile.objects.filter(mapped_under=user_id)
+                # TODO: farm_obj need to inactivate when inactive the company 
+                # * farm_obj = Farm.objects.filter(user_id = user_id)
+                # * print('farm_obj',farm_obj)
+
+                house_obj = House.objects.filter(user_id = user_id)
+                print('house_obj',house_obj)
+                for obj in house_obj:
+                    obj.is_active = is_active
+                    house_obj.save()
                 for obj in profile_obj:
                    active_user_obj = User.objects.get(id=obj.user_id)
                    active_user_obj.is_active = is_active
                    active_user_obj.save()
+                   active_house = House.objects.get(user_id = obj.user_id)
+                   active_house.is_active = is_active
+                   active_house.save()
 
                 update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
                 messages.success(request, update_success_message)
@@ -499,11 +523,19 @@ def add_farmer(request):
             email = request.POST.get('email')
             address = request.POST.get('address')
 
-            if len(company_name) >= 3:
-                companyName_slice = company_name[:3].upper()
-                farm_id = companyName_slice + str(uuid.uuid4())[:5].upper()
-            else:
-                farm_id = company_name.upper() + str(uuid.uuid4())[:5].upper()
+            def generate_farm_id():
+                return "UVB" + ''.join(str(random.randint(0, 9)) for _ in range(6))
+
+            def generate_unique_farm_id(existing_ids):
+                new_farm_id = generate_farm_id()
+                while new_farm_id in existing_ids:
+                    new_farm_id = generate_farm_id()
+                return new_farm_id
+
+            existing_farm_ids = set()
+
+            farm_id = generate_unique_farm_id(existing_farm_ids)
+            existing_farm_ids.add(farm_id)
 
             token = str(uuid.uuid4())
             expiration_time = timezone.now() + datetime.timedelta(hours=24)

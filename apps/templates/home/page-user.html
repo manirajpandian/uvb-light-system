@@ -22,7 +22,6 @@
   <div class="col-md-8 offset-md-2">
     <div class="card">
       <div class="card-body">
-        
         <!-- <div class="alert alert-danger show d-none" role="alert" id="imageSizeError"></div> -->
         <div class="card-avatar text-center">
           {% if profile_image %}
@@ -30,10 +29,15 @@
           {% else %}
           <img class="img rounded-circle" id="profile-image" src="/static/assets/img/default.png" alt="Default Image">
           {% endif %}
-          <div class="camera-icon m-3">
+          <div class="camera-icon m-2">
             <i id="upload-icon" class="material-icons cursor-pointer text-primary">camera_alt</i>
           </div>
+          <div class="text-center">
+            <h6 class=""><b class="text-gray">ID: </b><span>{{ id }}</span>
+            </h6>
+          </div>
         </div>
+        
         <!-- Form for getting the input fields  -->
         <form method="post" id="userProfileForm" role="form" enctype="multipart/form-data">
           {% csrf_token %}
