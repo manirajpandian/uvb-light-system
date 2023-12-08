@@ -42,10 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.authentication',
-    'apps.home'  # Enable the inner home (home)
+    'apps.authentication.apps.AuthenticationConfig',
+    'apps.home',  # Enable the inner home (home)
 ]
-
+# this for custom login using profile object
+AUTHENTICATION_BACKENDS = [
+    'apps.authentication.backends.ProfileBackend',
+    'django.contrib.auth.backends.ModelBackend', 
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
