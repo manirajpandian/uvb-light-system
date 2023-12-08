@@ -510,6 +510,15 @@ def add_farmer(request):
             loading = True
             if User.objects.filter(email=email).exists():
                 loading = False
+                
+                company_obj = Company.objects.select_related('user__profile').order_by('id')
+                company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
+
+                # Paginate the filtered company list
+                paginator = Paginator(company_list, 5)
+                page_number = request.GET.get('page')
+                page = paginator.get_page(page_number)
+                
                 context = {
                     'email': email,
                     'company_name':company_name,
@@ -520,7 +529,9 @@ def add_farmer(request):
                     'user_company':user_company,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
                     'loading':loading,
-                    'show':'true'
+                    'show':'true',
+                    'company_list':company_list,
+                    'page':page
                 }
                 return render(request, 'home/farmer-list.html', context)
             # mail sending fuction 

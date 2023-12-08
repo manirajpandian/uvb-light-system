@@ -242,9 +242,11 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <a href="/farmer_list">
+          <button type="button" class="btn btn-secondary">
             戻る
           </button>
+        </a>
           <button type="button" id="addButton" class="btn btn-success">
             追加
           </button>
@@ -293,9 +295,11 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            戻る
-          </button>
+          <a href="/farmer_list">
+            <button type="button" class="btn btn-secondary">
+              戻る
+            </button>
+          </a>
           <button type="button" id="updateSendButton" class="btn btn-success">
             編集
           </button>
@@ -430,7 +434,7 @@
       $("#addFarmer").modal("show");
     }
     if (address.value) {
-      document.getElementById('editRemarkCount').textContent = address.value.length
+      document.getElementById('addressCount').textContent = address.value.length
     }
     // add address count check 
     address.addEventListener("input", function (event) {

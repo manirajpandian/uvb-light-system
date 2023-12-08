@@ -175,8 +175,8 @@
                         {% for led in pole.leds.all|dictsort:"led_id" %}
                             <tr>
                               <td>{{ led.led_id }}</td>
-                              <td>{{ led.led_on_date  }}</td>
-                              <td>{{ led.led_off_date  }}</td>
+                              <td>{{ led.led_on_date|date:"Y/m/d H:i"  }}</td>
+                              <td>{{ led.led_off_date|date:"Y/m/d H:i" }}</td>
                                 <td>
                                   <form method="post" action="{% if farm and farm.farm_id %}{% url 'LED_control_farm_id' farm_id=farm.farm_id %}{% else %}{% url 'LED_control' %}{% endif %}" class="status-form" id="status-form-{{ led.led_id }}">
                                     {% csrf_token %}
