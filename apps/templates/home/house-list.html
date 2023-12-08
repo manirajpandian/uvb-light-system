@@ -71,6 +71,10 @@
   <a href="{% url 'add_house' %}?user={{ user_id }}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
     </span>&nbsp;&nbsp;追加</button>
   </a>
+  {% elif user_id and farm_id %}
+  <a href="{% url 'add_house' %}?user={{ user_id }}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
+  </span>&nbsp;&nbsp;追加</button>
+</a>
   {% else %}
   {% if user_role_id == '1' %}
   <a href="{% url 'add_house' %}"><button type="submit" name="search" class="btn btn-success"><span class="material-icons"">add_circle
@@ -119,7 +123,11 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               {% if farms|length > 0 %}
               {% for farm in farms %}
+              {% if user_id %}
+              <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}?user={{ farm.user_id }}">{{ farm.farm_name }}</a>
+              {% else %}
               <a class="dropdown-item" href="{% url 'house_list_with_farm' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
+              {% endif %}
               {% endfor %}
               {% else %}
               <p class="dropdown-item text-warning">農場がありません</p>
