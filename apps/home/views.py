@@ -68,7 +68,7 @@ def index(request,farm_id=None):
       
             house_count = House.objects.filter(is_active=True).count()
      
-            led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
             led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
 
         elif user_role_id =='2' :
@@ -585,7 +585,9 @@ def house_list(request, farm_id=None):
                 'users_list':users_list,
                 'user_id':user_id,
                 'selected_user_name':selected_user_name,
+                'farm_id':farm_id,
                 }
+            
             if request.method == "GET":
                 html_template = loader.get_template('home/house-list.html')
                 return HttpResponse(html_template.render(context, request))
