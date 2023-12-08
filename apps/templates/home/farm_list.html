@@ -144,7 +144,7 @@
            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
              {% if users_list|length > 0 %}
              {% for user in users_list %}
-             <a class="dropdown-item" href="{% url 'farm_list' %}?user={{ user.id }}">{{ user.first_name }}</a>
+             <a class="dropdown-item" href="{% url 'farm_list' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
              {% endfor %}
              {% else %}
              <p class="dropdown-item text-warning">農家がありません</p>

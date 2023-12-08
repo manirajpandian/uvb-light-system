@@ -2,16 +2,12 @@
 """
 © copyrights BEAM Technologies
 """
-
-# Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 import uuid
-from django.conf import settings
-from django.core.mail import send_mail
 from .models import Profile, Company
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -25,32 +21,41 @@ def login_view(request):
     msg = None
     loading = False
     
-    if request.method == "POST":
+    if request.method == "POST": 
         if form.is_valid():
-            username = form.cleaned_data['username']
-            email = form.cleaned_data.get("email")
-            password = form.cleaned_data.get("password")
-            if User.objects.filter(username=username).exists():
-                if User.objects.filter(email=email).exists():
-                    user = authenticate(request,username=username, email=email, password=password)
+            email = form.cleaned_data.get('email')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+
+            # Check if the user with the given email exists
+            try:
+                user_obj = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user_obj = None
+
+            if user_obj:
+                # User with the given email exists
+                profile_obj = Profile.objects.get(user=user_obj)
+
+                if profile_obj.username == username:
+                    # Authenticate the user
+                    user = authenticate(request, username=user_obj.username, email=email, password=password)
+
                     if user is not None:
-                        # Login the user
                         login(request, user)
-                        session_profile_obj, created = Profile.objects.get_or_create(user_id=request.user.id)
-                        if created:
-                            session_profile_obj.created_at = timezone.now()
-                            session_profile_obj.role_id = '0'
-                            session_profile_obj.save()
+                        # Store the user's profile image URL in the session
                         request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
+
                         return redirect("/")
                     else:
-                        msg = 'メールやパスワードが間違ってあります'
+                        msg = 'メールやパスワードが間違っています'
                 else:
-                    msg = 'メールやパスワードが間違ってあります'
+                    msg = 'IDまたはメールが間違っています'
             else:
-                msg = 'IDが間違ってあります'
-        else:
-            msg = 'メールやパスワードが間違ってあります'
+                msg = 'IDまたはメールが間違っています'
+        # else:
+        #     msg = 'フォームが有効ではありません'
+
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)
     email = request.session.pop('email',None)
@@ -61,13 +66,14 @@ def login_view(request):
 def user_list(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     current_user = request.user.id
     try:
         if user_role_id == '0':
             profile_list = Profile.objects.filter(Q(role_id='0'))
             user_profile_list = [(profile.user, profile) for profile in profile_list]
         else:
-            profile_list = Profile.objects.filter(mapped_under=current_user)
+            profile_list = Profile.objects.filter(Q(user=current_user) | Q(mapped_under=current_user))
             user_profile_list = [(profile.user, profile) for profile in profile_list]
         paginator = Paginator(user_profile_list, 5)
         page_number = request.GET.get('page')
@@ -77,6 +83,8 @@ def user_list(request):
                    'user_profile_list': user_profile_list,
                    'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
+                    'current_user_id': request.user.id,
                 }
 
         if request.method == "POST":
@@ -120,6 +128,7 @@ def user_list(request):
 def update_user(request, pk):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     try:
         user_obj = get_object_or_404(User, id=pk)
         profile_obj = get_object_or_404(Profile, user_id=pk)
@@ -145,7 +154,8 @@ def update_user(request, pk):
             'role_id': profile_obj.role_id,
             'address':profile_obj.address,
             'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
+            'user_role_id':user_role_id,
+            'user_company':user_company,
         }
         return render(request, 'home/add-user.html', context)
 
@@ -160,12 +170,14 @@ def update_user(request, pk):
 def add_user(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     loading = False
     try:
         if request.method == "GET":
             context = {
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                     'loading':loading,
                     'address_block':'none'
                     }
@@ -187,13 +199,25 @@ def add_user(request):
                     'user_id':user_id,
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
                     'loading':loading,
                     'address_block':'block'
                 }
                 return render(request, 'home/add-user.html', context)
+            
+            
+            user_obj = get_object_or_404(User, id=user_id)
+            company_id = user_obj.username
+            company_obj = get_object_or_404(Company, user_id=user_id)
+            user_company_name = company_obj.company_name
+            user_company_address = company_obj.company_address
+            if role_id == '0':
+                farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
 
-            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
+            else:
+                farm_id = company_id
+            
             token = str(uuid.uuid4())
 
             # mail sending fuction 
@@ -204,12 +228,15 @@ def add_user(request):
                 user_obj.set_password('Test@123')
                 user_obj.save()
             else:
-                user_obj = User(username = farm_id, first_name = first_name, email = email, is_active=False)
+                user_obj = User(username = str(uuid.uuid4())[:10].upper(), first_name = first_name, email = email, is_active=False)
                 user_obj.set_password('Test@123')
                 user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = role_id, mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time, username = farm_id)
             profile_obj.save()
+
+            company_obj = Company.objects.create(user = user_obj, company_name = user_company_name, company_address = user_company_address)
+            company_obj.save()
 
             loading = False
             success_message = "ユーザが正常に追加されました"
@@ -233,9 +260,11 @@ def delete_user(request, user_id):
                 active_user_obj = User.objects.get(id=obj.user_id)
                 active_user_obj.is_active = False
                 active_user_obj.save()
-
+            company_obj = get_object_or_404(Company, user_id=user_id)
             user_obj.delete()
             profile_obj.delete()
+            company_obj.delete()
+
             user_delete_success = f'ユーザー{ user_obj.first_name }が正常に削除されました。' 
             messages.success(request, user_delete_success)
             return redirect('/user_list')
@@ -323,9 +352,8 @@ def forgot_password(request):
             # Set expiration time for the token (24 hours from now)
             expiration_time = timezone.now() + datetime.timedelta(hours=24)
 
-            farm_id = user_obj.username
-
             profile_obj = Profile.objects.get(user=user_obj)
+            farm_id = profile_obj.username
             profile_obj.forget_password_token = token
             profile_obj.token_expiration_time = expiration_time  # Save the expiration time
             profile_obj.save()
@@ -347,9 +375,11 @@ def forgot_password(request):
 def user_profile(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     context={
         'user_profile_image': user_profile_image,
-        'user_role_id':user_role_id
+        'user_role_id':user_role_id,
+        'user_company':user_company,
         }
     try:
         current_user_id = request.user.id
@@ -363,7 +393,8 @@ def user_profile(request):
             'email': user_obj.email,
             'profile_image': profile_obj.image or None,
             'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id
+            'user_role_id':user_role_id,
+            'user_company':user_company,
         }
 
         if request.method == 'POST':
@@ -396,19 +427,26 @@ def user_profile(request):
     return render(request, 'home/page-user.html',  context)
 
 # farmer list 
+@login_required(login_url="/login/")
 def farmer_list(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        company_obj = Company.objects.order_by('id')
-        company_list = [(company.user, company) for company in company_obj]
-        print('company_list',company_list)
+        user_company = request.session.get('user_company')
+        company_obj = Company.objects.select_related('user__profile').order_by('id')
+        profile_obj = Profile.objects.order_by('id')
+
+        # Filter companies based on profile role_id
+        company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
+
+        # Paginate the filtered company list
         paginator = Paginator(company_list, 5)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
         loading = False
         context = {'user_profile_image': user_profile_image,
             'user_role_id':user_role_id,
+            'user_company':user_company,
             'loading':loading,
             'company_list':company_list,
             'page':page
@@ -447,9 +485,12 @@ def farmer_list(request):
         print(e)
     return render(request, 'home/farmer-list.html')
 
+# add new farmer 
+@login_required(login_url="/login/")
 def add_farmer(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     loading = False
     try:
         if request.method == 'POST':
@@ -457,12 +498,27 @@ def add_farmer(request):
             user_name = request.POST.get('user_name')
             email = request.POST.get('email')
             address = request.POST.get('address')
-            farm_id = "UVB" + str(uuid.uuid4())[:5].upper()
+
+            if len(company_name) >= 3:
+                companyName_slice = company_name[:3].upper()
+                farm_id = companyName_slice + str(uuid.uuid4())[:5].upper()
+            else:
+                farm_id = company_name.upper() + str(uuid.uuid4())[:5].upper()
+
             token = str(uuid.uuid4())
             expiration_time = timezone.now() + datetime.timedelta(hours=24)
             loading = True
             if User.objects.filter(email=email).exists():
                 loading = False
+                
+                company_obj = Company.objects.select_related('user__profile').order_by('id')
+                company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
+
+                # Paginate the filtered company list
+                paginator = Paginator(company_list, 5)
+                page_number = request.GET.get('page')
+                page = paginator.get_page(page_number)
+                
                 context = {
                     'email': email,
                     'company_name':company_name,
@@ -470,9 +526,12 @@ def add_farmer(request):
                     'address':address,
                     'user_profile_image': user_profile_image,
                     'user_role_id':user_role_id,
+                    'user_company':user_company,
                     'error_message':"このメールはすでに存在します。別のメールをお試しください。",
                     'loading':loading,
-                    'show':'true'
+                    'show':'true',
+                    'company_list':company_list,
+                    'page':page
                 }
                 return render(request, 'home/farmer-list.html', context)
             # mail sending fuction 
@@ -483,7 +542,7 @@ def add_farmer(request):
             user_obj.set_password('Test@123')
             user_obj.save()
 
-            profile_obj = Profile.objects.create(user = user_obj, role_id = '1', mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time)
+            profile_obj = Profile.objects.create(user = user_obj, role_id = '1', mapped_under = request.user.id, forget_password_token = token, token_expiration_time = expiration_time, username = farm_id)
             profile_obj.save()
 
             company_obj = Company.objects.create(user = user_obj, company_name = company_name, company_address = address)
@@ -496,7 +555,7 @@ def add_farmer(request):
         print(e)
     return render(request, 'home/farmer-list.html')
 
-# delete user 
+# delete farmer 
 @login_required(login_url="/login/")
 def delete_farmer(request, user_id):
     try:
@@ -513,14 +572,40 @@ def delete_farmer(request, user_id):
             user_obj.delete()
             profile_obj.delete()
             company_obj.delete()
-            user_delete_success = f'{ user_obj.first_name }が正常に削除されました。' 
-            messages.success(request, user_delete_success)
+            messages = f'{ user_obj.first_name }が正常に削除されました。' 
+            messages.success(request, messages)
             return redirect('/farmer_list')
         else:
-            user_delete_success = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
-            messages.success(request, user_delete_success)
+            messages = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
+            messages.success(request, messages)
             return redirect('/farmer_list')
 
     except Exception as e:
         print(e)
+    return redirect('/farmer_list')
+
+
+# update farmer 
+@login_required(login_url='/login/')
+def update_farmer(request, user_id):
+    try:
+        if request.method == 'POST':
+            # check if the user is already exist or not
+            user_obj = get_object_or_404(User, id=user_id)
+            company_obj = get_object_or_404(Company, user_id=user_id)
+            company_name = request.POST.get('company_name')
+            user_name = request.POST.get('user_name')
+            address = request.POST.get('address')
+            user_obj.first_name = user_name
+            company_obj.company_name = company_name
+            company_obj.company_address = address
+            company_obj.save()
+            user_obj.save()
+
+            update_success_message = f'{company_obj.company_name}の情報が正常に更新されました'
+            messages.success(request, update_success_message)
+            return redirect('/farmer_list')
+
+    except Exception as e:
+        print('update farmer>>>',e)
     return redirect('/farmer_list')

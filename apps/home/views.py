@@ -10,10 +10,10 @@ from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PlantForm
-from .models import Plant, Farm, House, Line, Pole, LED, data , Rasp
+
 from django.core.paginator import Paginator
 from django.contrib import messages
-from apps.authentication.models import Profile
+from apps.authentication.models import Profile,Company,Plant, Farm, House, Line, Pole, LED, data , Rasp
 from django.contrib.auth.models import User
 import paho.mqtt.client as mqtt
 import json
@@ -24,6 +24,7 @@ from django.db import IntegrityError
 import csv
 from django.db import transaction
 from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 
 @login_required(login_url="/login/")
@@ -34,6 +35,15 @@ def index(request,farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         request.session['role_id'] = session_profile_obj.role_id
         user_role_id = request.session.get('role_id')
+        if user_role_id == '0':
+            user_company = 'BEAM TECH'
+        elif user_role_id == '1' :
+            user_company = Company.objects.get(user_id=request.user.id).company_name
+        else:
+            mapped_under = Profile.objects.get(pk=request.user.id).mapped_under
+            user_company = Company.objects.get(user_id=mapped_under).company_name
+        request.session['user_company'] = user_company
+        
         plant_count = None
         admin_count = None
         farm_count = None
@@ -58,7 +68,7 @@ def index(request,farm_id=None):
       
             house_count = House.objects.filter(is_active=True).count()
      
-            led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
+            led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
             led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
 
         elif user_role_id =='2' :
@@ -113,6 +123,12 @@ def index(request,farm_id=None):
 
         #Users Filter
         users_list = User.objects.filter(profile__role_id='1')
+        for user in users_list:
+            try:
+                user.company = Company.objects.get(user=user)
+            except ObjectDoesNotExist:
+                user.company = None 
+       
         user_id = request.GET.get('user')
         
         #Farm Filter and House Display
@@ -154,6 +170,7 @@ def index(request,farm_id=None):
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
+                'user_company':user_company,
                 'admin_count': admin_count,
                 'users_list':users_list,
                 'farms': farms,
@@ -180,6 +197,7 @@ def index(request,farm_id=None):
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
+                'user_company':user_company,
                 'admin_count': admin_count,
                 'users_list':users_list,
                 'farms': farms,
@@ -243,6 +261,7 @@ def LED_control(request,farm_id=None):
 
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
         
         @transaction.atomic
         def on_message(client, userdata, message):
@@ -317,6 +336,8 @@ def LED_control(request,farm_id=None):
 
 
         users_list = User.objects.filter(profile__role_id='1')
+        for user in users_list:
+            user.company = Company.objects.get(user=user)
         user_id = request.GET.get('user') 
    
         farms = []
@@ -375,6 +396,7 @@ def LED_control(request,farm_id=None):
                 'selected_farm_name': selected_farm_name,
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
+                'user_company':user_company,
                 'temperature': sensor_data['temperature'],
                 'humidity': sensor_data['humidity'],
                 'soil_moisture': sensor_data['soil_moisture'],
@@ -447,7 +469,8 @@ def LED_control(request,farm_id=None):
             context = {
                 'segment': 'LED_control',
                 'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id
+                'user_role_id':user_role_id,
+                'user_company':user_company,
                 }
             return render(request,'home/LED-control.html', context)
     except BrokenPipeError as e:
@@ -463,13 +486,14 @@ def plant_setting(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
         plant_list = Plant.objects.all().order_by('plant_id')
         for plant in plant_list:
             plant.active_houses_count = plant.house_set.filter(is_active=True).count()
         page = Paginator(plant_list, 5)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
-        context = {'segment':'plant_settings', 'plant_list': plant_list,'page': page,'user_profile_image': user_profile_image,'user_role_id':user_role_id}
+        context = {'segment':'plant_settings', 'plant_list': plant_list,'page': page,'user_profile_image': user_profile_image,'user_role_id':user_role_id,'user_company':user_company,}
         if request.method == "GET":
             html_template = loader.get_template('home/settings.html')
             return HttpResponse(html_template.render(context, request))
@@ -483,6 +507,7 @@ def update_plant(request,pk):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
         show = 'true'
         plant = Plant.objects.get(plant_id=pk)
         if request.method == 'POST':
@@ -494,7 +519,7 @@ def update_plant(request,pk):
                 return redirect('/plant_setting')
         else:
             form = PlantForm(instance=plant)
-        context = {"form": form, "show": show, 'user_profile_image': user_profile_image,'user_role_id':user_role_id}
+        context = {"form": form, "show": show, 'user_profile_image': user_profile_image,'user_role_id':user_role_id,'user_company':user_company,}
         return render(request, 'home/add-plant.html', context)
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
@@ -505,14 +530,17 @@ def update_plant(request,pk):
 def pages(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     context = {
         'user_profile_image': user_profile_image,
-        'user_role_id':user_role_id  
+        'user_role_id':user_role_id,
+        'user_company':user_company,
     }
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
-        print(user_profile_image, user_role_id)
+        user_company = request.session.get('user_company')
+       
         load_template = request.path.split('/')[-1]
 
         if load_template == 'admin':
@@ -538,20 +566,22 @@ def house_list(request, farm_id=None):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
         users_list = User.objects.filter(profile__role_id='1')
+        for user in users_list:
+            user.company = Company.objects.get(user=user)
         user_id = request.GET.get('user')
-        
+        selected_user_name = None
         farms = []
         if user_role_id == '1':
             farms = Farm.objects.filter(user_id=request.user.id)
-            selected_user_name = None
+            
         elif user_role_id == '0':
             if user_id:
                 farms = Farm.objects.filter(user_id = user_id)
-                selected_user_name = User.objects.get(pk=user_id).first_name
+                selected_user_name = Company.objects.get(user_id=user_id).company_name
             else:
-                farms = Farm.objects.all()
-                selected_user_name = None
+                farms = Farm.objects.all()                
 
         if len(farms) > 0:
             selected_farm_id = request.GET.get('farm_id') or farm_id
@@ -575,10 +605,13 @@ def house_list(request, farm_id=None):
                 'selected_farm_id': selected_farm_id,
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
+                'user_company':user_company,
                 'users_list':users_list,
                 'user_id':user_id,
                 'selected_user_name':selected_user_name,
+                'farm_id':farm_id,
                 }
+            
             if request.method == "GET":
                 html_template = loader.get_template('home/house-list.html')
                 return HttpResponse(html_template.render(context, request))
@@ -617,7 +650,8 @@ def house_list(request, farm_id=None):
         else:
             context = {
                 'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id
+                'user_role_id':user_role_id,
+                'user_company':user_company,
                 }
             return render(request,'home/house-list.html',context)
         
@@ -629,6 +663,7 @@ def house_list(request, farm_id=None):
 def add_house(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     user_id = request.GET.get('user')
     choice_plant = Plant.objects.all()
     if user_role_id == '0':
@@ -650,7 +685,8 @@ def add_house(request):
             'choice_farm': choice_farm, 
             'choice_user': choice_user, 
             'user_profile_image': user_profile_image,
-            'user_role_id':user_role_id}
+            'user_role_id':user_role_id,
+            'user_company':user_company}
     if request.method == "GET":
         html_template = loader.get_template('home/add-house.html')
         return HttpResponse(html_template.render(context, request))
@@ -716,6 +752,7 @@ def add_house(request):
 def update_house(request, house_id):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
     context = {}
 
     try:
@@ -734,6 +771,7 @@ def update_house(request, house_id):
             'segment': 'update_house',
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
+            'user_company': user_company,
             'choice_user': choice_user,
             'choice_plant': choice_plant,
             'house_obj': house_obj
@@ -750,6 +788,7 @@ def update_house(request, house_id):
             'errorMessage': 'ハウス名は空欄であってはなりません',
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
+            'user_company': user_company,
             'choice_user': choice_user,
             'choice_plant': choice_plant,
             'house_obj': house_obj}
@@ -776,8 +815,11 @@ def farm_list(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
         if request.method == "GET":
             users_list = User.objects.filter(profile__role_id='1')
+            for user in users_list:
+                user.company = Company.objects.get(user=user)
             user_id = request.GET.get('user')
             selected_user_name = None
             if user_role_id == '1':
@@ -785,7 +827,7 @@ def farm_list(request):
             elif user_role_id == '0':
                 if user_id:
                     farm_list = Farm.objects.filter(user_id = user_id)
-                    selected_user_name = User.objects.get(pk=user_id).first_name
+                    selected_user_name = Company.objects.get(user_id=user_id).company_name
                 else:
                     farm_list = Farm.objects.all()
                     
@@ -798,6 +840,7 @@ def farm_list(request):
                 'page': page,
                 'user_profile_image': user_profile_image,
                 'user_role_id': user_role_id,
+                'user_company':user_company,
                 'users_list':users_list,
                 'user_id':user_id,
                 'selected_user_name':selected_user_name,
@@ -835,6 +878,7 @@ def add_farm(request):
     try:
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
+        user_company = request.session.get('user_company')
 
         if request.method == 'POST':
             farm_name = request.POST.get('farm_name')
@@ -854,6 +898,7 @@ def add_farm(request):
             'segment': 'farm_list',
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
+            'user_company': user_company,
         }
         return render(request, 'home/farm_list.html', context)
 
@@ -908,8 +953,9 @@ def add_plant(request):
         if request.method == "GET":
             user_profile_image = request.session.get('user_profile_image')
             user_role_id = request.session.get('role_id')
+            user_company = request.session.get('user_company')
             form = PlantForm()
-            return render(request, 'home/add-plant.html', {"form": form,'user_profile_image': user_profile_image,'user_role_id':user_role_id})
+            return render(request, 'home/add-plant.html', {"form": form,'user_profile_image': user_profile_image,'user_role_id':user_role_id,'user_company':user_company,})
         else:
             form = PlantForm(request.POST, request=request)
             if form.is_valid():
