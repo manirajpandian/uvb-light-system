@@ -1,5 +1,5 @@
 from django import forms
-from .models import Plant,Farm
+from apps.authentication.models import Plant
 
 
 

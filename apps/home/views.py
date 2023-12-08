@@ -10,10 +10,10 @@ from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PlantForm
-from .models import Plant, Farm, House, Line, Pole, LED, data , Rasp
+
 from django.core.paginator import Paginator
 from django.contrib import messages
-from apps.authentication.models import Profile,Company
+from apps.authentication.models import Profile,Company,Plant, Farm, House, Line, Pole, LED, data , Rasp
 from django.contrib.auth.models import User
 import paho.mqtt.client as mqtt
 import json
