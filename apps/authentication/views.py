@@ -8,7 +8,7 @@ from .forms import LoginForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 import uuid
-from .models import Profile, Company, Farm, House
+from apps.authentication.models import Profile, Company, Farm, House
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .helpers import send_forgot_password_mail, add_new_user_mail
@@ -475,22 +475,20 @@ def farmer_list(request):
 
                 # Get all profile objects mapped under the user_id
                 profile_obj = Profile.objects.filter(mapped_under=user_id)
-                # TODO: farm_obj need to inactivate when inactive the company 
-                # * farm_obj = Farm.objects.filter(user_id = user_id)
-                # * print('farm_obj',farm_obj)
-
-                house_obj = House.objects.filter(user_id = user_id)
-                print('house_obj',house_obj)
-                for obj in house_obj:
-                    obj.is_active = is_active
-                    house_obj.save()
                 for obj in profile_obj:
-                   active_user_obj = User.objects.get(id=obj.user_id)
+                   active_user_obj = get_object_or_404(User, id=obj.user_id)
                    active_user_obj.is_active = is_active
                    active_user_obj.save()
-                   active_house = House.objects.get(user_id = obj.user_id)
-                   active_house.is_active = is_active
-                   active_house.save()
+                farm_obj = Farm.objects.filter(user_id=user_id)
+                for farm in farm_obj:
+                    house_obj = House.objects.filter(farm_id = farm.farm_id)
+                    for house in house_obj:
+                        house.is_active = is_active
+                        house.save()
+                       
+                    farm.is_active = is_active
+                    farm.save()
+                   
 
                 update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
                 messages.success(request, update_success_message)

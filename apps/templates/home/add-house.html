@@ -451,12 +451,12 @@
                         <div class="tab-content" id="main_form">
                             <!-- ハウス名登録 -->
                             <div class="tab-pane active" role="tabpanel" id="step1">
-                                <h4 class="text-center mt-3">ハウス名登録</h4>
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}ハウス名登録</h4>
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">ユーザー名</label>
+                                            <label class=" bmd-label-floating">担当者名</label>
                                             <select name="userName" class="form-control" id="user_name">
                                                 <option value="" selected="selected" disabled>
                                                     選択してください
@@ -537,7 +537,7 @@
                             </div>
                             <!-- レーン・ポール・LED追加 -->
                             <div class="tab-pane" role="tabpanel" id="step2">
-                                <h4 class="text-center mt-3">レーン・ポール・LED追加</h4>
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}レーン・ポール・LED追加</h4>
                                 <div class="row text-left" id="lineAddViewHide">
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6 mt-4">
@@ -621,7 +621,7 @@
                             
                             <div class="tab-pane" role="tabpanel" id="step3">
                                 
-                                <h4 class="text-center mt-3"> 確認 </h4>
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %} 確認 </h4>
                                 <span class="text-danger" id="regMsg"></span>
                                 <form action="" method="post" id="" role="form" autocomplete="off">
                                     {% csrf_token %}

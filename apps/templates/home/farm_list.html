@@ -111,8 +111,7 @@
   </button>
   {% else %}
   {% if user_role_id == '1' %}
-  <button type="button" class="btn btn-success" name="search" data-toggle="modal" data-target="#addFarmModal"
-  ><span class="material-icons">add_circle
+  <button type="button" class="btn btn-success" name="search" data-toggle="modal" id="add" data-target="#addFarmModal" data-user-id=" "><span class="material-icons">add_circle
     </span>&nbsp;&nbsp;
     追加
   </button>
@@ -351,17 +350,14 @@
     document.getElementById('add_address').addEventListener('input', function () {
       document.getElementById('addressMsg').innerText = '';
     });
-
-
     document.getElementById('addFormSubmit').addEventListener('submit', function (event) {
       var AddInput = document.getElementById('add_farm_name').value;
       var AddressInput = document.getElementById('add_address').value;
 
       const userId = document.getElementById('add').getAttribute('data-user-id');
-      document.getElementById('user_id').value = userId;
+      document.getElementById('user_id').value = userId || '';
 
       document.getElementById('farmNameMsg').innerText = '';
-
       document.getElementById('addressMsg').innerText = '';
 
       if (AddInput === '') {
