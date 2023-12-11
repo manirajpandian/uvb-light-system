@@ -53,7 +53,7 @@ def index(request,farm_id=None):
             admin_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
             total_admin = User.objects.filter(profile__role_id=2,profile__mapped_under=current_user_id).count()
       
-            farm_count = Farm.objects.filter(user__id=current_user_id).count()
+            farm_count = Farm.objects.filter(user__id=current_user_id,is_active=True).count()
    
             house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
        
@@ -63,7 +63,7 @@ def index(request,farm_id=None):
         elif user_role_id =='0': 
             admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
             total_admin = User.objects.filter(profile__role_id=1,profile__mapped_under=current_user_id).count()
-            farm_count = Farm.objects.all().count()
+            farm_count = Farm.objects.filter(is_active=True).count()
             plant_count = Plant.objects.all().count()
       
             house_count = House.objects.filter(is_active=True).count()
@@ -161,7 +161,10 @@ def index(request,farm_id=None):
                     selected_farm_name = selected_farm.farm_name  
                 else:
                     if user_role_id == '0':
-                        houses = House.objects.filter(is_active=True)
+                        houses = []
+                        for farm in farms:
+                            house = House.objects.filter(farm_id=farm.farm_id,is_active=True).select_related('plant')
+                            houses.extend(house)
                     else:
                         houses = []
                         for farm in farms:
@@ -606,7 +609,10 @@ def house_list(request, farm_id=None):
                 selected_farm_name = selected_farm.farm_name  
             else:
                 if user_role_id == '0':
-                    houses = House.objects.all()
+                    houses = []
+                    for farm in farms:
+                        house = House.objects.filter(farm_id=farm.farm_id).select_related('plant')
+                        houses.extend(house)
                 elif user_role_id == '1':
                     houses = []
                     for farm in farms:
@@ -846,7 +852,7 @@ def farm_list(request):
         user_role_id = request.session.get('role_id')
         user_company = request.session.get('user_company')
         if request.method == "GET":
-            users_list = User.objects.filter(profile__role_id='1')
+            users_list = User.objects.filter(profile__role_id='1', is_active=True)
             for user in users_list:
                 user.company = Company.objects.get(user=user)
             user_id = request.GET.get('user')

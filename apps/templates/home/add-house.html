@@ -534,21 +534,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3"></div>
+                                
                             </div>
-
-                            <!-- レーン・ポール・LED追加 -->
-                            <div class="tab-pane" role="tabpanel" id="step2">
-                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}レーン・ポール・LED追加</h4>
-                                <div class="row text-left" id="lineAddViewHide">
-                                    <div class="col-md-3"></div>
-                                    <div class="col-md-6 mt-4">
-                                        <div class="form-group">
-                                            <label class=" bmd-label-floating">レーンの数 <span class="text-danger">*</span></label>
-                                            <input class="form-control" id="N-leanCount" type="number" name="leanCount"
-                                                placeholder="" />
-                                                <span class="text-danger" id="nleanMsg"></span>
-                                        </div>
-
                             <ul class="list-inline pull-right">
                                 <li>
                                     <button type="button" class="default-btn next-step" id="firststep">
@@ -557,10 +544,20 @@
                                 </li>
                             </ul>
                         </div>
-                        
-
-<!--                                     </div> -->
-                                </div>
+                            <!-- レーン・ポール・LED追加 -->
+                            <div class="tab-pane" role="tabpanel" id="step2">
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}レーン・ポール・LED追加</h4>
+                                <div class="row text-left" id="lineAddViewHide">
+                                    <div class="col-md-3"></div>
+                                        <div class="col-md-6 mt-4">
+                                                <div class="form-group">
+                                                    <label class=" bmd-label-floating">レーンの数 <span class="text-danger">*</span></label>
+                                                    <input class="form-control" id="N-leanCount" type="number" name="leanCount"
+                                                        placeholder="" />
+                                                        <span class="text-danger" id="nleanMsg"></span>
+                                                </div>
+                                        
+                                    </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-6 mt-4">
@@ -636,7 +633,7 @@
                                 </li>
                             </ul>
                         </div>
-
+                    
                         <!--preview Modal -->
                         <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
@@ -761,11 +758,7 @@
                         </div>
                         </form>
                         <div class="clearfix"></div>
-                    </div>
-
-
-                    <!-- </form> -->
-
+                </div>
                 </div>
             </div>
         </div>

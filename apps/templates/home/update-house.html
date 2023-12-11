@@ -46,6 +46,7 @@
                     <div class="form-group">
                         <label for="userName" class="bmd-label-floating">作物名</label>
                         <select name="plant_id" class="form-control" id="plat_name">
+                            <option value="">選択してください</option>
                             {% for plant in choice_plant %}
                             <option {% if house_obj.plant_id == plant.plant_id %} selected {% endif %}
                                 value="{{ plant.plant_id }}">{{ plant.plant_name }}</option>
