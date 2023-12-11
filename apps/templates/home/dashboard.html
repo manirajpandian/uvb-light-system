@@ -14,25 +14,8 @@
 }
 
 </style>
-{% endblock stylesheets %} {% block content %}
-<div class="d-flex align-items-center justify-content-end justify-content-end mb-3">
-{% if user_role_id == '0'%}
-  <div class="dropdown my-2">
-    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-     <span>農家フィルター</span>
-    </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      {% if users_list|length > 0 %}
-      {% for user in users_list %}
-          <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
-      {% endfor %}
-      {% else %}
-      <p class="dropdown-item text-warning">農家がありません</p>
-      {% endif %}
-    </div>
-  </div>
-  {% endif %}
-</div>
+{% endblock stylesheets %} 
+{% block content %}
 <div class="row justify-content-start">
   {% if  user_role_id == '1' or user_role_id == '0' %}
   <div class="col-lg-3">
@@ -92,10 +75,31 @@
 </div>
 </div>
 <br>
+<div class="d-flex align-items-center justify-content-end justify-content-end mb-3">
 
-<div class="d-flex align-items-center justify-content-end justify-content-between mb-3">
-  <h3>{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
+  </div>
+<div class="d-flex align-items-center justify-content-end justify-content-between">
+  <div class="justify-content-start w-50 d-none d-md-block"><h3>{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
+  {% if user_role_id == '0'%}
+  <div class="d-flex align-items-center justify-content-end ">
+  <div class="dropdown my-2">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+     <span>農家フィルター</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      {% if users_list|length > 0 %}
+      {% for user in users_list %}
+          <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
+      {% endfor %}
+      {% else %}
+      <p class="dropdown-item text-warning">農家がありません</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+  {% endif %}
   {% if user_role_id == '1' or user_role_id == '0'%}
+  <div class="d-flex align-items-center justify-content-end ">
   <div class="dropdown my-2">
     <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
      <span>農場フィルター</span>
@@ -111,19 +115,20 @@
   
   </div>
   </div>
+</div>
   {% endif %}
 </div>
 
 {% if houses|length > 0 %}
 <div class="row">
 {% for house in houses %}
-<div class="col-lg-3 col-md-6 col-sm-6">
+<div class="col-lg-4 col-md-6 col-sm-6">
     <a href="{% url 'LED_control_farm_id' farm_id=house.farm_id %}?house={{ house.house_id }}">
     <div class="card card-stats" style="cursor: pointer;">
         <div class="card-header card-header-success card-header-icon">
-            <div class="card-icon"><i class="material-icons">warehouse</i>{{ house.house_name }}</div>
+            <div class="card-icon text-left w-50"><i class="material-icons">warehouse</i>{{ house.house_name }}</div>
             <p class="card-category">温度 / 湿度</p>
-            <h4 class="card-title" style="display: flex; align-items: center; justify-content: end; flex-wrap: wrap;">
+            <h4 class="card-title">
               <div>
                   <span class="material-icons text-danger">device_thermostat</span> 
                   {{temperature}}
@@ -133,18 +138,16 @@
                   <span class="material-icons text-info">opacity</span> 
                   {{humidity}}
               </div>
-            
             </h4>
-            <br>
             <br>
             <div class="card-title d-flex justify-content-between">
                 <h4>使用LEDのONの数</h4>
                 <h4>{{ house.house_led_on_count }}/{{ house.total_leds }}</h4>
             </div>
         </div>
-        <div class="card-footer">
+        <!-- <div class="card-footer">
             <div class="stats"><i class="material-icons">update</i> 現在</div>
-        </div>
+        </div> -->
     </div>
     </a>
 </div>
