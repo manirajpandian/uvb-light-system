@@ -126,7 +126,7 @@
                       <td>{{ plant.plant_name }}</td>
                       <td>{{ plant.distance }}</td>
                       <td>{{ plant.time_required }}</td>
-                      <td>{{ plant.remarks }}</td>
+                      <td class="text-truncate" style="max-width: 15dvw;">{{ plant.remarks }}</td>
                       <td>
                         <a href="{% url 'update_plant' plant.plant_id %}" style="color: #ff9800;"><span>編集</span></a>
                         &nbsp; &nbsp;|&nbsp;&nbsp;

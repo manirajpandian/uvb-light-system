@@ -85,10 +85,10 @@
               {% for user, company in page.object_list %}
               <tr>
                 <td>{{ user.username }}</td>
-                <td>{{ company.company_name }}</td>
-                <td>{{ user.first_name }}</td>
+                <td class="text-truncate" style="max-width: 10dvw;">{{ company.company_name }}</td>
+                <td class="text-truncate" style="max-width: 10dvw;">{{ user.first_name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ company.company_address }}</td>
+                <td class="text-truncate" style="max-width: 10dvw;">{{ company.company_address }}</td>
                 <td>
                   <form method="POST" action="" autocomplete="on">
                     {% csrf_token %}
@@ -139,7 +139,7 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel"><span class="text-danger" id="userNameSpan"></span> -
+                  <h5 class="modal-title" id="exampleModalLabel"><span class="text-danger" style="word-break: break-all;" id="userNameSpan"></span> -
                     削除</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -206,9 +206,11 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">追加</h5>
+        <a href="/farmer_list">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
+      </a>
       </div>
       <form method="POST" id="addForm" action="">
         {% csrf_token %}
@@ -243,7 +245,7 @@
         </div>
         <div class="modal-footer">
           <a href="/farmer_list">
-          <button type="button" class="btn btn-secondary">
+          <button type="button" class="btn btn-Secondary">
             戻る
           </button>
         </a>
@@ -261,9 +263,11 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">編集</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <a href="/farmer_list">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </a>
       </div>
       <form method="POST" id="updateForm" action="">
         {% csrf_token %}
@@ -296,7 +300,7 @@
         </div>
         <div class="modal-footer">
           <a href="/farmer_list">
-            <button type="button" class="btn btn-secondary">
+            <button type="button" class="btn btn-Secondary">
               戻る
             </button>
           </a>

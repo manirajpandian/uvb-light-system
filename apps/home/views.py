@@ -364,10 +364,10 @@ def LED_control(request,farm_id=None):
             else:
                 farms = []
             
-        if len(farms) > 0:
+        if user_role_id:
             selected_farm_id = request.GET.get('farm_id') or farm_id
             house_id = request.GET.get('house')
-            
+
             if house_id:
                 houses = House.objects.filter(is_active=True,house_id=house_id).select_related('plant')
                 selected_farm = Farm.objects.get(pk=selected_farm_id)
@@ -378,7 +378,6 @@ def LED_control(request,farm_id=None):
                     farms = []
                     
                 elif user_role_id == '1':
-                    
                     if selected_farm_id:
                         houses = House.objects.filter(farm_id=selected_farm_id,is_active=True,farm__user_id=request.user.id).select_related('plant')
                         selected_farm = Farm.objects.get(pk=selected_farm_id)

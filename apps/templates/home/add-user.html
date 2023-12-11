@@ -50,7 +50,7 @@
           <div class="form-group">
             {% if show == 'true' %}
             <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="email" value="{{ user_obj.email }}" disabled>
+            <input type="text" id="email" class="form-control" name="email" value="{{ user_obj.email }}" disabled>
 
             {% else %}
             <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>

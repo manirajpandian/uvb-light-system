@@ -133,7 +133,7 @@
         
         {% if user_role_id == '0' %}
         <div class="d-flex align-items-center justify-content-between">
-          <h3 class="my-2"> {% if selected_user_name %}{{ selected_user_name }}{% endif %}</h3>
+          <h3 class="my-2 w-50"> {% if selected_user_name %}{{ selected_user_name }}{% endif %}</h3>
 
           <div class="dropdown my-2">
            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
@@ -288,7 +288,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">戻る</button>
+          <button type="button" class="btn btn-Secondary" data-dismiss="modal">戻る</button>
           <button type="button" id="editButton" class="btn btn-success">変更</button>
         </div>
      </form>
@@ -325,7 +325,7 @@
           <input type="hidden" name="user_id" id="user_id" value="">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button type="button" class="btn btn-Secondary" data-dismiss="modal">
             戻る
           </button>
           <button type="submit" id="addButton" class="btn btn-success">

@@ -144,7 +144,7 @@ def update_user(request, pk):
             profile_obj.address = request.POST.get('address')
             profile_obj.save()
 
-            update_success_message = 'ユーザー情報が正常に更新されました'
+            update_success_message = f'{user_obj.first_name}情報が正常に更新されました'
             messages.success(request, update_success_message)
             return redirect('/user_list')
 
@@ -251,7 +251,7 @@ def add_user(request):
             company_obj.save()
 
             loading = False
-            success_message = "ユーザが正常に追加されました"
+            success_message = f'{first_name}が正常に追加されました'
             messages.success(request, success_message)
             return redirect('/user_list')
         
@@ -267,21 +267,14 @@ def delete_user(request, user_id):
             user_obj = get_object_or_404(User, id=user_id)
             profile_obj = get_object_or_404(Profile, user=user_obj)
 
-            profile_obj = Profile.objects.filter(mapped_under=user_id)
-            for obj in profile_obj:
-                active_user_obj = User.objects.get(id=obj.user_id)
-                active_user_obj.is_active = False
-                active_user_obj.save()
-            company_obj = get_object_or_404(Company, user_id=user_id)
             user_obj.delete()
             profile_obj.delete()
-            company_obj.delete()
 
-            user_delete_success = f'ユーザー{ user_obj.first_name }が正常に削除されました。' 
+            user_delete_success = 'ユーザーが正常に削除されました。' 
             messages.success(request, user_delete_success)
             return redirect('/user_list')
         else:
-            user_delete_success = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
+            user_delete_success = f'{ user_obj.first_name }が提供されていないです。'  
             messages.success(request, user_delete_success)
             return redirect('/user_list')
 
@@ -593,20 +586,28 @@ def delete_farmer(request, user_id):
             user_obj = get_object_or_404(User, id=user_id)
             profile_obj = get_object_or_404(Profile, user=user_obj)
 
-            profile_obj = Profile.objects.filter(mapped_under=user_id)
-            for obj in profile_obj:
+            mapped_profile_obj = Profile.objects.filter(mapped_under=user_id)
+            for obj in mapped_profile_obj:
                 active_user_obj = User.objects.get(id=obj.user_id)
-                active_user_obj.is_active = False
-                active_user_obj.save()
-            company_obj = Company.objects.filter(user_id=user_id)
-            user_obj.delete()
-            profile_obj.delete()
+                active_user_obj.delete()
+            
+            farm_obj = Farm.objects.filter(user_id=user_id)
+            for farm in farm_obj:
+                house_obj = House.objects.filter(farm_id = farm.farm_id)
+                for house in house_obj:
+                    house.delete()
+                farm.delete()
+
+            company_obj = get_object_or_404(Company, user_id=user_id)
             company_obj.delete()
-            messages = f'{ user_obj.first_name }が正常に削除されました。' 
+            profile_obj.delete()
+            user_obj.delete()
+
+            messages = '農家が正常に削除されました。' 
             messages.success(request, messages)
             return redirect('/farmer_list')
         else:
-            messages = f'ユーザー{ user_obj.first_name }が提供されていないです。'  
+            messages = f'農家{ user_obj.first_name }が提供されていないです。'  
             messages.success(request, messages)
             return redirect('/farmer_list')
 
