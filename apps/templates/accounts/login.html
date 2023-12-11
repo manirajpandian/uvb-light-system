@@ -296,11 +296,11 @@
         forgotForm.action = '/forgot_password';
         forgotForm.submit();
         const loading = true;
-        // if (loading) {
-        //   openSweetAlert();
-        // } else {
-        //   closeSweetAlert();
-        // }
+        if (loading) {
+          openSweetAlert();
+        } else {
+          closeSweetAlert();
+        }
       }
     });
   });

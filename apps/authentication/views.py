@@ -240,7 +240,7 @@ def add_user(request):
                 user_obj.set_password('Test@123')
                 user_obj.save()
             else:
-                user_obj = User(username = str(uuid.uuid4())[:9].upper(), first_name = first_name, email = email, is_active=False)
+                user_obj = User(username = str(uuid.uuid4())[:9].replace('-', '').upper(), first_name = first_name, email = email, is_active=False)
                 user_obj.set_password('Test@123')
                 user_obj.save()
 
