@@ -66,6 +66,7 @@ class Farm(models.Model):
     farm_name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='farms')
+    is_active = models.BooleanField(default=True)
     
 class House(models.Model):
     house_id = models.CharField(max_length=10, primary_key=True)

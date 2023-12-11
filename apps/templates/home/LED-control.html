@@ -98,7 +98,7 @@
 </style>
 
   <div class="d-flex align-items-center justify-content-end justify-content-between">
-    <div class="justify-content-start w-50 d-none d-md-block"><h3 class="m-0">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
+    <div class="justify-content-start w-50 d-none d-md-block"><h3 class="m-0">{% if selected_user_name %}{{ selected_user_name }}{% endif %}&nbsp;&nbsp;&nbsp;{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
     {% if user_role_id == '0'%}
     <div class="d-flex align-items-center justify-content-end ">
     <div class="dropdown my-2">
@@ -117,7 +117,7 @@
     </div>
   </div>
     {% endif %}
-    {% if user_role_id == '1' or user_role_id == '0' %}
+    {% if user_id or user_role_id == '1' %}
     <div class="d-flex align-items-center justify-content-end ">
     <div class="dropdown my-2">
       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
@@ -127,7 +127,11 @@
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         {% if farms|length > 0 %}
           {% for farm in farms %}
+          {% if user_id %}
+          <a class="dropdown-item" href="{% url 'LED_control_farm_id' farm_id=farm.farm_id %}?user={{ farm.user_id }}">{{ farm.farm_name }}</a>
+          {% else %}
               <a class="dropdown-item" href="{% url 'LED_control_farm_id' farm_id=farm.farm_id %}">{{ farm.farm_name }}</a>
+              {% endif %}
           {% endfor %}
           {% else %}
               <p class="dropdown-item text-warning">農場がありません</p>
@@ -219,7 +223,7 @@
         {% endfor %}
         {% else %}
         <div class="text-center">
-          <h4 class="text-warning">ハウスがありません</h4>
+          <h4 class="text-warning">{{ display_message }}</h4>
       </div>
           {% endif %}
  

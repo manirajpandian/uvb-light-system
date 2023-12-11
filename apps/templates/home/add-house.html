@@ -446,27 +446,30 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <!-- <form role="form" action="" class="login-box" method="" id = "wholeform"> -->
 
-                    <div class="tab-content" id="main_form">
-                        <!-- ハウス名登録 -->
-                        <div class="tab-pane active" role="tabpanel" id="step1">
-                            <h4 class="text-center mt-3">ハウス名登録</h4>
-                            <div class="row text-left">
-                                <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
-                                    <div class="form-group">
-                                        <label class=" bmd-label-floating">ユーザー名</label>
-                                        <select name="userName" class="form-control" id="user_name">
-                                            <option value="" selected="selected" disabled>
-                                                選択してください
-                                            </option>
-                                            <option value="">誰も割り当てられない</option>
-                                            {% for user in choice_user %}
-                                            <option value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                        
+                        <div class="tab-content" id="main_form">
+                            <!-- ハウス名登録 -->
+                            <div class="tab-pane active" role="tabpanel" id="step1">
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}ハウス名登録</h4>
+                                <div class="row text-left">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class=" bmd-label-floating">担当者名</label>
+                                            <select name="userName" class="form-control" id="user_name">
+                                                <option value="" selected="selected" disabled>
+                                                    選択してください
+                                                </option>
+                                                <option value="">誰も割り当てられない</option>
+                                                {% for user in choice_user %}
+                                                 <option value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}</option>
+                                                 {% endfor %}
+                                            </select>
+                                        </div>
+
+
+                
                                 </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
@@ -532,6 +535,20 @@
                                 </div>
                                 <div class="col-md-3"></div>
                             </div>
+
+                            <!-- レーン・ポール・LED追加 -->
+                            <div class="tab-pane" role="tabpanel" id="step2">
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}レーン・ポール・LED追加</h4>
+                                <div class="row text-left" id="lineAddViewHide">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 mt-4">
+                                        <div class="form-group">
+                                            <label class=" bmd-label-floating">レーンの数 <span class="text-danger">*</span></label>
+                                            <input class="form-control" id="N-leanCount" type="number" name="leanCount"
+                                                placeholder="" />
+                                                <span class="text-danger" id="nleanMsg"></span>
+                                        </div>
+
                             <ul class="list-inline pull-right">
                                 <li>
                                     <button type="button" class="default-btn next-step" id="firststep">
@@ -540,19 +557,9 @@
                                 </li>
                             </ul>
                         </div>
-                        <!-- レーン・ポール・LED追加 -->
-                        <div class="tab-pane" role="tabpanel" id="step2">
-                            <h4 class="text-center mt-3">レーン・ポール・LED追加</h4>
-                            <div class="row text-left" id="lineAddViewHide">
-                                <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
-                                    <div class="form-group">
-                                        <label class=" bmd-label-floating">レーンの数 <span
-                                                class="text-danger">*</span></label>
-                                        <input class="form-control" id="N-leanCount" type="number" name="leanCount"
-                                            placeholder="" />
-                                        <span class="text-danger" id="nleanMsg"></span>
-                                    </div>
+                        
+
+<!--                                     </div> -->
                                 </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
@@ -657,10 +664,10 @@
 
                         <div class="tab-pane" role="tabpanel" id="step3">
 
-                            <h4 class="text-center mt-3"> 確認 </h4>
-                            <span class="text-danger" id="regMsg"></span>
-                            <form action="" method="post" id="" role="form" autocomplete="off">
-                                {% csrf_token %}
+                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %} 確認 </h4>
+                                <span class="text-danger" id="regMsg"></span>
+                                <form action="" method="post" id="" role="form" autocomplete="off">
+                                    {% csrf_token %}
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3 mt-4">
