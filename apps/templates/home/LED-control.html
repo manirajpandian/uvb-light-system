@@ -154,7 +154,7 @@
   {% if houses|length > 0 %}
       {% for house in houses %}
       <div class="d-inline-flex align-items-center">
-        <h3 class="m-0">{{ house.house_name }}</h3> - {{ house.plant.plant_name }}
+        <h3 class="m-0">{{ house.house_name }}</h3>&nbsp;&nbsp;-&nbsp;&nbsp;{{ house.plant.plant_name }}
 
         <i class="material-icons text-success ml-3">router</i>
         <span class="ml-1">{{Rbi}}</span>
@@ -178,7 +178,8 @@
               <button class="{% if house == houses.0 and line == house.lines.all.0 %}btn btn-link{% else %}btn btn-link collapsed{% endif %}" 
               type="button" data-toggle="collapse" data-target="#collapse{{ line.line_id }}" aria-expanded="{% if house == houses.0 and line == house.lines.all.0 %}true{% else %}false{% endif %}"
                aria-controls="collapse{{ line.line_id }}">
-                <h4 class="card-title">レーン{{ line.line_id }}</h4>
+               
+                <h4 class="card-title">レーン&nbsp;{{ line.display_id }}{{ line.line_id }}</h4>
               </button>
             </h2>
           </div>
@@ -223,7 +224,7 @@
         {% endfor %}
         {% else %}
         <div class="text-center">
-          <h4 class="text-warning">{{ display_message }}</h4>
+          <h4 class="text-warning">{% if display_message %}{{ display_message }}{% else %}ハウスがありません{% endif %}</h4>
       </div>
           {% endif %}
  

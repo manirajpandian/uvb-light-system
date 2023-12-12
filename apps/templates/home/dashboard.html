@@ -162,7 +162,7 @@
 </div>
 {% else %}
       <div class="text-center">
-        <h4 class="text-warning">{{ display_message }}</h4>
+        <h4 class="text-warning">{% if display_message %}{{ display_message }}{% else %}ハウスがありません{% endif %}</h4>
     </div>
 {% endif %}
 
