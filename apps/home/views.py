@@ -254,7 +254,8 @@ sensor_data = {
     'soil_moisture': None,
     'raspberry_id': None,
     'date':None,
-    'led_count':4
+    'led_count':4,
+    'message1':None
 }
 
 latest_stored_date ={}
@@ -276,7 +277,7 @@ def LED_control(request,farm_id=None):
         
         @transaction.atomic
         def on_message(client, userdata, message):
-            sensor_data , latest_stored_date , payload
+            sensor_data , latest_stored_date
     
             payload = json.loads(message.payload.decode())
             print(f"Received message from MQTT: {payload}")
@@ -288,6 +289,7 @@ def LED_control(request,farm_id=None):
             sensor_data['raspberry_id'] = payload.get('raspberry_id')
             sensor_data['date'] = payload.get('date')
             payload_date_str = sensor_data['date']
+            sensor_data['message1'] = payload.get('message')
             
             if payload_date_str:
                 
@@ -412,6 +414,7 @@ def LED_control(request,farm_id=None):
                 'Rbi': sensor_data['raspberry_id'],
                 'users_list':users_list,
                 'led_count':sensor_data['led_count'],
+                'message1':sensor_data['message1'],
                 'display_message': 'ハウスがありません',
                 'selected_farm_name':selected_farm_name,
                 'user_id':user_id,

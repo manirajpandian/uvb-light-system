@@ -33,29 +33,31 @@ def login_view(request):
                 user_obj = User.objects.get(email=email)
             except User.DoesNotExist:
                 user_obj = None
+            if user_obj.is_active:
+                if user_obj:
+                    # User with the given email exists
+                    profile_obj = Profile.objects.get(user=user_obj)
 
-            if user_obj:
-                # User with the given email exists
-                profile_obj = Profile.objects.get(user=user_obj)
+                    if profile_obj.username == username:
+                        # Authenticate the user
+                        user = authenticate(request, username=user_obj.username, email=email, password=password)
 
-                if profile_obj.username == username:
-                    # Authenticate the user
-                    user = authenticate(request, username=user_obj.username, email=email, password=password)
+                        if user is not None:
+                            login(request, user)
+                            # Store the user's profile image URL in the session
+                            request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
 
-                    if user is not None:
-                        login(request, user)
-                        # Store the user's profile image URL in the session
-                        request.session['user_profile_image'] = user.profile.image.url if user.profile.image else None
-
-                        return redirect("/")
+                            return redirect("/")
+                        else:
+                            msg = 'メールやパスワードが間違っています'
                     else:
-                        msg = 'メールやパスワードが間違っています'
+                        msg = 'IDまたはメールが間違っています'
                 else:
                     msg = 'IDまたはメールが間違っています'
             else:
-                msg = 'IDまたはメールが間違っています'
-        # else:
-        #     msg = 'フォームが有効ではありません'
+                msg = 'ユーザーが無効です、BEAMTECHを連絡してください'
+        else:
+                msg = '無効なデータですもう一度直して試してみてください'
 
     forgot_password_message = request.session.pop('forgot_password_message', None)
     forgot_password_success_msg = request.session.pop('forgot_password_success_msg', None)

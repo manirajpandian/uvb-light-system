@@ -203,9 +203,11 @@
       userSpan.innerText = '';
     });
     email.addEventListener('input', function () {
-      console.log('object');
       emailErrorSpan.innerText = '';
-      document.getElementById('invalidEmailError').remove()
+      if(document.getElementById('invalidEmailError')){
+        document.getElementById('invalidEmailError').remove()
+      }
+      
     })
     password.addEventListener('input', function () {
       passwordSpan.innerText = '';

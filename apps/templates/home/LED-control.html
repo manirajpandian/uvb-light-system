@@ -97,8 +97,8 @@
 
 </style>
 
-  <div class="d-flex align-items-center justify-content-between">
-    <div class="justify-content-start w-50 d-none d-md-block"><h3 class="m-0 text-truncate" style="max-width: 50dvw;">{% if selected_user_name %}{{ selected_user_name }}{% endif %}&nbsp;&nbsp;&nbsp;{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
+  <div class="d-flex align-items-center justify-content-end">
+    <div class="justify-content-start w-100 d-none d-md-block"><h3 class="m-0 text-truncate" style="max-width: 50dvw;">{% if selected_user_name %}{{ selected_user_name }}{% endif %}&nbsp;&nbsp;&nbsp;{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3></div>
     {% if user_role_id == '0'%}
     <div class="d-flex align-items-center justify-content-end ">
     <div class="dropdown my-2">
@@ -144,7 +144,7 @@
 </div>
 
 
-{% if message%}
+{% if not message1 %}
 <div id="marquee" class='text-danger'> <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
   Raspberry pi が接続されていません。接続してもう一度お試しください。
   </marquee>
