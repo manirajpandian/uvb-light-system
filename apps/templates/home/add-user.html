@@ -132,8 +132,10 @@
     }
     else{
       if (loading) {
+        document.getElementById('addBtn').disabled = true;
         openSweetAlert();
       } else {
+        document.getElementById('addBtn').disabled = false;
         closeSweetAlert();
       }
     }

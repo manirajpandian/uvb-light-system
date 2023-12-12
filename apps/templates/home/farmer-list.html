@@ -109,11 +109,11 @@
                   <a href="#" class="text-warning" data-toggle="modal" id="updateButton" data-target="#updateFarmer"
                     data-user-id="{{ user.id }}" data-csrf-token="{{ csrf_token }}"
                     data-company-name="{{ company.company_name }}" data-email="{{ user.email }}"
-                    data-name="{{ user.first_name }}" data-address="{{ company.company_address }}"><span>編集</span></a>
+                    data-name="{{ user.first_name }}" data-address="{{ company.company_address }}" data-page-number="{{ page.number }}"><span>編集</span></a>
                   &nbsp; &nbsp;|&nbsp;&nbsp;
                   <a href="#" data-toggle="modal" class="text-danger deleteButton" data-target="#farmerDeleteModal"
                     data-user-id="{{ user.id }}" data-csrf-token="{{ csrf_token }}"
-                    data-first-name="{{ company.company_name }}"><span>削除</span>
+                    data-first-name="{{ company.company_name }}" data-page-number="{{ page.number }}"><span>削除</span>
                   </a>
                 </td>
               </tr>
@@ -246,7 +246,7 @@
         <div class="modal-footer">
           <a href="/farmer_list">
           <button type="button" class="btn btn-Secondary">
-            戻る
+            閉じる
           </button>
         </a>
           <button type="button" id="addButton" class="btn btn-success">
@@ -301,7 +301,7 @@
         <div class="modal-footer">
           <a href="/farmer_list">
             <button type="button" class="btn btn-Secondary">
-              戻る
+              閉じる
             </button>
           </a>
           <button type="button" id="updateSendButton" class="btn btn-success">
@@ -346,6 +346,7 @@
     const userNameSpan2 = document.getElementById("userNameSpan2");
     var error_message = '{{ error_message }}'
     var loading = '{{ loading }}'
+    var pageNumber = 0
 
     // update modal open and append the input value 
     updateButtons.forEach(function (button) {
@@ -355,6 +356,7 @@
         var userName = this.getAttribute("data-name");
         var address = this.getAttribute("data-address");
         var userId = this.getAttribute("data-user-id");
+        var pageNumber = this.getAttribute("data-page-number");
 
         updateCompanyName.value = companyName;
         updateEmail.value = email;
@@ -411,7 +413,7 @@
         event.preventDefault();
       }
       else if (updateCompanyName.value && updateEmail.value && updateUserName.value && updateAddress.value) {
-        updateForm.action = `/update_farmer/${currentUserId}/`;
+        updateForm.action = `/update_farmer/${currentUserId}/?page=${pageNumber}`;
         updateForm.submit();
       }
 
@@ -490,8 +492,10 @@
         form.action = `/add_farmer`;
         form.submit();
         if (loading) {
+          document.getElementById('addButton').disabled = true;
           openSweetAlert();
         } else {
+          document.getElementById('addButton').disabled = false;
           closeSweetAlert();
         }
       }

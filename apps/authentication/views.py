@@ -78,7 +78,7 @@ def user_list(request):
         else:
             profile_list = Profile.objects.filter(Q(user=current_user) | Q(mapped_under=current_user))
             user_profile_list = [(profile.user, profile) for profile in profile_list]
-        paginator = Paginator(user_profile_list, 5)
+        paginator = Paginator(user_profile_list, 10)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
 
@@ -109,15 +109,15 @@ def user_list(request):
 
                 update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
                 messages.success(request, update_success_message)
-                return redirect('/user_list')
+                return redirect(f'/user_list?page={page_number}')
 
             except User.DoesNotExist:
                 messages.error(request, '指定されたユーザーは存在しません')
-                return redirect('/user_list')
+                return redirect(f'/user_list?page={page_number}')
 
             except Profile.DoesNotExist:
                 messages.error(request, '指定されたプロファイルは存在しません')
-                return redirect('/user_list')
+                return redirect(f'/user_list?page={page_number}')
 
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
@@ -148,7 +148,8 @@ def update_user(request, pk):
 
             update_success_message = f'{user_obj.first_name}情報が正常に更新されました'
             messages.success(request, update_success_message)
-            return redirect('/user_list')
+            page_number = request.GET.get('page')
+            return redirect(f'/user_list?page={page_number}')
 
         context = {
             'user_obj': user_obj,
@@ -274,15 +275,17 @@ def delete_user(request, user_id):
 
             user_delete_success = 'ユーザーが正常に削除されました。' 
             messages.success(request, user_delete_success)
-            return redirect('/user_list')
+            page_number = request.GET.get('page')
+            return redirect(f'/user_list?page={page_number}')
         else:
             user_delete_success = f'{ user_obj.first_name }が提供されていないです。'  
             messages.success(request, user_delete_success)
-            return redirect('/user_list')
+            page_number = request.GET.get('page')
+            return redirect(f'/user_list?page={page_number}')
 
     except Exception as e:
         print(e)
-    return redirect('/user_list')
+    return redirect(f'/user_list?page={page_number}')
 
 
 # change password 
@@ -447,7 +450,7 @@ def farmer_list(request):
         company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
 
         # Paginate the filtered company list
-        paginator = Paginator(company_list, 5)
+        paginator = Paginator(company_list, 1)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
         loading = False
@@ -487,15 +490,15 @@ def farmer_list(request):
 
                 update_success_message = f'{user_obj.first_name}の情報が正常に更新されました'
                 messages.success(request, update_success_message)
-                return redirect('/farmer_list')
+                return redirect(f'/farmer_list?page={page_number}')
 
             except User.DoesNotExist:
                 messages.error(request, '指定されたユーザーは存在しません')
-                return redirect('/farmer_list')
+                return redirect(f'/farmer_list?page={page_number}')
 
             except Profile.DoesNotExist:
                 messages.error(request, '指定されたプロファイルは存在しません')
-                return redirect('/farmer_list')
+                return redirect(f'/farmer_list?page={page_number}')
         return render(request, 'home/farmer-list.html',context)
 
     except Exception as e:
@@ -540,7 +543,7 @@ def add_farmer(request):
                 company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
 
                 # Paginate the filtered company list
-                paginator = Paginator(company_list, 5)
+                paginator = Paginator(company_list, 10)
                 page_number = request.GET.get('page')
                 page = paginator.get_page(page_number)
                 
@@ -575,7 +578,7 @@ def add_farmer(request):
             loading = False
             message = '農家が正常に追加されました！'
             messages.success(request, message)
-            return redirect('/farmer_list')
+            return redirect(f'/farmer_list?page={page_number}')
     except Exception as e:
         print(e)
     return render(request, 'home/farmer-list.html')

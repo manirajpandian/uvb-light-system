@@ -127,12 +127,12 @@
                           {% if user.is_staff or current_user_id == user.id %}
                           不可能
                           {% else %}
-                          <a href="{% url 'update_user' user.id %}" style="color: #ff9800;"><span>編集</span></a>
+                          <a href="{% url 'update_user' user.id %}?page={{ page.number }}" style="color: #ff9800;"><span>編集</span></a>
                           &nbsp; &nbsp;|&nbsp;&nbsp;
                           <a href="#" data-toggle="modal" class="text-danger deleteButton"
                             data-target="#userDeleteModal" data-user-id="{{ user.id }}"
                             data-csrf-token="{{ csrf_token }}"
-                            data-first-name="{{ user.first_name }}"><span>削除</span></a>
+                            data-first-name="{{ user.first_name }}" data-page-number="{{ page.number }}"><span>削除</span></a>
                             {% endif %}
                         </td>
                       </tr>
@@ -246,11 +246,13 @@
             const deleteForm = document.getElementById("deleteForm");
             const userNameSpan = document.getElementById("userNameSpan");
             const userNameSpan2 = document.getElementById("userNameSpan2");
+            var pageNumber=0
 
             deleteButtons.forEach(function (button) {
               button.addEventListener("click", function () {
                 currentUserId = this.getAttribute("data-user-id");
                 const userName = this.getAttribute("data-first-name");
+                pageNumber = this.getAttribute("data-page-number");
                 userNameSpan.innerHTML = userName;
                 userNameSpan2.innerHTML = userName;
 
@@ -259,7 +261,7 @@
             });
 
             document.getElementById("deleteButton").addEventListener("click", function () {
-              deleteForm.action = `/delete_user/${currentUserId}/`;
+              deleteForm.action = `/delete_user/${currentUserId}/?page=${pageNumber}`;
               deleteForm.submit();
             });
           });
