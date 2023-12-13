@@ -433,6 +433,34 @@
         border-top: 0;
         border-bottom: 8px solid transparent;
     }
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f5f5f5;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        padding: 12px;
+        z-index: 1;
+    }
+
+    .dropdown-content label {
+        display: block;
+        margin-bottom: 8px;
+        color: #000;
+    }
+
+    .dropdown-content input {
+        margin-right: 8px;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
 </style>
 {% endblock stylesheets %} {% block content %}
 
@@ -480,20 +508,22 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class=" bmd-label-floating">担当者名</label>
-                                            <select name="userName" class="form-control" id="user_name">
-                                                <option value="" selected="selected" disabled>
-                                                    選択してください
-                                                </option>
-                                                <option value="">誰も割り当てられない</option>
-                                                {% for user in choice_user %}
-                                                 <option value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}</option>
-                                                 {% endfor %}
-                                            </select>
+                                            <label>担当者名</label>
+                                            <input class="form-control" type="text" name="userName" id="user_name" disabled>
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary">農家フィルター</button>
+                                                <div class="dropdown-content">
+                                                    <label>
+                                                        <input type="checkbox" id="noOneCheckbox" value="">誰も割り当てない
+                                                    </label>
+                                                    {% for user in choice_user %}
+                                                        <label>
+                                                            <input type="checkbox" id="userCheckbox_{{ user.id }}" value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}
+                                                        </label>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
                                         </div>
-
-
-                
                                 </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
@@ -794,6 +824,61 @@
 {% block javascripts %}
 <!-- Add this script to your HTML file -->
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var noOneCheckbox = document.getElementById("noOneCheckbox");
+        var otherCheckboxes = document.querySelectorAll(".dropdown-content input[id^='userCheckbox_']");
+        var userNameInput = document.getElementById("user_name");
+
+        function updateUserNameInput() {
+    var checkedUsers = Array.from(otherCheckboxes)
+        .filter(function (checkbox) {
+            return checkbox.checked;
+        })
+        .map(function (checkbox) {
+            return {
+                username: checkbox.getAttribute("data-username"),
+                value: checkbox.value
+            };
+        });
+
+    var checkedUserNames = checkedUsers.map(function (user) {
+        return user.username;
+    });
+    var checkedValues = checkedUsers.map(function (user) {
+        return user.value;
+    });
+
+    userNameInput.value = checkedUserNames.join(",");
+    var farmerId = checkedValues.join(",");
+    var userNameReg = checkedUserNames.join(", ");
+
+    $('#farmerId').val(farmerId);
+    $('#userNameReg').val(userNameReg);
+}
+
+
+        noOneCheckbox.addEventListener("change", function () {
+            otherCheckboxes.forEach(function (checkbox) {
+                checkbox.disabled = noOneCheckbox.checked;
+            });
+
+            updateUserNameInput();
+        });
+
+        otherCheckboxes = Array.from(otherCheckboxes); // Convert NodeList to Array
+
+        otherCheckboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                noOneCheckbox.disabled = otherCheckboxes.some(function (checkbox) {
+                    return checkbox.checked;
+                });
+
+                updateUserNameInput();
+            });
+        });
+
+    });
+
     let memoInput = document.getElementById('memo');
     let remarkCountSpan = document.getElementById('memoCount');
 
@@ -1022,13 +1107,7 @@
             let memo = e.target.value
             $('#memoReg').val(e.target.value);
         })
-        //farmerName
-        $('#user_name').change(function (e) {
-            let farmerId = e.target.value
-            let user_name = $(e.target).find('option:selected').data('username');
-            $('#farmerId').val(farmerId);
-            $('#userNameReg').val(user_name);
-        })
+   
         //farmName
         $('#farmName').change(function (e) {
             let farmId = e.target.value
