@@ -514,7 +514,8 @@
                                     <div class="col-md-6">
                                         <div class="form-group dropdown">
                                             <div class="">
-                                            <label>担当者名</label>
+                                            <label>担当者名 <span
+                                                class="text-danger">*</span></label>
                                             <input class="form-control" type="text" name="userName" id="user_name" disabled>
                                             <div class="dropdown-content">
                                                 <label>
@@ -649,7 +650,8 @@
                                 <div class="col-md-3"></div>
                                 <div class="col-md-6 mt-3">
                                     <div class="form-group text-left">
-                                        <label class=" bmd-label-floating">レーンの数</label>
+                                        <label class=" bmd-label-floating">レーンの数 <span
+                                            class="text-danger">*</span></label>
                                         <input class="form-control" type="number" id="verticalCount" placeholder="" />
                                         <span class="text-danger" id="customleanMsg"></span>
                                     </div>
@@ -727,7 +729,7 @@
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
-                                            <label class=" bmd-label-floating">ユーザー名</label>
+                                            <label class=" bmd-label-floating">担当者名</label>
                                             <input class="form-control" id="userNameReg" type="text" name="userNameReg"
                                                 placeholder="" value="" />
                                             <input type="hidden" id="farmerId" name="farmerId">
@@ -834,44 +836,54 @@
         var userNameInput = document.getElementById("user_name");
 
         function updateUserNameInput() {
-    var checkedUsers = Array.from(otherCheckboxes)
-        .filter(function (checkbox) {
-            return checkbox.checked;
-        })
-        .map(function (checkbox) {
-            return {
-                username: checkbox.getAttribute("data-username"),
-                value: checkbox.value
-            };
-        });
+        var checkedUsers = [];
+
         
-
-    var checkedUserNames = checkedUsers.map(function (user) {
-        // console.log('user.username>>>',user.username);
-        return user.username;
-    });
-    var checkedValues = checkedUsers.map(function (user) {
-        return user.value;
-    });
-
-    userNameInput.value = checkedUserNames.join(",");
-    var farmerId = checkedValues.join(",");
-    var userNameReg = checkedUserNames.join(", ");
-
-    $('#farmerId').val(farmerId);
-    $('#userNameReg').val(userNameReg);
-}
-
-        otherCheckboxes = Array.from(otherCheckboxes); // Convert NodeList to Array
-
-        otherCheckboxes.forEach(function (checkbox) {
-            checkbox.addEventListener("change", function () {
-
-                updateUserNameInput();
+        if (noOneCheckbox.checked) {
+            checkedUsers.push({
+                username: noOneCheckbox.getAttribute("data-username"),
+                value: noOneCheckbox.value
             });
+        }
+
+        
+        checkedUsers = checkedUsers.concat(Array.from(otherCheckboxes)
+            .filter(function (checkbox) {
+                return checkbox.checked;
+            })
+            .map(function (checkbox) {
+                return {
+                    username: checkbox.getAttribute("data-username"),
+                    value: checkbox.value
+                };
+            }));
+
+        var checkedUserNames = checkedUsers.map(function (user) {
+            return user.username;
+        });
+        var checkedValues = checkedUsers.map(function (user) {
+            return user.value;
         });
 
+        userNameInput.value = checkedUserNames.join(",");
+        var farmerId = checkedValues.join(",");
+        var userNameReg = checkedUserNames.join(", ");
+
+        $('#farmerId').val(farmerId);
+        $('#userNameReg').val(userNameReg);
+    }
+
+    noOneCheckbox.addEventListener("change", function () {
+        updateUserNameInput();
     });
+
+    // Add event listener for other checkboxes
+    otherCheckboxes.forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            updateUserNameInput();
+        });
+    });
+});
 
     let memoInput = document.getElementById('memo');
     let remarkCountSpan = document.getElementById('memoCount');
