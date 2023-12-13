@@ -706,19 +706,22 @@ def update_house(request, house_id):
     user_role_id = request.session.get('role_id')
     user_company = request.session.get('user_company')
     context = {}
+    house_user_id = []
 
     try:
         house_obj = House.objects.filter(house_id=house_id).first()
+        for house in house_obj.user.all():
+            house_user_id.append(house.id)
         
         if request.user.is_authenticated:
             current_user_id = Farm.objects.get(houses__house_id=house_id).user.id
             mapped_profiles = Profile.objects.filter(mapped_under=current_user_id)
             choice_user = [profile.user for profile in mapped_profiles]
+                
         else:
             choice_user = []
 
         choice_plant = Plant.objects.all()
-
         context = {
             'segment': 'update_house',
             'user_profile_image': user_profile_image,
@@ -726,11 +729,18 @@ def update_house(request, house_id):
             'user_company': user_company,
             'choice_user': choice_user,
             'choice_plant': choice_plant,
-            'house_obj': house_obj
+            'house_obj': house_obj,
+            'house_user_id':house_user_id
         }
 
         if request.method == "POST":
-            user_id = request.POST['user_id']
+            user_id = request.POST['user_id'] or None
+            if user_id != None:
+                print('user_id',user_id,type(user_id))
+                user_ids = user_id.split(',')
+            else:
+                user_ids = []
+
             plant_id = request.POST['plant_id']
             house_name = request.POST['house_name']
 
@@ -746,10 +756,11 @@ def update_house(request, house_id):
             'house_obj': house_obj}
                 return render(request, 'home/update-house.html', context)
             
-            house_obj.user_id = user_id
+            # house_obj.user_id = user_id
             house_obj.plant_id = plant_id
             house_obj.house_name = house_name
             house_obj.save()
+            house_obj.user.set(user_ids)
 
             message = f"ハウス{house_obj.house_name} が更新されました"
             messages.success(request, message)
