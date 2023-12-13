@@ -356,7 +356,7 @@
         var userName = this.getAttribute("data-name");
         var address = this.getAttribute("data-address");
         var userId = this.getAttribute("data-user-id");
-        var pageNumber = this.getAttribute("data-page-number");
+        pageNumber = this.getAttribute("data-page-number");
 
         updateCompanyName.value = companyName;
         updateEmail.value = email;
@@ -423,6 +423,7 @@
       button.addEventListener("click", function () {
         currentUserId = this.getAttribute("data-user-id");
         const userName = this.getAttribute("data-first-name");
+        pageNumber = this.getAttribute("data-page-number");
         userNameSpan.innerHTML = userName;
         userNameSpan2.innerHTML = userName;
 
@@ -431,7 +432,7 @@
     });
     // delete modal form submit 
     document.getElementById("deleteButton").addEventListener("click", function () {
-      deleteForm.action = `/delete_farmer/${currentUserId}/`;
+      deleteForm.action = `/delete_farmer/${currentUserId}/?page=${pageNumber}`;
       deleteForm.submit();
     });
 

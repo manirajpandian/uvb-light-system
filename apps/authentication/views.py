@@ -73,10 +73,10 @@ def user_list(request):
     current_user = request.user.id
     try:
         if user_role_id == '0':
-            profile_list = Profile.objects.filter(Q(role_id='0'))
+            profile_list = Profile.objects.filter(Q(role_id='0')).order_by('id')
             user_profile_list = [(profile.user, profile) for profile in profile_list]
         else:
-            profile_list = Profile.objects.filter(Q(user=current_user) | Q(mapped_under=current_user))
+            profile_list = Profile.objects.filter(Q(user=current_user) | Q(mapped_under=current_user)).order_by('id')
             user_profile_list = [(profile.user, profile) for profile in profile_list]
         paginator = Paginator(user_profile_list, 10)
         page_number = request.GET.get('page')
@@ -450,7 +450,7 @@ def farmer_list(request):
         company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
 
         # Paginate the filtered company list
-        paginator = Paginator(company_list, 1)
+        paginator = Paginator(company_list, 10)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
         loading = False
@@ -578,14 +578,15 @@ def add_farmer(request):
             loading = False
             message = '農家が正常に追加されました！'
             messages.success(request, message)
-            return redirect(f'/farmer_list?page={page_number}')
+            return redirect('/farmer_list')
     except Exception as e:
         print(e)
-    return render(request, 'home/farmer-list.html')
+    return render(request, 'home/farmer-list.html',context)
 
 # delete farmer 
 @login_required(login_url="/login/")
 def delete_farmer(request, user_id):
+    page_number = request.GET.get('page')
     try:
         if request.method == 'POST':
             user_obj = get_object_or_404(User, id=user_id)
@@ -610,20 +611,21 @@ def delete_farmer(request, user_id):
 
             messages = '農家が正常に削除されました。' 
             messages.success(request, messages)
-            return redirect('/farmer_list')
+            return redirect(f'/farmer_list?page={page_number}')
         else:
-            messages = f'農家{ user_obj.first_name }が提供されていないです。'  
+            messages = f'農家が提供されていないです。'  
             messages.success(request, messages)
-            return redirect('/farmer_list')
+            return redirect(f'/farmer_list?page={page_number}')
 
     except Exception as e:
         print(e)
-    return redirect('/farmer_list')
+    return redirect(f'/farmer_list?page={page_number}')
 
 
 # update farmer 
 @login_required(login_url='/login/')
 def update_farmer(request, user_id):
+    page_number = request.GET.get('page')
     try:
         if request.method == 'POST':
             # check if the user is already exist or not
@@ -640,8 +642,8 @@ def update_farmer(request, user_id):
 
             update_success_message = f'{company_obj.company_name}の情報が正常に更新されました'
             messages.success(request, update_success_message)
-            return redirect('/farmer_list')
+            return redirect(f'/farmer_list?page={page_number}')
 
     except Exception as e:
         print('update farmer>>>',e)
-    return redirect('/farmer_list')
+    return redirect(f'/farmer_list?page={page_number}')
