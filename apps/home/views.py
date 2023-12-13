@@ -117,7 +117,7 @@ def index(request,farm_id=None):
 
         #Super Admin login
         elif user_role_id =='0': 
-            admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
+            admin_count = User.objects.filter(profile__role_id=1,is_active=True).count()
             farm_count = Farm.objects.filter(is_active=True).count()
             plant_count = Plant.objects.all().count()
             house_count = House.objects.filter(is_active=True).count()
@@ -532,6 +532,11 @@ def house_list(request, farm_id=None):
         #House Filter
         houses,selected_farm_name,display_message = house_filter(user_role_id, farms, request, selected_farm_id,house_list)
 
+        for house in houses:
+            house.user_count = house.user.count()
+            if house.user_count == 0:
+                house.user_count = '自分'
+
         page = Paginator(houses, 10)
         page_list = request.GET.get('page')
         page = page.get_page(page_list) 
@@ -635,6 +640,7 @@ def add_house(request):
     else:
         user_id_get = request.POST.get("farmerId")
         user_id_list = user_id_get.split(",") if user_id_get else []
+        user_id_list = [user_id for user_id in user_id_list if user_id.strip()]   
         house_name = request.POST.get("houseNameReg")
         plant_id = request.POST.get("plantIdReg")
         farm_id = request.POST.get("farmIdReg")
@@ -645,13 +651,14 @@ def add_house(request):
         sum_pole_counts = int(request.POST.get("laneCountPerPole"))
         sum_led_counts = int(request.POST.get("ledCountPerpole"))
 
+
         house = House(
             house_name=house_name,
             memo=memo,
             total_line_count=lane_count,  
             total_pole_count=sum_pole_counts,  
             total_leds=sum_led_counts,  
-            is_active=True
+            is_active=True,
         )
         
         if plant_id:
@@ -660,10 +667,7 @@ def add_house(request):
             farm_id
             house.farm_id = farm_id
         house.save()
-        for user_id in user_id_list:
-            each_user = User.objects.get(pk=user_id).id
-            house.user.add(each_user)
-             
+
         for i in range(1, lane_count + 1):
             line = Line(
                 house=house,
@@ -685,6 +689,11 @@ def add_house(request):
                         pole=pole
                     )
                     led.save()
+        
+    
+        for user_id in user_id_list:
+            each_user = User.objects.get(pk=user_id).id
+            house.user.add(each_user)
                     
         house_success_msg ="ハウスが正常に追加されました。"        #House is added Successfully
         messages.success(request, house_success_msg)  

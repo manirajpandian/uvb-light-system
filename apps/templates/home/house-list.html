@@ -143,7 +143,7 @@
             <thead class="text-primary-emphasis table-success">
               <th>ハウス名</th>
               <th>作物名</th>
-              <th>ユーザー名</th>
+              <th>ユーザーの数</th>
               <th>レーンの数</th>
               <th>ポール数</th>
               <th>LEDの数</th>
@@ -157,7 +157,7 @@
               <tr>
                 <td>{{ house.house_name }}</td>
                 <td class="text-truncate" style="max-width: 10dvw;">{% if house.plant.plant_name %}{{ house.plant.plant_name }}{% else %}<span class="text-danger">作物が未割り当て</span>{% endif %}</td>
-                <td class="text-truncate" style="max-width: 10dvw;">{{ house.user.first_name }}</td>
+                <td class="text-truncate" style="max-width: 10dvw;">{{ house.user_count }}</td>
                 <td>{{ house.total_line_count }}</td>
                 <td>{{ house.total_pole_count }}</td>
                 <td>{{ house.total_leds }}</td>

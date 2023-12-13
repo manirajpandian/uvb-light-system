@@ -75,7 +75,7 @@ class House(models.Model):
         if not self.house_id:
             last_instance = House.objects.last()
             if last_instance:
-                last_number = int(last_instance.house_id[1:])
+                last_number = int(last_instance.house_id)
                 new_number = last_number + 1
             else:
                 new_number = 1
@@ -87,7 +87,8 @@ class House(models.Model):
 class Line(models.Model):
     line_id = models.CharField(max_length=15, primary_key=True)
     house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='lines')
-    pole_count = models.PositiveIntegerField(default=0)  # Added field
+    pole_count = models.PositiveIntegerField(default=0) 
+
     def save(self, *args, **kwargs):
         if not self.line_id:
             last_instance = Line.objects.filter(house=self.house).last()
@@ -98,6 +99,7 @@ class Line(models.Model):
                 new_number = 1
             self.line_id = f'{self.house.house_id}-{new_number}'
         super().save(*args, **kwargs)
+
 class Pole(models.Model):
     pole_id = models.CharField(max_length=20, primary_key=True)
     line = models.ForeignKey(Line, on_delete=models.CASCADE, related_name='poles')
@@ -117,18 +119,12 @@ class LED(models.Model):
     led_id = models.CharField(max_length=25, primary_key=True)
     pole = models.ForeignKey(Pole, on_delete=models.CASCADE, related_name='leds')
     is_on = models.BooleanField(default=False)
-    button_no = models.PositiveIntegerField(unique=True)
+    button_no = models.PositiveIntegerField(unique=False)
     led_on_date= models.DateTimeField(null=True, blank=True)
     led_off_date = models.DateTimeField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.button_no:
-            last_instance = LED.objects.order_by('-button_no').first()
-            if last_instance:
-                new_button_no = last_instance.button_no + 1
-            else:
-                new_button_no = 1
-            self.button_no = new_button_no
+    def save(self, *args, **kwargs):  
+        
         if not self.led_id:
             last_instance = LED.objects.filter(pole=self.pole).last()
             if last_instance:
@@ -137,6 +133,16 @@ class LED(models.Model):
             else:
                 new_number = 1
             self.led_id = f'{self.pole.pole_id}-{new_number}'
+
+        if not self.button_no:  
+            # Check if button_no is not set or it's a new instance
+            last_instance_same_house = LED.objects.filter(pole__line__house=self.pole.line.house).order_by('-led_id').first()
+            if last_instance_same_house:
+                new_button_no = (last_instance_same_house.button_no % 4) + 1
+            else:
+                new_button_no = 1
+            self.button_no = new_button_no
+
         super().save(*args, **kwargs)
 
 
