@@ -434,18 +434,20 @@
         border-bottom: 8px solid transparent;
     }
     .dropdown {
-        position: relative;
-        display: inline-block;
+        display: block;
     }
 
     .dropdown-content {
         display: none;
         position: absolute;
         background-color: #f5f5f5;
-        min-width: 160px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
         padding: 12px;
         z-index: 1;
+        width: max-content;
+        min-width: 100%;
+        overflow: auto;
+        height: 200px;
     }
 
     .dropdown-content label {
@@ -460,6 +462,9 @@
 
     .dropdown:hover .dropdown-content {
         display: block;
+    }
+    .z-0{
+        z-index:0 !important;
     }
 </style>
 {% endblock stylesheets %} {% block content %}
@@ -507,22 +512,21 @@
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
                                     <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group dropdown">
+                                            <div class="">
                                             <label>担当者名</label>
                                             <input class="form-control" type="text" name="userName" id="user_name" disabled>
-                                            <div class="dropdown">
-                                                <button class="btn btn-primary">農家フィルター</button>
-                                                <div class="dropdown-content">
+                                            <div class="dropdown-content">
+                                                <label>
+                                                    <input type="checkbox" id="noOneCheckbox" value="" data-username="管理者">管理者
+                                                </label>
+                                                {% for user in choice_user %}
                                                     <label>
-                                                        <input type="checkbox" id="noOneCheckbox" value="">誰も割り当てない
+                                                        <input type="checkbox" id="userCheckbox_{{ user.id }}" value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}
                                                     </label>
-                                                    {% for user in choice_user %}
-                                                        <label>
-                                                            <input type="checkbox" id="userCheckbox_{{ user.id }}" value="{{ user.id }}" data-username="{{ user.first_name }}">{{ user.first_name }}
-                                                        </label>
-                                                    {% endfor %}
-                                                </div>
+                                                {% endfor %}
                                             </div>
+                                        </div>
                                         </div>
                                 </div>
                                 <div class="col-md-3"></div>
@@ -541,7 +545,7 @@
                                 <div class="col-md-3"></div>
 
                                 <div class="col-md-3 mt-3">
-                                    <div class="form-group">
+                                    <div class="form-group z-0">
                                         <label class=" bmd-label-floating">作物名 <span
                                                 class="text-danger">*</span></label>
                                         <select name="plantName" class="form-control" id="plantName">
@@ -560,7 +564,7 @@
 
                                 </div>
                                 <div class="col-md-3 mt-3">
-                                    <div class="form-group">
+                                    <div class="form-group z-0">
                                         <label class=" bmd-label-floating">農場名 <span
                                                 class="text-danger">*</span></label>
                                         <select name="farmName" class="form-control" id="farmName">
@@ -840,8 +844,10 @@
                 value: checkbox.value
             };
         });
+        
 
     var checkedUserNames = checkedUsers.map(function (user) {
+        // console.log('user.username>>>',user.username);
         return user.username;
     });
     var checkedValues = checkedUsers.map(function (user) {
@@ -856,22 +862,10 @@
     $('#userNameReg').val(userNameReg);
 }
 
-
-        noOneCheckbox.addEventListener("change", function () {
-            otherCheckboxes.forEach(function (checkbox) {
-                checkbox.disabled = noOneCheckbox.checked;
-            });
-
-            updateUserNameInput();
-        });
-
         otherCheckboxes = Array.from(otherCheckboxes); // Convert NodeList to Array
 
         otherCheckboxes.forEach(function (checkbox) {
             checkbox.addEventListener("change", function () {
-                noOneCheckbox.disabled = otherCheckboxes.some(function (checkbox) {
-                    return checkbox.checked;
-                });
 
                 updateUserNameInput();
             });
