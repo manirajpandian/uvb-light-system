@@ -25,7 +25,66 @@ import csv
 from django.db import transaction
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+import re
 
+
+
+
+def company_filter(user_role_id, request,list=None):
+
+    users_list = User.objects.filter(profile__role_id='1', is_active=True)
+    for user in users_list:
+        try:
+            user.company = Company.objects.get(user=user)
+        except ObjectDoesNotExist:
+            user.company = None
+
+    user_id = request.GET.get('user')
+    selected_user_name = None
+
+    if user_role_id == '1':
+        farms = Farm.objects.filter(user_id=request.user.id)
+    elif user_role_id == '2':
+        profile = get_object_or_404(Profile, user=request.user.id)
+        farms = Farm.objects.filter(user_id=profile.mapped_under)
+    elif user_role_id == '0':
+        if user_id:
+            farms = Farm.objects.filter(user_id=user_id, is_active=True)
+            selected_user_name = Company.objects.get(user_id=user_id).company_name
+        elif list:
+            farms = Farm.objects.filter(is_active=True)
+        else:
+            farms = []
+
+    return users_list, user_id, selected_user_name, farms
+
+def house_filter(user_role_id, farms, request, selected_farm_id,house_list=None):
+    houses = []
+    selected_farm_name = None
+    display_message = None
+    if len(farms) > 0:
+        if user_role_id == '2':
+            houses = House.objects.filter(user=request.user.id, is_active=True)
+            farms = []
+            selected_farm_name = None
+        else:
+            if selected_farm_id:
+                houses = House.objects.filter(farm_id=selected_farm_id) if house_list else House.objects.filter(farm_id=selected_farm_id, is_active=True)
+                selected_farm_name = Farm.objects.get(pk=selected_farm_id).farm_name          
+            else:
+                if user_role_id == '0':
+                    for farm in farms:
+                        house = House.objects.filter(farm_id=farm.farm_id) if house_list else House.objects.filter(farm_id=farm.farm_id, is_active=True)
+                        houses.extend(house)
+                else:
+                    for farm in farms:
+                        house = House.objects.filter(farm_id=farm.farm_id) if house_list else House.objects.filter(is_active=True, farm_id=farm.farm_id)
+                        houses.extend(house)
+
+    elif len(farms) == 0:
+        display_message = '農家を選んで下さい'
+
+    return houses,selected_farm_name,display_message
 
 @login_required(login_url="/login/")
 def index(request,farm_id=None):
@@ -44,39 +103,33 @@ def index(request,farm_id=None):
             user_company = Company.objects.get(user_id=mapped_under).company_name
         request.session['user_company'] = user_company
         
+
         plant_count = None
         admin_count = None
         farm_count = None
-
         # Admin login
         if user_role_id =='1':
             admin_count = User.objects.filter(profile__role_id=2,is_active=True,profile__mapped_under=current_user_id).count()
-            total_admin = User.objects.filter(profile__role_id=2,profile__mapped_under=current_user_id).count()
-      
             farm_count = Farm.objects.filter(user__id=current_user_id,is_active=True).count()
-   
             house_count = House.objects.filter(farm__user_id=current_user_id,is_active=True).count()
-       
             led_on_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,is_on=True,pole__line__house__is_active=True).count()
             led_full_count = LED.objects.filter(pole__line__house__farm__user_id=current_user_id,pole__line__house__is_active=True).count()
+
         #Super Admin login
         elif user_role_id =='0': 
             admin_count = User.objects.filter(profile__role_id=1,is_active=True,profile__mapped_under=current_user_id).count()
-            total_admin = User.objects.filter(profile__role_id=1,profile__mapped_under=current_user_id).count()
             farm_count = Farm.objects.filter(is_active=True).count()
             plant_count = Plant.objects.all().count()
-      
             house_count = House.objects.filter(is_active=True).count()
-     
             led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
             led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
 
         elif user_role_id =='2' :
-      
             house_count = House.objects.filter(user=current_user_id,is_active=True).count()
-     
             led_on_count = LED.objects.filter(pole__line__house__user=current_user_id,is_on=True,pole__line__house__is_active=True).count()
-            led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count()      
+            led_full_count = LED.objects.filter(pole__line__house__user=current_user_id,pole__line__house__is_active=True).count() 
+
+
         # Assuming you want to retrieve this data for all Raspberry Pi instances
         raspberries = Rasp.objects.all()
 
@@ -95,7 +148,6 @@ def index(request,farm_id=None):
             # Fetch data for the first Raspberry instance
             first_data_entry = data.objects.filter(raspberry_id=first_raspberry).order_by('date').first()
            
-
             if first_data_entry:
                 # Extract relevant information
                 temperature = first_data_entry.temperature
@@ -121,60 +173,16 @@ def index(request,farm_id=None):
             }
  
 
-        #Users Filter
-        users_list = User.objects.filter(profile__role_id='1',is_active = True)
-        for user in users_list:
-            try:
-                user.company = Company.objects.get(user=user)
-            except ObjectDoesNotExist:
-                user.company = None 
-       
-        user_id = request.GET.get('user')
-        selected_user_name = None
-        selected_farm_name = None
-        #Farm Filter and House Display
-        farms = []
-        if user_role_id == '1':
-            farms = Farm.objects.filter(user_id=request.user.id)
-        elif user_role_id == '2':
-            profile = get_object_or_404(Profile, user=request.user.id)
-            farms = Farm.objects.filter(user_id = profile.mapped_under)
-        else:
-            if user_id:
-                farms = Farm.objects.filter(user_id=user_id,is_active = True)
-                selected_user_name = Company.objects.get(user_id=user_id).company_name
-            else:
-                farms = []
+        #Company Filter
+        users_list, user_id, selected_user_name, farms = company_filter(user_role_id, request)
+        selected_farm_id = request.GET.get('farm_id') or farm_id
+        #House Filter
+        houses,selected_farm_name,display_message = house_filter(user_role_id, farms, request, selected_farm_id)
 
-        if len(farms) > 0:
-            if user_role_id == '2':
-                houses = House.objects.filter(user=current_user_id,is_active=True).select_related('plant')
-                farms = None
-                selected_farm_name = None
-                for house in houses:
-                    house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-            else:
-                selected_farm_id = request.GET.get('farm_id') or farm_id
-                if selected_farm_id:
-                    houses = House.objects.filter(farm_id=selected_farm_id,is_active=True).select_related('plant')
-                    selected_farm = Farm.objects.get(pk=selected_farm_id)
-                    selected_farm_name = selected_farm.farm_name  
-                else:
-                    if user_role_id == '0':
-                        houses = []
-                        for farm in farms:
-                            house = House.objects.filter(farm_id=farm.farm_id,is_active=True).select_related('plant')
-                            houses.extend(house)
-                    else:
-                        houses = []
-                        for farm in farms:
-                            house = House.objects.filter(is_active=True,farm_id=farm.farm_id).select_related('plant')
-                            houses.extend(house)
+        for house in houses:
+                house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
             
-                for house in houses:
-                    house.house_led_on_count = LED.objects.filter(pole__line__house_id=house.house_id, is_on=True).count()
-            
-            context = {
+        context = {
                 'segment': 'dashboard',
                 'user_profile_image': user_profile_image,
                 'user_role_id':user_role_id,
@@ -193,38 +201,15 @@ def index(request,farm_id=None):
                 'rbi':dashboard_sensor_data['raspberry_id'],
                 'led_full_count':led_full_count,   
                 'plant_count':plant_count,
-                 'selected_user_name':selected_user_name,   
-                 'user_id':user_id,
-                 'display_message': 'ハウスがありません'
+                'selected_user_name':selected_user_name,   
+                'user_id':user_id,
+                'display_message': display_message
                 }
-            if request.method == "GET":
-                html_template = loader.get_template('home/dashboard.html')
-                return HttpResponse(html_template.render(context, request))
-            return redirect('')
-    
-        else:
-            houses = []
-            context = {'segment': 'dashboard',
-                'segment': 'dashboard',
-                'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id,
-                'user_company':user_company,
-                'admin_count': admin_count,
-                'users_list':users_list,
-                'farms': farms,
-                'farm_count':farm_count,
-                'house_count':house_count,
-                'led_on_count':led_on_count,
-                'temperature': dashboard_sensor_data['temperature'],
-                'humidity': dashboard_sensor_data['humidity'],
-                'soil_moisture': dashboard_sensor_data['soil_moisture'],
-                'rbi':dashboard_sensor_data['raspberry_id'],
-                'led_full_count':led_full_count,   
-                'plant_count' : plant_count,
-                'display_message': '農家を選んで下さい'
-              }
+        if request.method == "GET":
             html_template = loader.get_template('home/dashboard.html')
             return HttpResponse(html_template.render(context, request))
+        return redirect('')
+    
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
@@ -347,151 +332,102 @@ def LED_control(request,farm_id=None):
         mqtt_client.loop_start()
 
 
-        users_list = User.objects.filter(profile__role_id='1',is_active = True)
-        for user in users_list:
-            user.company = Company.objects.get(user=user)
-        user_id = request.GET.get('user') 
-        selected_farm_name = None
-        selected_user_name = None
-        farms = []
-        if user_role_id == '1':
-            farms = Farm.objects.filter(user_id=request.user.id)
-        elif user_role_id == '2':
-            profile = get_object_or_404(Profile, user=request.user.id)
-            farms = Farm.objects.filter(user_id = profile.mapped_under)
-        else:
-            if user_id:
-                farms = Farm.objects.filter(user_id = user_id,is_active = True)
-                selected_user_name = Company.objects.get(user_id=user_id).company_name
-            else:
-                farms = []
-            
-        if user_role_id:
-            selected_farm_id = request.GET.get('farm_id') or farm_id
-            house_id = request.GET.get('house')
+        #Company Filter
+        users_list, user_id, selected_user_name, farms = company_filter(user_role_id, request)
 
-            if house_id:
-                houses = House.objects.filter(is_active=True,house_id=house_id).select_related('plant')
-                selected_farm = Farm.objects.get(pk=selected_farm_id)
-                selected_farm_name = selected_farm.farm_name
-            else:    
-                if user_role_id == '2':
-                    houses = House.objects.filter(user=request.user.id,is_active=True).select_related('plant')
-                    farms = []
-                    
-                elif user_role_id == '1':
-                    if selected_farm_id:
-                        houses = House.objects.filter(farm_id=selected_farm_id,is_active=True,farm__user_id=request.user.id).select_related('plant')
-                        selected_farm = Farm.objects.get(pk=selected_farm_id)
-                        selected_farm_name = selected_farm.farm_name 
-                    else:
-                        houses = []
-                        for farm in farms:
-                            house = House.objects.filter(is_active=True,farm_id=farm.farm_id).select_related('plant')
-                            houses.extend(house)       
-                else:
-                    if selected_farm_id:
-                        houses = House.objects.filter(farm_id=selected_farm_id,is_active=True).select_related('plant')
-                        selected_farm = Farm.objects.get(pk=selected_farm_id)
-                        selected_farm_name = selected_farm.farm_name 
-                    else:
-                        houses = []
-                        for farm in farms:
-                            house = House.objects.filter(is_active=True,farm_id=farm.farm_id).select_related('plant')
-                            houses.extend(house)
-          
-            context = {
-                'segment': 'LED_control',
-                'farms': farms,
-                'houses': houses,
-                'selected_farm_name': selected_farm_name,
-                'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id,
-                'user_company':user_company,
-                'temperature': sensor_data['temperature'],
-                'humidity': sensor_data['humidity'],
-                'soil_moisture': sensor_data['soil_moisture'],
-                'Rbi': sensor_data['raspberry_id'],
-                'users_list':users_list,
-                'led_count':sensor_data['led_count'],
-                'message1':sensor_data['message1'],
-                'display_message': 'ハウスがありません',
-                'selected_farm_name':selected_farm_name,
-                'user_id':user_id,
-                'selected_user_name':selected_user_name,
-                }  
-            if request.method == "GET":
-                if context['temperature'] or context ['humidity'] or context['soil_moisture'] is None:
-                    context['message'] = "Raspberry pi "
-                    html_template = loader.get_template('home/LED-control.html')
-                    
-                    return HttpResponse(html_template.render(context, request))
+        house_id = request.GET.get('house')
+        selected_farm_id = request.GET.get('farm_id') or farm_id
+        if house_id:
+                houses = House.objects.filter(is_active=True,house_id=house_id)
+                selected_farm_name = Farm.objects.get(pk=selected_farm_id).farm_name
+                display_message = None
+        else:
+            houses,selected_farm_name,display_message = house_filter(user_role_id, farms, request, selected_farm_id)
+
+                
+        context = {
+            'segment': 'LED_control',
+            'farms': farms,
+            'houses': houses,
+            'selected_farm_name': selected_farm_name,
+            'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id,
+            'user_company':user_company,
+            'temperature': sensor_data['temperature'],
+            'humidity': sensor_data['humidity'],
+            'soil_moisture': sensor_data['soil_moisture'],
+            'Rbi': sensor_data['raspberry_id'],
+            'users_list':users_list,
+            'led_count':sensor_data['led_count'],
+            'message1':sensor_data['message1'],
+            'display_message': display_message,
+            'selected_farm_name':selected_farm_name,
+            'user_id':user_id,
+            'selected_user_name':selected_user_name,
+            } 
+    
+        if request.method == "GET":
+
+            if context['temperature'] or context ['humidity'] or context['soil_moisture'] is None:
+                context['message'] = "Raspberry pi "
                 html_template = loader.get_template('home/LED-control.html')
                 return HttpResponse(html_template.render(context, request))
-        
-            elif request.method == "POST":
-                led_id = request.POST.get('led_id')
-                farm_id = request.POST.get('farm_id')
-
-                if led_id:
-                    led = LED.objects.get(pk=led_id)
-                    if led.is_on:  
-                        led.is_on = False  # Set to False
-                        led.led_off_date = timezone.now() 
-                       
-                        led.save()
-                        print('button no',led.button_no)
-                        button_data = led.button_no
-                        Relay_data= False
-                        if button_data > sensor_data['led_count']:
-                            led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"         #Led is set to OFF
-                            messages.error(request, led_success_msg)
-                            led.led_on_date = None
-                            led.is_on = False  
-                            led.save()
-                           
-                        else:
-                            # Publish button_no data to the topic
-                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                            led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
-                            messages.success(request, led_success_msg)
+            html_template = loader.get_template('home/LED-control.html')
+            return HttpResponse(html_template.render(context, request))
             
-                    else:
-                        led.is_on = True  # Set to True
-                        led.led_on_date = timezone.now() 
-                        
+        elif request.method == "POST":
+            led_id = request.POST.get('led_id')
+            farm_id = request.POST.get('farm_id')
+            user_id = Farm.objects.get(pk=farm_id).user_id
+            if led_id:
+                led = LED.objects.get(pk=led_id)
+                if led.is_on:  
+                    led.is_on = False  # Set to False
+                    led.led_off_date = timezone.now() 
+                    led.save()
+
+                    print('button no',led.button_no)
+                    button_data = led.button_no
+                    Relay_data= False
+                    if button_data > sensor_data['led_count']:
+                        led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"         #Led is set to OFF
+                        messages.error(request, led_success_msg)
+                        led.led_on_date = None
+                        led.is_on = False  
                         led.save()
-                        button_data = led.button_no
-                        Relay_data = True 
-                        
-                        if button_data > sensor_data['led_count']:
-                            led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"       #Led is set to OFF
-                            messages.error(request, led_success_msg)
-                            led.led_on_date = None
-                            led.is_on = False  
-                            led.save()
-                           
-                        else:  
+                    else:
                         # Publish button_no data to the topic
-                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                            
-                            print('button no',led.button_no)
-                            led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
-                            messages.success(request, led_success_msg)
-               
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
+                        messages.success(request, led_success_msg)
+                else:
+                    led.is_on = True  # Set to True
+                    led.led_on_date = timezone.now() 
+                    led.save()
+
+                    print('button no',led.button_no)
+                    button_data = led.button_no
+                    Relay_data = True 
+                    if button_data > sensor_data['led_count']:
+                        led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"       #Led is set to OFF
+                        messages.error(request, led_success_msg)
+                        led.led_on_date = None
+                        led.is_on = False  
+                        led.save()
+                        
+                    else:  
+                    # Publish button_no data to the topic
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
+                        messages.success(request, led_success_msg)
+            if user_role_id == '0':
+                url = reverse('LED_control_farm_id', kwargs={'farm_id': farm_id}) + f'?user={user_id}'
+                return redirect(url)
+            else:
                 return redirect('LED_control_farm_id', farm_id=farm_id)
-    
-            return redirect('LED_control')
-        else:
-            context = {
-                'segment': 'LED_control',
-                'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id,
-                'user_company':user_company,
-                'display_message': '農家を選んで下さい',
-                'users_list':users_list
-                }
-            return render(request,'home/LED-control.html', context)
+
+        return redirect('LED_control')
+      
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
@@ -509,7 +445,7 @@ def plant_setting(request):
         plant_list = Plant.objects.all().order_by('plant_id')
         for plant in plant_list:
             plant.active_houses_count = plant.house_set.filter(is_active=True).count()
-        page = Paginator(plant_list, 5)
+        page = Paginator(plant_list, 10)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
         context = {'segment':'plant_settings', 'plant_list': plant_list,'page': page,'user_profile_image': user_profile_image,'user_role_id':user_role_id,'user_company':user_company,}
@@ -586,108 +522,77 @@ def house_list(request, farm_id=None):
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         user_company = request.session.get('user_company')
-        selected_farm_name = None
-        selected_farm_id = request.GET.get('farm_id') or farm_id
-        users_list = User.objects.filter(profile__role_id='1',is_active = True)
-        for user in users_list:
-            user.company = Company.objects.get(user=user)
-        user_id = request.GET.get('user')
-        selected_user_name = None
-        farms = []
-        if user_role_id == '1':
-            farms = Farm.objects.filter(user_id=request.user.id)
-            
-        elif user_role_id == '0':
-            if user_id:
-                farms = Farm.objects.filter(user_id = user_id,is_active = True)
-                selected_user_name = Company.objects.get(user_id=user_id).company_name
-            else:
-                farms = Farm.objects.filter(is_active = True)             
-
-        if len(farms) > 0:
-            if selected_farm_id:
-                houses = House.objects.filter(farm_id=selected_farm_id).select_related('plant')
-                selected_farm = Farm.objects.get(pk=selected_farm_id)
-                selected_farm_name = selected_farm.farm_name  
-            else:
-                if user_role_id == '0':
-                    houses = []
-                    for farm in farms:
-                        house = House.objects.filter(farm_id=farm.farm_id).select_related('plant')
-                        houses.extend(house)
-                elif user_role_id == '1':
-                    houses = []
-                    for farm in farms:
-                        house = House.objects.filter(farm_id=farm.farm_id).select_related('plant')
-                        houses.extend(house)
-
-            page = Paginator(houses, 5)
-            page_list = request.GET.get('page')
-            page = page.get_page(page_list) 
-            context = {
-                'farms': farms,
-                'houses': houses,
-                'selected_farm_name': selected_farm_name,
-                'page': page,
-                'selected_farm_id': selected_farm_id,
-                'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id,
-                'user_company':user_company,
-                'users_list':users_list,
-                'user_id':user_id,
-                'selected_user_name':selected_user_name,
-                'farm_id':farm_id,
-                }
-            
-            if request.method == "GET":
-                html_template = loader.get_template('home/house-list.html')
-                return HttpResponse(html_template.render(context, request))
-
-            elif request.method == "POST":
-                house_id = request.POST.get('house_id')
-                farm_id = request.POST.get('farm_id')
-                selected_farm_id = request.GET.get('farm_id') or farm_id
-                if house_id and farm_id:
-                    house = House.objects.get(pk=house_id, farm_id=farm_id)
-
-                    if house.is_active:  
-                        house.is_active = False  # Set to False
-                        house.save()
-
-                        leds = LED.objects.filter(pole__line__house_id=house.house_id)
-                        for led in leds:
-                            button_no = led.button_no
-                            print(f"Button No: {button_no}")
-                            # Publish data to MQTT
-                            publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no, "status": False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
-                            led.is_on = False
-                            led.save() 
-                        house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
-                        messages.success(request, house_success_msg)
-            
-                    else:
-                        house.is_active = True  # Set to True
-                        house.save()
-                        house_success_msg = f"{house.house_name} ハウスが活性化されました。"        #House Status is set to ON
-                        messages.success(request, house_success_msg)            
-
-                if selected_farm_id and user_role_id == '0':
-                    user_id = request.GET.get('user')
-                    return redirect(f'/house_list_with_farm?user={user_id}', farm_id=selected_farm_id)
-                elif user_role_id == '1':
-                    return redirect('house_list_with_farm', farm_id=selected_farm_id)
-                else:
-                    return redirect('house_list')
-
-            return redirect('house_list')
-        else:
-            context = {
-                'user_profile_image': user_profile_image,
-                'user_role_id':user_role_id,
-                'user_company':user_company,
-                }
-            return render(request,'home/house-list.html',context)
         
+        #Company Filter
+        list = True
+        house_list = True
+        users_list, user_id, selected_user_name, farms = company_filter(user_role_id, request,list)   
+        selected_farm_id = request.GET.get('farm_id') or farm_id      
+        
+        #House Filter
+        houses,selected_farm_name,display_message = house_filter(user_role_id, farms, request, selected_farm_id,house_list)
+
+        page = Paginator(houses, 10)
+        page_list = request.GET.get('page')
+        page = page.get_page(page_list) 
+        context = {
+            'farms': farms,
+            'houses': houses,
+            'selected_farm_name': selected_farm_name,
+            'page': page,
+            'selected_farm_id': selected_farm_id,
+            'user_profile_image': user_profile_image,
+            'user_role_id':user_role_id,
+            'user_company':user_company,
+            'users_list':users_list,
+            'user_id':user_id,
+            'selected_user_name':selected_user_name,
+            'farm_id':farm_id,
+            }
+            
+        if request.method == "GET":
+            html_template = loader.get_template('home/house-list.html')
+            return HttpResponse(html_template.render(context, request))
+
+        elif request.method == "POST":
+            house_id = request.POST.get('house_id')
+            farm_id = request.POST.get('farm_id')
+            selected_farm_id = request.GET.get('farm_id') or farm_id
+            user_id = Farm.objects.get(pk=farm_id).user_id
+            if house_id and farm_id:
+                house = House.objects.get(pk=house_id, farm_id=farm_id)
+
+                if house.is_active:  
+                    house.is_active = False  # Set to False
+                    house.save()
+
+                    leds = LED.objects.filter(pole__line__house_id=house.house_id)
+                    for led in leds:
+                        button_no = led.button_no
+                        print(f"Button No: {button_no}")
+                        # Publish data to MQTT
+                        publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no, "status": False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                        led.is_on = False
+                        led.save() 
+                    house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
+                    messages.success(request, house_success_msg)
+        
+                else:
+                    house.is_active = True  # Set to True
+                    house.save()
+                    house_success_msg = f"{house.house_name} ハウスが活性化されました。"        #House Status is set to ON
+                    messages.success(request, house_success_msg)            
+
+            if selected_farm_id and user_role_id == '0':
+                url = reverse('house_list_with_farm', kwargs={'farm_id': selected_farm_id}) + f'?user={user_id}'
+                return redirect(url)
+            elif user_role_id == '1':
+                 return redirect('house_list_with_farm', farm_id=selected_farm_id)
+            else:
+                return redirect('house_list')
+
+        return redirect('house_list')
+
     except BrokenPipeError as e:
         print('exception BrokenPipeError', e)
         return HttpResponseServerError()
@@ -728,7 +633,8 @@ def add_house(request):
         html_template = loader.get_template('home/add-house.html')
         return HttpResponse(html_template.render(context, request))
     else:
-        user_id = request.POST.get("farmerId")
+        user_id_get = request.POST.get("farmerId")
+        user_id_list = user_id_get.split(",") if user_id_get else []
         house_name = request.POST.get("houseNameReg")
         plant_id = request.POST.get("plantIdReg")
         farm_id = request.POST.get("farmIdReg")
@@ -746,17 +652,17 @@ def add_house(request):
             total_pole_count=sum_pole_counts,  
             total_leds=sum_led_counts,  
             is_active=True
-
         )
-        if user_id:
-            user = User.objects.get(pk=user_id)
-            house.user = user
+        
         if plant_id:
             house.plant_id = plant_id
         if farm_id:
             farm_id
             house.farm_id = farm_id
         house.save()
+        for user_id in user_id_list:
+            each_user = User.objects.get(pk=user_id).id
+            house.user.add(each_user)
              
         for i in range(1, lane_count + 1):
             line = Line(
@@ -854,26 +760,16 @@ def farm_list(request):
         user_role_id = request.session.get('role_id')
         user_company = request.session.get('user_company')
         if request.method == "GET":
-            users_list = User.objects.filter(profile__role_id='1', is_active=True)
-            for user in users_list:
-                user.company = Company.objects.get(user=user)
-            user_id = request.GET.get('user')
-            selected_user_name = None
-            if user_role_id == '1':
-                farm_list = Farm.objects.filter(user_id = request.user.id).order_by('farm_id')
-            elif user_role_id == '0':
-                if user_id:
-                    farm_list = Farm.objects.filter(user_id = user_id,is_active=True)
-                    selected_user_name = Company.objects.get(user_id=user_id).company_name
-                else:
-                    farm_list = Farm.objects.filter(is_active=True)
+            #Company Filter
+            list = True
+            users_list, user_id, selected_user_name, farms = company_filter(user_role_id, request,list)   
                     
             page_number = request.GET.get('page', 1)
-            paginator = Paginator(farm_list, 5)
+            paginator = Paginator(farms, 10)
             page = paginator.get_page(page_number)
             context = {
                 'segment': 'farm_list',
-                'farm_list': farm_list,
+                'farm_list': farms,
                 'page': page,
                 'user_profile_image': user_profile_image,
                 'user_role_id': user_role_id,
