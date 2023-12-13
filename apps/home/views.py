@@ -535,7 +535,7 @@ def house_list(request, farm_id=None):
         for house in houses:
             house.user_count = house.user.count()
             if house.user_count == 0:
-                house.user_count = '自分'
+                house.user_count = '管理者'
 
         page = Paginator(houses, 10)
         page_list = request.GET.get('page')
@@ -696,8 +696,12 @@ def add_house(request):
             house.user.add(each_user)
                     
         house_success_msg ="ハウスが正常に追加されました。"        #House is added Successfully
-        messages.success(request, house_success_msg)  
-        return redirect('house_list_with_farm', farm_id=farm_id)
+        messages.success(request, house_success_msg)
+        if user_role_id == '0':
+            user_id = request.GET.get('user') 
+            return redirect(f'/house_list?user={user_id}')
+        elif user_role_id == '1':
+            return redirect('house_list_with_farm', farm_id=farm_id)
 
 # update house 
 @login_required(login_url="/login/")
