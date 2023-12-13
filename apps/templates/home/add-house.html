@@ -46,7 +46,7 @@
     }
 
     .signup-step-container {
-        padding: 50px 0px;
+        padding: 42px 0px 0px 0px;
     }
 
     /* .wizard {
@@ -341,6 +341,17 @@
         justify-content: space-between;
     }
 
+    .static-vertical-line {
+        border-left: 2px solid black;
+        min-height: 250px;
+        margin: 48px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+    }
+
     .verticalLineContainer {
         display: flex;
         align-items: center;
@@ -366,6 +377,19 @@
     }
 
     .generated-div input {
+        padding: 10px;
+        margin-left: -20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 45px;
+        position: relative;
+        left: -70px;
+        margin: 4px;
+        text-align: center;
+    }
+
+    .static-generated-div input {
         padding: 10px;
         margin-left: -20px;
         border: 1px solid #ddd;
@@ -451,10 +475,10 @@
                         <div class="tab-content" id="main_form">
                             <!-- ハウス名登録 -->
                             <div class="tab-pane active" role="tabpanel" id="step1">
-                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}ハウス名登録</h4>
+                                <h4 class="text-center mt-2">{% if selected_user_name %}{{ selected_user_name }} - {% endif %}ハウス名登録</h4>
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label class=" bmd-label-floating">担当者名</label>
                                             <select name="userName" class="form-control" id="user_name">
@@ -473,7 +497,7 @@
                                 </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group">
                                         <label id="sample" class=" bmd-label-floating">ハウス名 <span
                                                 class="text-danger">*</span></label>
@@ -486,7 +510,7 @@
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
 
-                                <div class="col-md-3 mt-4">
+                                <div class="col-md-3 mt-3">
                                     <div class="form-group">
                                         <label class=" bmd-label-floating">作物名 <span
                                                 class="text-danger">*</span></label>
@@ -505,7 +529,7 @@
                                     </div>
 
                                 </div>
-                                <div class="col-md-3 mt-4">
+                                <div class="col-md-3 mt-3">
                                     <div class="form-group">
                                         <label class=" bmd-label-floating">農場名 <span
                                                 class="text-danger">*</span></label>
@@ -525,7 +549,7 @@
 
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group text-gray">
                                         <label class=" bmd-label-floating" for="memo">メモ</label>
                                         <textarea name="memo" class="form-control" id="memo" rows="3"
@@ -546,10 +570,10 @@
                         </div>
                             <!-- レーン・ポール・LED追加 -->
                             <div class="tab-pane" role="tabpanel" id="step2">
-                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %}レーン・ポール・LED追加</h4>
+                                <h4 class="text-center mt-2">{% if selected_user_name %}{{ selected_user_name }} - {% endif %}レーン・ポール・LED追加</h4>
                                 <div class="row text-left" id="lineAddViewHide">
                                     <div class="col-md-3"></div>
-                                        <div class="col-md-6 mt-4">
+                                        <div class="col-md-6 mt-3">
                                                 <div class="form-group">
                                                     <label class=" bmd-label-floating">レーンの数 <span class="text-danger">*</span></label>
                                                     <input class="form-control" id="N-leanCount" type="number" name="leanCount"
@@ -560,7 +584,7 @@
                                     </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group">
                                         <label class=" bmd-label-floating">１レーンのポールの数 <span
                                                 class="text-danger">*</span></label>
@@ -571,7 +595,7 @@
                                 </div>
                                 <div class="col-md-3"></div>
                                 <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group">
                                         <label class=" bmd-label-floating">1ポールのLEDの数 <span
                                                 class="text-danger">*</span></label>
@@ -586,15 +610,14 @@
                                     </button>
                                 </div>
                             </div>
-
+                            <!-- custom house section  -->
                             <div class="row justify-content-center align-items-center" id="lineAddViewShow">
                                 <div class="col-md-3"></div>
-                                <div class="col-md-6 mt-4">
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group text-left">
                                         <label class=" bmd-label-floating">レーンの数</label>
                                         <input class="form-control" type="number" id="verticalCount" placeholder="" />
                                         <span class="text-danger" id="customleanMsg"></span>
-
                                     </div>
                                     <span class="text-danger" id="poleMsg"></span>
                                 </div>
@@ -602,14 +625,12 @@
                                 <div class="col-1.5"></div>
                                 <div class="col-9 mt-4">
                                     <div id="customVerticalLineContainer" class="verticalLineContainer">
-
                                     </div>
                                     <div id="customInputs" class="inputLayout"></div>
-
                                 </div>
                                 <div class="col-1.5"></div>
                             </div>
-
+                            <!-- custom house section  -->
                             <ul class="list-inline pull-right">
                                 <li>
                                     <button type="button" id="lineBackBtn-1" class="default-btn prev-step">
@@ -635,8 +656,8 @@
                         </div>
                     
                         <!--preview Modal -->
-                        <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal fade bd-example-modal-lg" id="previewModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">プレビュー</h5>
@@ -654,6 +675,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-Secondary" data-dismiss="modal">閉じる</button>
+                                      </div>
                                 </div>
                             </div>
                         </div>
@@ -661,13 +685,13 @@
 
                         <div class="tab-pane" role="tabpanel" id="step3">
 
-                                <h4 class="text-center mt-3">{% if selected_user_name %}{{ selected_user_name }}　-　{% endif %} 確認 </h4>
+                                <h4 class="text-center mt-2">{% if selected_user_name %}{{ selected_user_name }} - {% endif %} 確認 </h4>
                                 <span class="text-danger" id="regMsg"></span>
                                 <form action="" method="post" id="" role="form" autocomplete="off">
                                     {% csrf_token %}
                                 <div class="row text-left">
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-3 mt-4">
+                                    <div class="col-md-3 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ユーザー名</label>
                                             <input class="form-control" id="userNameReg" type="text" name="userNameReg"
@@ -675,7 +699,7 @@
                                             <input type="hidden" id="farmerId" name="farmerId">
                                         </div>
                                     </div>
-                                    <div class="col-md-3 mt-4">
+                                    <div class="col-md-3 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">農場名</label>
                                             <input class="form-control" type="text" id="farmNameReg" name="farmNameReg"
@@ -685,7 +709,7 @@
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-3 mt-4">
+                                    <div class="col-md-3 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ハウス名</label>
                                             <input class="form-control" type="text" id="houseNameReg"
@@ -694,7 +718,7 @@
 
                                         </div>
                                     </div>
-                                    <div class="col-md-3 mt-4">
+                                    <div class="col-md-3 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">作物名</label>
                                             <input class="form-control" type="text" id="plantNameReg"
@@ -704,7 +728,7 @@
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">レーンの数</label>
                                             <input class="form-control" type="text" id="laneCountReg" name="laneCount"
@@ -713,7 +737,7 @@
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ポールの数</label>
                                             <input class="form-control" type="text" name="laneCountPerPole" id="polePLC"
@@ -723,7 +747,7 @@
                                     </div>
                                     <div class="col-md-3"></div>
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">LEDの数</label>
                                             <input class="form-control" type="text" name="ledCountPerpole" id="ledPPC"
@@ -734,7 +758,7 @@
                                     <div class="col-md-3"></div>
 
                                     <div class="col-md-3"></div>
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6 mt-3">
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating" for="memoReg">メモ</label>
                                             <textarea name="memoReg" class="form-control" id="memoReg"
@@ -1039,29 +1063,29 @@
         var count = document.getElementById("N-leanCount").value;
         var lines = "";
         for (var i = 0; i < count; i++) {
-            lines += `<div class='vertical-line'><input value='' disabled type='text' class='dynamic-input' placeholder='数'/></div>`;
+            lines += `<div class='static-vertical-line'><input value='' disabled type='text' id='Line_${i}' class='static-input' placeholder='数'/></div>`;
         }
         $("#staticVerticalLineContainer").html(lines);
     })
     // lean input value assign and pole input creation 
     npole.addEventListener('input', function () {
-        var contentDivs = document.querySelectorAll('.vertical-line');
+        var contentDivs = document.querySelectorAll('.static-vertical-line');
         contentDivs.forEach((node) => {
             node.removeAttribute('style')
         });
         var inputValues = [];
-        $(".dynamic-input").each(function (index, element) {
+        $(".static-input").each(function (index, element) {
             $(element).val(npole.value)
             inputValues.push($(element).val());
         });
-        $(".vertical-line").each(function (index, element) {
+        $(".static-vertical-line").each(function (index, element) {
             var count = inputValues[index];
             var childNode = $(element);
-            childNode.children('.generated-div').remove(); // Remove previously generated divs
+            childNode.children('.static-generated-div').remove(); // Remove previously static-generated-div divs
             if (count !== "") {
                 for (var j = 0; j < parseInt(count); j++) {
-                    var newNode = $("<div class='generated-div'></div>").css("background-color", 'white');
-                    var inputNode = $(`<input value='' disabled class='poleInput' placeholder='数'/>`);
+                    var newNode = $("<div class='static-generated-div'></div>").css("background-color", 'white');
+                    var inputNode = $(`<input value='' disabled id='LED_${j}' class='staticPoleInput' placeholder='数'/>`);
                     newNode.append(inputNode);
                     childNode.append(newNode);
                 }
@@ -1071,12 +1095,14 @@
     // LED value assignment 
     nled.addEventListener('input', function () {
         $('#previewBtn').show();
-        var poleInputElement = $('.poleInput');
+        var poleInputElement = $('.staticPoleInput');
         poleInputElement.each(function (index, element) {
             $(element).val(nled.value)
         });
     })
     // <######################### preview static lean layout #########################> 
+
+    // validation check for all inputs while register the form
     document.getElementById('LEDCountGen').addEventListener('click', function () {
 
         var nlean = document.getElementById("N-leanCount").value;

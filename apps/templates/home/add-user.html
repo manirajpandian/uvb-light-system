@@ -54,8 +54,7 @@
 
             {% else %}
             <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>
-            <input type="email" id="email" class="form-control" name="email" value="{{ email }}"
-              maxlength="253">
+            <input type="text" id="email" class="form-control" name="email" value="{{ email }}" maxlength="253">
             {% endif %}
           </div>
           <span id="emailMsg" class="text-danger"></span>
