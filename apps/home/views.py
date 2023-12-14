@@ -977,37 +977,49 @@ def delete_house(request, house_id, farm_id):
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
         return HttpResponseServerError()
+from urllib.parse import quote
 
-# download
 @login_required(login_url='/login/')
 def LED_data_download(request):
     try:
-        sensor = data.objects.all()
-        house_id = request.GET.get('house_id')  # Convert house_id to an integer
-        LEDs = LED.objects.all()
-        # print('house_id',house_id)
+        house_id = request.GET.get('house_id')
+        house = House.objects.get(house_id=house_id)
+        # print('house', house.house_name)
+        now = timezone.now()
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Replace spaces with underscores and keep colons
+        formatted_date = formatted_date.replace('_', ':')
+
+        # print('formatted_date',formatted_date)
+        
+        file_name = f"{quote(house.house_name)}_{formatted_date}.csv"
+
+        # print('file_name>>>>>>>>>', file_name)
+        LEDs = LED.objects.filter(led_id__startswith=house_id)  # Filter LEDs directly
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        # print('response>>>>>>>>>>>>>>>>>>>>>>>>>', response['Content-Disposition'])
+        csv_writer = csv.writer(response)
+        print('csv_writer',csv_writer)
+        csv_writer.writerow(['LED No', 'temperature', 'humidity', 'soil-moisture', 'ON', 'OFF'])
+
         for led in LEDs:
-            led_id_parts = led.led_id.split('-')[0]
-            if house_id == led_id_parts:
-                # print(f'Found match for house_id {house_id} with LED_data {led.led_id}')
-                filtered_LEDs = LED.objects.filter(led_id = led.led_id)
-                print('filtered_LEDs',filtered_LEDs)
+            filtered_LEDs = LED.objects.filter(led_id=led.led_id)
+            # print('filtered_LEDs', filtered_LEDs)
 
-        # response = HttpResponse(content_type='text/csv')
-        # response['Content-Disposition'] = 'attachment; filename="sensors_data.csv"'
-        # csv_writer = csv.writer(response)
-        # csv_writer.writerow(['LED_no', 'temperature', 'humidity' , 'soil-moisture', 'ON','OFF'])
+        for sdata in data.objects.all():
+            csv_writer.writerow([sdata.raspberry_id, sdata.date, sdata.temperature, sdata.humidity, sdata.soil_moisture])
+            print(csv_writer)
 
-        # for sdata in sensor :
-        #     csv_writer.writerow([sdata.raspberry_id ,sdata.date , sdata.temperature, sdata.humidity, sdata.soil_moisture])
-        #     print(csv_writer)
-        # return response
+        return response
 
     except BrokenPipeError as e:
-        print('Download api error>>',e)
+        print('Download API error:', e)
         pass
-    return HttpResponse("Error occurred during CSV download.")
 
+    return HttpResponse("Error occurred during CSV download.")
 
 
 

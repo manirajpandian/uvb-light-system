@@ -73,7 +73,7 @@
           <table class="table table-striped">
             <thead class="text-primary-emphasis table-success">
               <th>ID</th>
-              <th>会社名</th>
+              <th>農家名</th>
               <th>担当</th>
               <th>メール</th>
               <th>住所</th>
@@ -219,7 +219,7 @@
           <span id="errorMessage" class="text-danger">{{ error_message }}</span>
           {% endif %}
           <div class="my-4 form-group">
-            <label for="company_name" class="bmd-label-floating">会社名<span class="text-danger">*</span></label>
+            <label for="company_name" class="bmd-label-floating">農家名<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="companyName" maxlength=80 name="company_name"
               value="{{ company_name }}" />
             <span class="text-danger" id="companyNameMsg"></span>
@@ -246,7 +246,7 @@
         <div class="modal-footer">
           <a href="/farmer_list">
           <button type="button" class="btn btn-Secondary">
-            閉じる
+            キャンセル
           </button>
         </a>
           <button type="button" id="addButton" class="btn btn-success">
@@ -276,7 +276,7 @@
           <span id="errorMessage" class="text-danger">{{ error_message }}</span>
           {% endif %}
           <div class="my-4 form-group bmd-form-group is-filled is-focused">
-            <label for="company_name" class="bmd-label-floating">会社名<span class="text-danger">*</span></label>
+            <label for="company_name" class="bmd-label-floating">農家名<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="updateCompanyName" maxlength=80 name="company_name" value="" />
             <span class="text-danger" id="editCompanyNameMsg"></span>
           </div>
@@ -301,7 +301,7 @@
         <div class="modal-footer">
           <a href="/farmer_list">
             <button type="button" class="btn btn-Secondary">
-              閉じる
+              キャンセル
             </button>
           </a>
           <button type="button" id="updateSendButton" class="btn btn-success">

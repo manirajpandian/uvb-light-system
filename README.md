@@ -1,17 +1,8 @@
-# [Material Dashboard Django](https://www.creative-tim.com/product/material-dashboard-django) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/home?status=Material%20Dashboard,%20a%20free%20Material%20Bootstrap%204%20Admin%20Template%20%E2%9D%A4%EF%B8%8F%20https%3A//bit.ly/2Lyat1Y%20%23bootstrap%20%23material%20%23design%20%23developers%20%23freebie%20%20via%20%40CreativeTim)
-
- ![version](https://img.shields.io/badge/version-1.0.1-blue.svg) [![GitHub issues open](https://img.shields.io/github/issues/creativetimofficial/material-dashboard-django.svg?maxAge=2592000)](https://github.com/creativetimofficial/material-dashboard-django/issues?q=is%3Aopen+is%3Aissue) [![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/creativetimofficial/material-dashboard-django.svg?maxAge=2592000)](https://github.com/creativetimofficial/material-dashboard-django/issues?q=is%3Aissue+is%3Aclosed) [![Join the chat at https://gitter.im/NIT-dgp/General](https://badges.gitter.im/NIT-dgp/General.svg)](https://gitter.im/creative-tim-general/Lobby) [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/E4aHAQy)
-
-![Material Dashboard Django - Admin Dashboard coded in Django.](https://github.com/creativetimofficial/material-dashboard-django/blob/master/media/material-dashboard-django-intro.gif)
-
-<br />
-
 > Free product - **Django Dashboard** starter project - Features:
 
 - Up-to-date [dependencies](./requirements.txt): **Django 3.2.6 LTS**
 - [SCSS compilation](#recompile-css) via **Gulp**
-- UI Kit: **Material Dashboard** (Free Version) provided by **[Creative-Tim](https://www.creative-tim.com/)**
-- Django Codebase - provided by **[AppSeed](https://appseed.us/)**
+- Django Codebase 
 - UI-Ready app, SQLite Database, Django Native ORM
 - Modular design, clean code-base
 - Session-Based Authentication, Forms validation
@@ -19,26 +10,9 @@
 
 <br />
 
-## Table of Contents
-
-* [Demo](#demo)
-* [Quick Start](#quick-start)
-* [Documentation](#documentation)
-* [File Structure](#file-structure)
-* [Browser Support](#browser-support)
-* [Resources](#resources)
-* [Reporting Issues](#reporting-issues)
-* [Technical Support or Questions](#technical-support-or-questions)
-* [Licensing](#licensing)
-* [Useful Links](#useful-links)
-
-<br />
-
 ## Demo
 
-> To authenticate use the default credentials ***test / ApS12_ZZs8*** or create a new user on the [registration page](https://creativetim-django-dashboard-black-pro.appseed.us/register/).
-
-- **Material Dashboard Django** [Login Page](https://www.creative-tim.com/live/material-dashboard-django)
+- **Login UVB** [Login Page](http://52.192.209.112/login/)
 
 <br />
 
@@ -48,16 +22,16 @@
 
 ```bash
 $ # Get the code
-$ git clone https://github.com/creativetimofficial/material-dashboard-django.git
-$ cd material-dashboard-django
+$ git clone https://github.com/manirajpandian/uvb-light-system.git
+$ cd uvb-light-system
 $
 $ # Virtualenv modules installation (Unix based systems)
 $ virtualenv env
 $ source env/bin/activate
 $
 $ # Virtualenv modules installation (Windows based systems)
-$ # virtualenv env
-$ # .\env\Scripts\activate
+$ python -m venv env
+$ .\env\Scripts\activate
 $
 $ # Install modules - SQLite Storage
 $ pip3 install -r requirements.txt
@@ -65,23 +39,20 @@ $
 $ # Create tables
 $ python manage.py makemigrations
 $ python manage.py migrate
+$
 $ # for recreating the database
 $ python manage.py migrate --run-syncdb 
+$
 $ # Start the application (development mode)
 $ python manage.py runserver # default port 8000
 $
 $ # Start the app - custom port
-$ # python manage.py runserver 0.0.0.0:<your_port>
+$ python manage.py runserver 0.0.0.0:<your_port>
 $
-$ # Access the web app in browser: http://127.0.0.1:8000/
+$  Access the web app in browser: http://127.0.0.1:8000/
 ```
 
-> Note: To use the app, please access the registration page and create a new user. After authentication, the app will unlock the private pages.
-
-<br />
-
-## Documentation
-The documentation for the **Material Dashboard Django** is hosted at our [website](https://demos.creative-tim.com/material-dashboard-django/docs/1.0/getting-started/getting-started-django.html).
+> Note: To use the app, please access the login page and login your provided credentials. After authentication, the app will unlock the private pages.
 
 <br />
 
