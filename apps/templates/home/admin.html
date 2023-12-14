@@ -197,14 +197,13 @@
                     <div class="modal-dialog" role="document">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel"><span class="text-danger"
-                              id="userNameSpan"></span> - 削除</h5>
+                          <h5 class="modal-title" id="exampleModalLabel">{% if user_role_id == '0' %}管理者{% else %}ユーザー{% endif %}削除</h5>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
                         <div class="modal-body">
-                          <span class="text-danger" id="deletecontent"></span> ユーザを削除してもよろしいですか？
+                          <span class="text-danger" id="deletecontent"></span> {% if user_role_id == '0' %}管理者{% else %}ユーザー{% endif %}『<span id="userNameSpan"></span>』を削除してもよろしいですか？
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-Secondary" data-dismiss="modal">キャンセル</button>
