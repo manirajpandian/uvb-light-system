@@ -167,13 +167,13 @@
               <tr>
                 <td>{{ farm.farm_name }}</td>
                 <td>{{ farm.address }}</td>
-
+                
                 <td>
                 <!--Update Modal trigger-->
                   <a id="updatedButton" style="cursor: pointer;" class="text-warning" data-toggle="modal" data-edit-farm-id="{{farm.farm_id}}" data-farm-name='{{ farm.farm_name }}' data-farm-address='{{ farm.address }}' data-target="#updateFarmModal" >
                     <span>編集</span> 
                   </a>&nbsp; &nbsp;|&nbsp;&nbsp;
-                  <span class="text-danger deleteButton" style="cursor: pointer;" data-farm-id="{{ farm.farm_id }}" data-farm-name="{{ farm.farm_name }}" data-farm-address='{{ farm.address }}'>削除</span>
+                  <span class="text-danger deleteButton" style="cursor: pointer;" data-farm-id="{{ farm.farm_id }}" data-farm-name="{{ farm.farm_name }}" data-farm-address='{{ farm.address }}' data-ledoncount='{{ farm.ledoncount }}'>削除</span>
                 </td>
                 {% endfor %}
             </tbody>
@@ -242,13 +242,13 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><span class="text-danger" id="deleteModalTitle"></span> - 削除</h5>
+        <h5 class="modal-title">削除 - <span class="text-danger" id="deleteModalTitle"></span></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        農場<span id="deleteNameSpan"></span> を削除してもよろしいですか？
+        <span class="text-danger" id="deletecontent"></span>農場を削除してもよろしいですか
       </div>
       <div class="modal-footer">
         <form id="deleteForm" method="post">
@@ -443,6 +443,10 @@
       button.addEventListener("click", function () {
         currentFarmId = this.getAttribute("data-farm-id");
         let deletedName = this.getAttribute("data-farm-name");
+        let ledoncount = this.getAttribute("data-ledoncount");
+        if (ledoncount > 0) {
+          document.getElementById("deletecontent").innerText = '農場にはLEDがONになっています。'
+        }
         document.getElementById("deleteModalTitle").innerText = `${deletedName}`;
         $("#deleteModal").modal("show");
       });

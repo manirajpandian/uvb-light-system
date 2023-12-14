@@ -117,12 +117,20 @@ def index(request,farm_id=None):
 
         #Super Admin login
         elif user_role_id =='0': 
-            admin_count = User.objects.filter(profile__role_id=1,is_active=True).count()
-            farm_count = Farm.objects.filter(is_active=True).count()
-            plant_count = Plant.objects.all().count()
-            house_count = House.objects.filter(is_active=True).count()
-            led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
-            led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
+            user_id = request.GET.get('user')
+            if user_id:
+                farm_count = Farm.objects.filter(user__id=user_id,is_active=True).count()
+                house_count = House.objects.filter(farm__user__id=user_id).count()
+                led_on_count = LED.objects.filter(pole__line__house__farm__user_id=user_id,is_on=True,pole__line__house__is_active=True).count()
+                led_full_count = LED.objects.filter(pole__line__house__farm__user_id=user_id,pole__line__house__is_active=True).count()
+
+            else:   
+                admin_count = User.objects.filter(profile__role_id=1,is_active=True).count()
+                farm_count = Farm.objects.filter(is_active=True).count()
+                plant_count = Plant.objects.all().count()
+                house_count = House.objects.filter(is_active=True).count()
+                led_on_count = LED.objects.filter(is_on=True,pole__line__house__is_active=True).count()
+                led_full_count = LED.objects.filter(pole__line__house__is_active=True).count()
 
         elif user_role_id =='2' :
             house_count = House.objects.filter(user=current_user_id,is_active=True).count()
@@ -531,11 +539,13 @@ def house_list(request, farm_id=None):
         
         #House Filter
         houses,selected_farm_name,display_message = house_filter(user_role_id, farms, request, selected_farm_id,house_list)
-
+     
         for house in houses:
             house.user_count = house.user.count()
             if house.user_count == 0:
                 house.user_count = '管理者'
+            house.ledoncount = LED.objects.filter(pole__line__house__house_id=house.house_id, is_on=True).count()
+             
 
         page = Paginator(houses, 10)
         page_list = request.GET.get('page')
@@ -787,7 +797,10 @@ def farm_list(request):
             #Company Filter
             list = True
             users_list, user_id, selected_user_name, farms = company_filter(user_role_id, request,list)   
-                    
+
+            for farm in farms:
+                farm.ledoncount = LED.objects.filter(pole__line__house__farm__farm_id=farm.farm_id, is_on=True).count()
+
             page_number = request.GET.get('page', 1)
             paginator = Paginator(farms, 10)
             page = paginator.get_page(page_number)

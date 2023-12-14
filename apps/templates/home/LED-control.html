@@ -178,9 +178,9 @@
               <button class="{% if house == houses.0 and line == house.lines.all.0 %}btn btn-link{% else %}btn btn-link collapsed{% endif %}" 
               type="button" data-toggle="collapse" data-target="#collapse{{ line.line_id }}" aria-expanded="{% if house == houses.0 and line == house.lines.all.0 %}true{% else %}false{% endif %}"
                aria-controls="collapse{{ line.line_id }}">
-               
-               <h4 class="card-title">レーン&nbsp;{{ line.line_id|slice:'-1:' }}</h4>
-
+              
+               <h4 class="card-title">レーン&nbsp;{{ line.line_id }}</h4>
+           
 
               </button>
             </h2>
@@ -200,7 +200,7 @@
                     {% for pole in line.poles.all|dictsort:"pole_id" %}
                         {% for led in pole.leds.all|dictsort:"led_id" %}
                             <tr>
-                              <td>{{ led.led_id|cut:'-'|slice:'1:'|join:'-' }}</td>
+                              <td>{{ led.led_id }}</td>
                               <td>{{ led.led_on_date|date:"Y/m/d H:i"  }}</td>
                               <td>{{ led.led_off_date|date:"Y/m/d H:i" }}</td>
                                 <td>

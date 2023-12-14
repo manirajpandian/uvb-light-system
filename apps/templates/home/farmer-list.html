@@ -113,7 +113,7 @@
                   &nbsp; &nbsp;|&nbsp;&nbsp;
                   <a href="#" data-toggle="modal" class="text-danger deleteButton" data-target="#farmerDeleteModal"
                     data-user-id="{{ user.id }}" data-csrf-token="{{ csrf_token }}"
-                    data-first-name="{{ company.company_name }}" data-page-number="{{ page.number }}"><span>削除</span>
+                    data-first-name="{{ company.company_name }}" data-page-number="{{ page.number }}" data-ledoncount="{{ company.ledoncount }}"><span>削除</span> 
                   </a>
                 </td>
               </tr>
@@ -146,7 +146,7 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <span class="text-danger" id="userNameSpan2"></span> を削除してもよろしいですか？
+                  <span class="text-danger" id="deletecontent"></span>農家を削除してもよろしいですか？
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-Secondary" data-dismiss="modal">キャンセル</button>
@@ -343,7 +343,6 @@
     const deleteButtons = document.querySelectorAll(".deleteButton");
     const deleteForm = document.getElementById("deleteForm");
     const userNameSpan = document.getElementById("userNameSpan");
-    const userNameSpan2 = document.getElementById("userNameSpan2");
     var error_message = '{{ error_message }}'
     var loading = '{{ loading }}'
     var pageNumber = 0
@@ -425,8 +424,11 @@
         currentUserId = this.getAttribute("data-user-id");
         const userName = this.getAttribute("data-first-name");
         pageNumber = this.getAttribute("data-page-number");
+        let ledoncount = this.getAttribute("data-ledoncount");
+        if (ledoncount > 0){
+          document.getElementById("deletecontent").innerText = 'LEDがONになっています。'
+        }
         userNameSpan.innerHTML = userName;
-        userNameSpan2.innerHTML = userName;
 
         $("#farmerDeleteModal").modal("show");
       });

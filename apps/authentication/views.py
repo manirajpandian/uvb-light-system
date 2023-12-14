@@ -8,14 +8,15 @@ from .forms import LoginForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 import uuid
-from apps.authentication.models import Profile, Company, Farm, House
+from apps.authentication.models import Profile, Company, Farm, House, LED
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .helpers import send_forgot_password_mail, add_new_user_mail
 import datetime
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
 import random
+from django.db import models
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -78,6 +79,9 @@ def user_list(request):
         else:
             profile_list = Profile.objects.filter(Q(user=current_user) | Q(mapped_under=current_user)).order_by('id')
             user_profile_list = [(profile.user, profile) for profile in profile_list]
+            for user, profile in user_profile_list:
+                user.housecount = House.objects.filter(user__id=user.id).count()
+
         paginator = Paginator(user_profile_list, 10)
         page_number = request.GET.get('page')
         page = paginator.get_page(page_number)
@@ -448,6 +452,11 @@ def farmer_list(request):
 
         # Filter companies based on profile role_id
         company_list = [(company.user, company) for company in company_obj if company.user.profile.role_id == '1']
+
+        for user, company in company_list:
+            farms = Farm.objects.filter(user_id=user.id)
+            company.ledoncount = farms.aggregate(total_led_count=Count('houses__lines__poles__leds', filter=models.Q(houses__lines__poles__leds__is_on=True)))['total_led_count'] or 0
+            
 
         # Paginate the filtered company list
         paginator = Paginator(company_list, 10)
