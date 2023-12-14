@@ -178,7 +178,7 @@
                 <td>
                   <a class="text-warning" href="/update_house/{{house.house_id}}">編集</a>&nbsp; &nbsp;|&nbsp;&nbsp;
                   <a href="#" class="text-danger deleteButton" data-house-name="{{ house.house_name }}"
-                    data-house-id="{{ house.house_id }}" data-farm-id="{{ house.farm.farm_id }}">削除</a>
+                    data-house-id="{{ house.house_id }}" data-farm-id="{{ house.farm.farm_id }}" data-ledon-house="{{ house.ledoncount }}">削除</a>
                 </td>
               </tr>
               {% endfor %}
@@ -257,7 +257,8 @@
                 </div>
                 <div class="modal-body">
                   <!-- Are you sure you want to delete this house? -->
-                  ハウス『 <span id="houseNameSpan"></span> 』を削除してもよろしいですか？<br>
+                  <span class= text-danger id="deletecontent"></span>
+                  ハウス『 <span id="houseNameSpan"></span> 』を削除してもよろしいですか<br>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-Secondary" data-dismiss="modal">キャンセル</button>
@@ -304,6 +305,10 @@
         currentHouseId = this.getAttribute("data-house-id");
         const houseName = this.getAttribute("data-house-name");
         currentFarmId = this.getAttribute("data-farm-id");
+        let ledoncount = this.getAttribute('data-ledon-house');
+        if (ledoncount > 0) {
+          document.getElementById("deletecontent").innerText = 'ハウスにはLEDがONになっています。'
+        }
         houseNameSpan.textContent = houseName;
         $("#deleteModal").modal("show");
       });

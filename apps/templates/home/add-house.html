@@ -674,7 +674,7 @@
                                     </button>
                                 </li>
                                 <li>
-                                    <button type="button" id="lineBackBtn-2" class="btn btn-warning">
+                                    <button type="button" id="lineBackBtn-2" class="btn btn-Secondary">
                                         戻る
                                     </button>
                                 </li>
@@ -731,7 +731,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">担当者名</label>
                                             <input class="form-control" id="userNameReg" type="text" name="userNameReg"
-                                                placeholder="" value="" />
+                                                placeholder="" value="" readonly />
                                             <input type="hidden" id="farmerId" name="farmerId">
                                         </div>
                                     </div>
@@ -739,7 +739,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">農場名</label>
                                             <input class="form-control" type="text" id="farmNameReg" name="farmNameReg"
-                                                placeholder="" />
+                                                placeholder="" readonly />
                                             <input type="hidden" id="farmIdReg" name="farmIdReg">
                                         </div>
                                     </div>
@@ -749,7 +749,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ハウス名</label>
                                             <input class="form-control" type="text" id="houseNameReg"
-                                                name="houseNameReg" placeholder="" />
+                                                name="houseNameReg" placeholder=""  readonly />
 
 
                                         </div>
@@ -758,7 +758,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">作物名</label>
                                             <input class="form-control" type="text" id="plantNameReg"
-                                                name="plantNameReg" placeholder="" />
+                                                name="plantNameReg" placeholder=""  readonly  />
                                             <input type="hidden" id="plantIdReg" name="plantIdReg">
                                         </div>
                                     </div>
@@ -768,7 +768,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">レーンの数</label>
                                             <input class="form-control" type="text" id="laneCountReg" name="laneCount"
-                                                placeholder="" />
+                                                placeholder=""  readonly />
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -777,7 +777,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">ポールの数</label>
                                             <input class="form-control" type="text" name="laneCountPerPole" id="polePLC"
-                                                placeholder="" />
+                                                placeholder=""  readonly />
                                             <input type="hidden" id="arrayPolePLC" name="arrayPolePLC">
                                         </div>
                                     </div>
@@ -787,7 +787,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating">LEDの数</label>
                                             <input class="form-control" type="text" name="ledCountPerpole" id="ledPPC"
-                                                placeholder="" />
+                                                placeholder=""  readonly />
                                             <input type="hidden" id="arrayLED" name="arrayLED">
                                         </div>
                                     </div>
@@ -798,7 +798,7 @@
                                         <div class="form-group bmd-form-group is-focused">
                                             <label class=" bmd-label-floating" for="memoReg">メモ</label>
                                             <textarea name="memoReg" class="form-control" id="memoReg"
-                                                rows="3"></textarea>
+                                                rows="3" readonly></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-3"></div>
@@ -1440,7 +1440,7 @@
 
 
 
-
+    
 </script>
 
 {% endblock javascripts %}

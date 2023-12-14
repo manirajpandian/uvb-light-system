@@ -16,8 +16,32 @@
 </style>
 {% endblock stylesheets %} 
 {% block content %}
-<div class="row justify-content-start">
+<div class="d-flex align-items-center justify-content-end mb-3">
+<div class="justify-content-start w-100 d-none d-md-block">
+  <h3 class="justify-content-start d-none d-md-block text-truncate" style="max-width: 100dvw;">{% if selected_user_name %}{{ selected_user_name }}{% endif %}</h3>
+</div>
+  {% if user_role_id == '0'%}
+    <div class="d-flex align-items-center justify-content-end  ">
+    <div class="dropdown my-2">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+       <span>農家フィルター</span>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        {% if users_list|length > 0 %}
+        {% for user in users_list %}
+            <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
+        {% endfor %}
+        {% else %}
+        <p class="dropdown-item text-warning">農家がありません</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+    {% endif %}
+  </div>
+    <div class="row justify-content-start">
   {% if  user_role_id == '1' or user_role_id == '0' %}
+  {% if user_role_id == '0' and not user_id %}
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
@@ -29,8 +53,9 @@
       </div>
     </div>
   </div>
+  {% endif %}
 {% endif %}
-{% if  user_role_id == '0' %}
+{% if  user_role_id == '0' and not user_id %}
   <div class="col-lg-3">
     <div class="card text-center custom-card-height color1">
       <div class="card-header"> 
@@ -78,26 +103,9 @@
 <div class="d-flex align-items-center justify-content-end mb-3">
 
 <div class="justify-content-start w-100 d-none d-md-block">
-  <h3 class="justify-content-start d-none d-md-block text-truncate" style="max-width: 100dvw;">{% if selected_user_name %}{{ selected_user_name }}{% endif %}&nbsp;&nbsp;&nbsp;{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
+  <h3 class="justify-content-start d-none d-md-block text-truncate" style="max-width: 100dvw;">{% if selected_farm_name %}{{ selected_farm_name }}{% endif %}</h3>
   </div>
-    {% if user_role_id == '0'%}
-    <div class="d-flex align-items-center justify-content-end  ">
-    <div class="dropdown my-2">
-      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-       <span>農家フィルター</span>
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        {% if users_list|length > 0 %}
-        {% for user in users_list %}
-            <a class="dropdown-item" href="{% url 'home' %}?user={{ user.id }}">{{ user.company.company_name }}</a>
-        {% endfor %}
-        {% else %}
-        <p class="dropdown-item text-warning">農家がありません</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-    {% endif %}
+    
   {% if user_role_id == '1' or user_role_id == '0'%}
   {% if user_id or user_role_id == '1' %}
 
