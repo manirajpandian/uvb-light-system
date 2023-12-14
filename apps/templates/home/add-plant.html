@@ -33,14 +33,14 @@
         <form id="plantForm" class="my-4" method="post" action="" autocomplete="off">
             {% csrf_token %}
             <div class="form-group">
-                <label class="bmd-label-floating" for="plant_name">作物名</label>
+                <label class="bmd-label-floating" for="plant_name">作物名<span class="text-danger">*</span></label>
                 {{ form.plant_name }}
                 <span class="text-danger" id="plantNameMsg"></span>
             </div>
             <br>
     
             <div class="form-group">
-                <label class="bmd-label-floating" for="distance">光源距離(cm)</label>
+                <label class="bmd-label-floating" for="distance">光源距離(cm)<span class="text-danger">*</span></label>
                 {{ form.distance }}
                 <span class="text-danger" id="distanceMsg"></span>
             </div>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="col-1">
                     <div class="form-group">
-                    <label class="bmd-label-floating" for="hour">hh</label>
+                    <label class="bmd-label-floating" for="hour">hh<span class="text-danger">*</span></label>
                     <input type="number" class="form-control time-input" id="hour" maxlength="2" pattern="\d+" >
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                 </div>
                 <div class="col-1">
                     <div class="form-group">
-                        <label class="bmd-label-floating" for="minute">mm</label>
+                        <label class="bmd-label-floating" for="minute">mm<span class="text-danger">*</span></label>
                         <input type="number" class="form-control time-input" id="minute" maxlength="2" >
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                 </div>
                 <div class="col-1">
                     <div class="form-group">
-                        <label class="bmd-label-floating" for="second">ss</label>
+                        <label class="bmd-label-floating" for="second">ss<span class="text-danger">*</span></label>
                         <input type="number" class="form-control time-input" id="second" maxlength="2">
                     </div>
                 </div>
@@ -85,7 +85,7 @@
             </div>
             <div class="center-container">
                 <a onclick='goBack()' href="#">
-                    <button type="button" class="btn btn-Secondary mr-3">戻る</button></a>
+                    <button type="button" class="btn btn-Secondary mr-3">キャンセル</button></a>
                     {% if show == 'true' %}
     <button type="submit" id="updateBtn" class="btn btn-success" >変更</button>
     {% else %}

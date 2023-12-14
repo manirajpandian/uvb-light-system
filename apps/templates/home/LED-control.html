@@ -165,7 +165,7 @@
           <i class="material-icons text-success ml-3">grass</i>
           <span class="ml-1">{{soil_moisture}}</span>
 
-          <a href="{% url 'LED_data_download' %}" class="ml-3">
+          <a href="{% url 'LED_data_download' %}?house_id={{ house.house_id }}" class="ml-3">
             <span class="material-icons">sim_card_download</span>
           </a>
           

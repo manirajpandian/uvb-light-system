@@ -41,7 +41,7 @@ def send_forgot_password_mail(email, token, farm_id):
 def add_new_user_mail(email, farm_id, token):
     base_url = settings.BASE_URL
     link = f'{base_url}change_password/{token}'
-    subject = 'パスワードの設定'
+    subject = '光防除システム管理サイト登録'
     html_content = render_to_string('home/add-user-email-template.html', {'link': link, 'farm_id': farm_id, 'email': email})
     message = f'''
     光防除システム管理サイトログイン

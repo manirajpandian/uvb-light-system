@@ -979,15 +979,25 @@ def delete_house(request, house_id, farm_id):
 def LED_data_download(request):
     try:
         sensor = data.objects.all()
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="sensors_data.csv"'
-        csv_writer = csv.writer(response)
-        csv_writer.writerow(['rasp-id', 'date', 'temperature', 'humidity' , 'soil-moisture'])
+        house_id = request.GET.get('house_id')  # Convert house_id to an integer
+        LEDs = LED.objects.all()
+        # print('house_id',house_id)
+        for led in LEDs:
+            led_id_parts = led.led_id.split('-')[0]
+            if house_id == led_id_parts:
+                # print(f'Found match for house_id {house_id} with LED_data {led.led_id}')
+                filtered_LEDs = LED.objects.filter(led_id = led.led_id)
+                print('filtered_LEDs',filtered_LEDs)
 
-        for sdata in sensor :
-            csv_writer.writerow([sdata.raspberry_id ,sdata.date , sdata.temperature, sdata.humidity, sdata.soil_moisture])
-            print(csv_writer)
-        return response
+        # response = HttpResponse(content_type='text/csv')
+        # response['Content-Disposition'] = 'attachment; filename="sensors_data.csv"'
+        # csv_writer = csv.writer(response)
+        # csv_writer.writerow(['LED_no', 'temperature', 'humidity' , 'soil-moisture', 'ON','OFF'])
+
+        # for sdata in sensor :
+        #     csv_writer.writerow([sdata.raspberry_id ,sdata.date , sdata.temperature, sdata.humidity, sdata.soil_moisture])
+        #     print(csv_writer)
+        # return response
 
     except BrokenPipeError as e:
         print('Download api error>>',e)

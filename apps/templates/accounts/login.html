@@ -103,9 +103,14 @@
           {% comment %} ID3 {% endcomment %}
           <div class="row">
             <div class="col-md-12">
-              <div class="form-group">
+              <div class="form-group" style="position: relative;">
                 <label class="bmd-label-floating">パスワード</label>
                 {{ form.password }}
+                <div class="input-group-append" >
+                  <span class="input-group-text" id="password-toggle" style="cursor: pointer;">
+                    <span class="material-icons" style="position: absolute;margin-bottom: 50px;right: 8px;" id="toggle-icon">visibility</span>
+                  </span>
+                </div>
               </div>
               <span class="text-danger" id="passwordSpan"></span>
             </div>
@@ -306,6 +311,19 @@
       }
     });
   });
+  var passwordField = document.getElementById("id_password"); // Replace "id_password" with the actual ID of your password field
+  var toggleIcon = document.getElementById("toggle-icon");
 
+  toggleIcon.addEventListener("click", function () {
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      toggleIcon.innerText = '';
+      toggleIcon.innerText = "visibility_off";
+    } else {
+      passwordField.type = "password";
+      toggleIcon.innerText = "";
+      toggleIcon.innerText = "visibility";
+    }
+  });
 </script>
 {% endblock javascripts %}

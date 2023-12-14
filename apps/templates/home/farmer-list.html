@@ -219,25 +219,25 @@
           <span id="errorMessage" class="text-danger">{{ error_message }}</span>
           {% endif %}
           <div class="my-4 form-group">
-            <label for="company_name" class="bmd-label-floating">会社名</label>
+            <label for="company_name" class="bmd-label-floating">会社名<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="companyName" maxlength=80 name="company_name"
               value="{{ company_name }}" />
             <span class="text-danger" id="companyNameMsg"></span>
           </div>
           <div class="my-4 form-group">
-            <label for="email" class="bmd-label-floating">メール</label>
+            <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>
             <input type="email" class="form-control" id="email" maxlength=250 name="email" value="{{ email }}" />
             <span class="text-danger" id="emailMsg"></span>
           </div>
           <div class="my-4 form-group">
-            <label for="user_name" class="bmd-label-floating">担当</label>
+            <label for="user_name" class="bmd-label-floating">担当<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="userName" maxlength=30 name="user_name"
               value="{{ user_name }}" />
             <span class="text-danger" id="userNameMsg"></span>
           </div>
 
           <div class="my-4 form-group">
-            <label for="address" class="bmd-label-floating">住所</label>
+            <label for="address" class="bmd-label-floating">住所<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="address" maxlength=150 name="address" value="{{ address }}" />
             <span id="addressCount">0</span><span>/150</span>字
             <div><span class="text-danger" id="addressMsg"></span></div>
@@ -276,23 +276,23 @@
           <span id="errorMessage" class="text-danger">{{ error_message }}</span>
           {% endif %}
           <div class="my-4 form-group bmd-form-group is-filled is-focused">
-            <label for="company_name" class="bmd-label-floating">会社名</label>
+            <label for="company_name" class="bmd-label-floating">会社名<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="updateCompanyName" maxlength=80 name="company_name" value="" />
             <span class="text-danger" id="editCompanyNameMsg"></span>
           </div>
           <div class="my-4 form-group bmd-form-group is-filled is-focused">
-            <label for="email" class="bmd-label-floating">メール</label>
+            <label for="email" class="bmd-label-floating">メール<span class="text-danger">*</span></label>
             <input type="email" class="form-control" id="updateEmail" maxlength=250 name="email" readonly value="" />
             <span class="text-danger" id="editEmailMsg"></span>
           </div>
           <div class="my-4 form-group bmd-form-group is-filled is-focused">
-            <label for="user_name" class="bmd-label-floating">担当</label>
+            <label for="user_name" class="bmd-label-floating">担当<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="updateUserName" maxlength=30 name="user_name" value="" />
             <span class="text-danger" id="editUserNameMsg"></span>
           </div>
 
           <div class="my-4 form-group bmd-form-group is-filled is-focused">
-            <label for="address" class="bmd-label-floating">住所</label>
+            <label for="address" class="bmd-label-floating">住所<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="updateAddress" maxlength=150 name="address" value="" />
             <span id="addressCount2">0</span><span>/150</span>字
             <div><span class="text-danger" id="editAddressMsg"></span></div>

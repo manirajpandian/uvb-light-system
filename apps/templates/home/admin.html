@@ -105,7 +105,7 @@
                         </td>
                         <td>
                           {% if user.is_staff or current_user_id == user.id %}
-                          不可能
+                          変更不可
                           {% else %}
                           <form method="POST" action="" autocomplete="on">
                             {% csrf_token %}
@@ -125,7 +125,7 @@
                         </td>
                         <td>
                           {% if user.is_staff or current_user_id == user.id %}
-                          不可能
+                          変更不可
                           {% else %}
                           <a href="{% url 'update_user' user.id %}?page={{ page.number }}" style="color: #ff9800;"><span>編集</span></a>
                           &nbsp; &nbsp;|&nbsp;&nbsp;
