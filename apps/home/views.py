@@ -20,12 +20,11 @@ import json
 from django.utils import timezone
 import paho.mqtt.publish as publish
 from datetime import date, datetime
-from django.db import IntegrityError
-import csv
 from django.db import transaction
-from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-import re
+import codecs
+from django.http import StreamingHttpResponse
+from urllib.parse import quote
 
 
 
@@ -977,41 +976,43 @@ def delete_house(request, house_id, farm_id):
     except BrokenPipeError as e:
         print('Exception BrokenPipeError', e)
         return HttpResponseServerError()
-from urllib.parse import quote
+    
+# write the csv file here 
+class Echo:
+    def write(self, value):
+        return value
 
-@login_required(login_url='/login/')
+# csv content generate 
+def generate_csv_content(house_id):
+    LEDs = LED.objects.filter(led_id__startswith=house_id)
+    # Todo: different RasberryPi were used please change this query
+    sensor_data = data.objects.get(raspberry_id_id='Rpi-4')
+
+    yield codecs.BOM_UTF8 + bytes(','.join(['LED No', '温度', '湿度', '土壌', 'ON_時間', 'OFF_時間']) + '\n', 'utf-8')
+
+    for led in LEDs:
+        on_time = '' 
+        off_time = ''
+        if None != led.led_on_date:
+            on_time = led.led_on_date.strftime("%H:%M:%S")
+        if None != led.led_off_date:
+            off_time = led.led_off_date.strftime("%H:%M:%S")
+        row = f"{led.led_id},{sensor_data.temperature},{sensor_data.humidity},{sensor_data.soil_moisture},{on_time},{off_time}\n"
+        yield bytes(row, 'utf-8')
+
+# csv file download 
 def LED_data_download(request):
     try:
         house_id = request.GET.get('house_id')
         house = House.objects.get(house_id=house_id)
-        # print('house', house.house_name)
+        
+        # file name with date 
         now = timezone.now()
-        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Replace spaces with underscores and keep colons
-        formatted_date = formatted_date.replace('_', ':')
-
-        # print('formatted_date',formatted_date)
-        
+        formatted_date = now.strftime("%d-%m-%Y %H:%M:%S")
         file_name = f"{quote(house.house_name)}_{formatted_date}.csv"
 
-        # print('file_name>>>>>>>>>', file_name)
-        LEDs = LED.objects.filter(led_id__startswith=house_id)  # Filter LEDs directly
-
-        response = HttpResponse(content_type='text/csv')
+        response = StreamingHttpResponse(generate_csv_content(house_id), content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-        # print('response>>>>>>>>>>>>>>>>>>>>>>>>>', response['Content-Disposition'])
-        csv_writer = csv.writer(response)
-        print('csv_writer',csv_writer)
-        csv_writer.writerow(['LED No', 'temperature', 'humidity', 'soil-moisture', 'ON', 'OFF'])
-
-        for led in LEDs:
-            filtered_LEDs = LED.objects.filter(led_id=led.led_id)
-            # print('filtered_LEDs', filtered_LEDs)
-
-        for sdata in data.objects.all():
-            csv_writer.writerow([sdata.raspberry_id, sdata.date, sdata.temperature, sdata.humidity, sdata.soil_moisture])
-            print(csv_writer)
 
         return response
 
@@ -1020,8 +1021,6 @@ def LED_data_download(request):
         pass
 
     return HttpResponse("Error occurred during CSV download.")
-
-
 
 def RPI_settings(request):
     user_profile_image = request.session.get('user_profile_image')

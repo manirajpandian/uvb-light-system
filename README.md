@@ -1,9 +1,9 @@
-> Free product - **Django Dashboard** starter project - Features:
+> project - Features:
 
 - Up-to-date [dependencies](./requirements.txt): **Django 3.2.6 LTS**
 - [SCSS compilation](#recompile-css) via **Gulp**
 - Django Codebase 
-- UI-Ready app, SQLite Database, Django Native ORM
+- Responsive UI, SQLite Database, Django Native ORM
 - Modular design, clean code-base
 - Session-Based Authentication, Forms validation
 - Deployment scripts: Docker, Gunicorn / Nginx
