@@ -21,6 +21,7 @@ from django.utils import timezone
 import paho.mqtt.publish as publish
 from datetime import date, datetime
 from django.db import IntegrityError
+from django.contrib import messages
 import csv
 from django.db import transaction
 from django.http import JsonResponse
@@ -85,7 +86,8 @@ def index(request,farm_id=None):
             'humidity': None,
             'soil_moisture': None,
             'raspberry_id': None,
-            'date': None
+            'date': None,
+           
         }
 
         # Assuming you want data for the first Raspberry instance, you can use first()
@@ -226,14 +228,14 @@ def house_lights(request):
 
 
 # MQTT---Crdentials 
-
-broker_address = "52.192.209.112"  # Replace with your local broker address
+broker_address = "localhost" 
+# broker_address = "52.192.209.112"  # Replace with your local broker address
 port = 1883
 topic_rpi_to_ec2 = "rpi_to_ec2_topic"
 topic_ec2_to_rpi = "ec2_to_rpi_topic"
 
-mqtt_username = "dht"
-mqtt_password = "dht123"
+# mqtt_username = "dht"
+# mqtt_password = "dht123"
 
 
 # LED Control - Sensor and LED Access
@@ -243,7 +245,8 @@ sensor_data = {
     'soil_moisture': None,
     'raspberry_id': None,
     'date':None,
-    'led_count':4
+    'led_count':None ,
+    'connection_info' :None
 }
 
 latest_stored_date ={}
@@ -263,9 +266,25 @@ def LED_control(request,farm_id=None):
         user_role_id = request.session.get('role_id')
         user_company = request.session.get('user_company')
         
+        def on_disconnect(client, userdata, rc):
+            print(f"Disconnected with result code {rc}")
+            
+            # Clear the sensor_data dictionary when disconnected
+            global sensor_data
+            sensor_data = {
+                'temperature': None,
+                'humidity': None,
+                'soil_moisture': None,
+                'raspberry_id': None,
+                'date': None,
+                'led_count': None,
+                'connection_info': None
+            }
+
+        
         @transaction.atomic
         def on_message(client, userdata, message):
-            sensor_data , latest_stored_date , payload
+            sensor_data , latest_stored_date 
     
             payload = json.loads(message.payload.decode())
             print(f"Received message from MQTT: {payload}")
@@ -276,11 +295,13 @@ def LED_control(request,farm_id=None):
             sensor_data['soil_moisture'] = payload.get('soil_moisture')
             sensor_data['raspberry_id'] = payload.get('raspberry_id')
             sensor_data['date'] = payload.get('date')
+            sensor_data['connection_info']= payload.get ('message')
+            sensor_data['led_count'] = payload.get ('led_count')
             payload_date_str = sensor_data['date']
             
             if payload_date_str:
                 
-                sensor_data['date'] = datetime.strptime(payload_date_str, "%Y-%m-%d %H:%M:%S").date()
+               sensor_data['date'] = datetime.strptime(payload_date_str, "%Y-%m-%d %H:%M:%S").date()
                 
             else:
                 print("Invalid date provided in sensor data.")
@@ -321,11 +342,14 @@ def LED_control(request,farm_id=None):
        
         # MQTT client for receiving sensor data
         mqtt_client = mqtt.Client()
-        mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
+        # mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
         mqtt_client.on_message = on_message
 
         # Connect to the MQTT broker
         mqtt_client.connect(broker_address, port, 60)
+        
+        # Set the disconnect callback function
+        mqtt_client.on_disconnect = on_disconnect
 
         # Subscribe to the topic where the Raspberry Pi publishes sensor data
         mqtt_client.subscribe(topic_rpi_to_ec2)
@@ -402,9 +426,11 @@ def LED_control(request,farm_id=None):
                 'Rbi': sensor_data['raspberry_id'],
                 'users_list':users_list,
                 'led_count':sensor_data['led_count'],
-                'message':None
+                'message1': sensor_data['connection_info']
+                
                 
                 }  
+            print('333333333333333333',context)
             if request.method == "GET":
                 if context['temperature'] or context ['humidity'] or context['soil_moisture'] is None:
                     context['message'] = "Raspberry pi "
@@ -437,7 +463,8 @@ def LED_control(request,farm_id=None):
                            
                         else:
                             # Publish button_no data to the topic
-                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                            # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}))
                             led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
                             messages.success(request, led_success_msg)
             
@@ -458,8 +485,8 @@ def LED_control(request,farm_id=None):
                            
                         else:  
                         # Publish button_no data to the topic
-                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                            
+                            # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                            publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}),)
                             print('button no',led.button_no)
                             led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
                             messages.success(request, led_success_msg)
@@ -548,7 +575,7 @@ def pages(request):
         if load_template == 'admin':
             return HttpResponseRedirect(reverse('admin:index'))
         context['segment'] = load_template
-        print("test", context)
+        
 
         html_template = loader.get_template('home/' + load_template)
         return HttpResponse(html_template.render(context, request))
@@ -1043,15 +1070,6 @@ def LED_data_download(request):
         pass
     return HttpResponse("Error occurred during CSV download.")
 
-
-
-
-def RPI_settings(request):
-    user_profile_image = request.session.get('user_profile_image')
-    user_role_id = request.session.get('role_id')
-    context = {'user_profile_image': user_profile_image,
-            'user_role_id': user_role_id,}
-    return render(request, 'home/RPI_settings.html',context)
     
 def raspberryid(request):
     user_profile_image = request.session.get('user_profile_image')
@@ -1101,7 +1119,64 @@ def raspberryid(request):
         return render(request, 'home/RPI_settings.html', context)
 
     return render(request, 'home/RPI_settings.html')
-        
-        
-        
+
+def RPI_settings(request):
+    user_profile_image = request.session.get('user_profile_image')
+    user_role_id = request.session.get('role_id')
+    user_company = request.session.get('user_company')
+    # Fetch all existing rbi values from the database
+    all_rbis = Rasp.objects.values_list('rbi', flat=True).order_by('rbi')
+
+    paginator = Paginator(all_rbis, 5)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    print('page>>>', page)
+
     
+    if request.method == 'POST':
+        # Retrieve the RpiID from the form data
+        rpi_id = request.POST.get('RpiID', None)
+        if not rpi_id:
+            error_msg = "RpiID is required"
+            messages.error(request, error_msg)
+        else:
+            try:
+                # Try to create a new entry
+                Rasp.objects.create(rbi=rpi_id)
+                # Pass all rbi values to the template
+                all_rbis = Rasp.objects.values_list('rbi', flat=True)
+                context = {
+                    'user_profile_image': user_profile_image,
+                    'user_role_id': user_role_id,
+                    'page': page,  # Pass all rbi values to the template
+                    'user_company': user_company,
+                    'success': True, 
+                    'rbis': all_rbis
+                    
+                }
+                
+                messages.success(request, 'RpiID added successfully')
+                return render(request, 'home/RPI_settings.html',context)
+            except IntegrityError:
+                # Handle IntegrityError when the entry already exists
+                error_msg = f"RpiID {rpi_id} already exists"
+                messages.error(request, error_msg)
+    else:
+        # Fetch all existing rbi values from the database
+        # all_rbis = Rasp.objects.values_list('rbi', flat=True).order_by('rbi')
+        print('all_rbis', all_rbis)
+
+
+
+        context = {
+            'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'page': page,  # Pass all rbi values to the template
+            'user_company': user_company,
+             'rbis': all_rbis
+            
+            
+        }
+
+        return render(request, 'home/RPI_settings.html', context)
+

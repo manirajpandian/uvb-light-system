@@ -161,4 +161,6 @@ class data(models.Model):
 
     class Meta:
         unique_together = ('date', 'raspberry_id')
+        
+
     

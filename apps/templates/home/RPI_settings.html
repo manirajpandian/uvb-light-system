@@ -1,48 +1,229 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} RPI_settings{% endblock %} 
+{% extends "layouts/base.html" %} {% block title %} 作物設定 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<style>
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
 
-{% block content %}
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 19px;
+  }
 
-   <h5> Welcome to RPI_settings </h5>
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-   <!-- Form for entering manual ID -->
-   <form method="post" action="{% url 'raspberryid' %}">
-       {% csrf_token %}
-       <label for="manual_id">Enter ID to assign:</label>
-       <input type="text" name="manual_id" required>
-       <button type="submit">Submit</button>
-   </form>
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
 
-   {% if status %}
-       <p>{{ status }}</p>
-   {% endif %}
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-   <!-- Display entered IDs in a table -->
-   {% if entered_ids %}
-       <h6>Entered IDs:</h6>
-       <table>
-           <thead>
-               <tr>
-                   <th>S.No</th>
-                   <th>Raspberry Pi ID</th>
-               </tr>
-           </thead>
-           <tbody>
-             
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #66bb6a;
+  }
+
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(16px);
+  }
+
+  input:checked+.slider+.toggle-text {
+    left: 35px;
+  }
+  #successMessage {
+  opacity: 0; /* Start with 0 opacity */
+  z-index: 100;
+  position: fixed;
+  top: 2%;
+  left: 50%;
+  transform: translateY(-50%, -50%);
+  transition: opacity 1.5s ease-in-out; /* Adjust the duration and timing function */
+}
+
+#successMessage.show {
+  opacity: 1; /* When the 'show' class is added, transition to 1 opacity */
+}
+
+  @media (max-width: 767px) {
+    #successMessage {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+    }
+  }
+</style>
+
+
   
-                       
-                       <td>{{entered_ids}}</td>
-                   </tr>
-         
-           </tbody>
-       </table>
-   {% endif %}
+<div class="d-flex align-items-center justify-content-end">
+    <button type="button" name="search" class="btn btn-success" data-toggle="modal" data-target="#addRpimodal">
+      <span class="material-icons"">add_circle</span>&nbsp;&nbsp;追加
+      </button>
+  </div>
+  <div class=" row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="text-primary-emphasis table-success">
+                            <th>Rpi ID</th>
+                        </thead> 
+                        <tbody>
+                                {% for rbi in page.object_list %}
+                                    <tr>
+                                        <td>{{ rbi }}</td>
+                                    </tr>
+                                {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- Pagination Section  -->
+                    <div class="flex-container">
+                      <p>ページ: {{ page.number }}/{{ page.paginator.num_pages }}</p>
+                      <nav aria-label="...">
+                        <ul class="pagination justify-content-end">
+                          <li class="page-item">
+                            {% if page.has_previous %}
+                            <a class="page-link" href="?page=1" tabindex="-1">最初</a>
+                            {% endif %}
+                          </li>
+                          <li class="page-item">
+                            {% if page.has_previous %}
+                            <a class="page-link" href="?page={{ page.previous_page_number }}">前</a>
+                            {% endif %}
+                          </li>
+                          {% for num_page in page.paginator.page_range %}
+                          {% if page.number == num_page %}
+                          <li class="page-item active">
+                            <span class="page-link">{{ num_page }}<span class="sr-only">(current)</span></span>
+                          </li>
+                          {% else %}
+                          <li class="page-item">
+                            <a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a>
+                          </li>
+                          {% endif %}
+                          {% endfor %}
+                          <li class="page-item">
+                            {% if page.has_next %}
+                            <a class="page-link" href="?page={{ page.next_page_number }}">次</a>
+                            {% endif %}
+                          </li>
+                          <li class="page-item">
+                            {% if page.has_next %}
+                            <a class="page-link" href="?page={{ page.paginator.num_pages }}">最後</a>
+                            {% endif %}
+                          </li>
+                        </ul>
+                      </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% endblock content %}
+  <!-- add raspberry pi -->
+  <div class=" modal fade" id="addRpimodal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">ラズベリーを加える</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" id="addRpi" action=""> 
+            {% csrf_token %} 
+         <div class="modal-body"> {% if error_message %} <span id="errorMessage" class="text-danger">{{ error_message }}</span> {% endif %} 
+          <div class="my-4 form-group">
+              <label for="Raspberry_id" class="bmd-label-floating">ラズベリーID </label>
+              <input type="text" class="form-control" id="Rpi_id" maxlength="80" name="RpiID" value="{{ rbi }}" />
 
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+              <span class="text-danger" id="Raspberrymsg"></span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a href="/RPI_settings">
+              <button type="button" class="btn btn-secondary"> 戻る </button>
+            </a>
+            <button type="button" id="addButton" class="btn btn-success"> 追加 </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    var form = document.getElementById('addRpi')
+    var RaspberryID = document.getElementById('Rpi_id')
+    var Raspberrymsg = document.getElementById('Raspberrymsg')
+    var addButton = document.getElementById('addButton')
+
+
+    // add form validation 
+    addButton.addEventListener('click', function (event) {
+      console.log("make a easy")
+   
+      console.log('RaspberryID',RaspberryID.value)
+      if (RaspberryID.value === '') {
+        Raspberrymsg.innerText = 'ラズベリーパイIDを入力してください。';
+      }
+      else if (RaspberryID.value ) {
+        form.action = `/RPI_settings`;
+        form.submit();
+        if (loading) {
+          openSweetAlert();
+        } else {
+          closeSweetAlert();
+        }
+      }
+    })
+
+});
+  </script>
+      {% endblock content %}
+
+      <!-- Specific Page JS goes HERE  -->
+      {% block javascripts %}{% endblock javascripts %}
+
+      

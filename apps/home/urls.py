@@ -31,6 +31,7 @@ urlpatterns = [
     path ('RPI_settings', views.RPI_settings , name ='RPI_settings '),
     path ('raspberryid', views.raspberryid, name= 'raspberryid'),
    
+   
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

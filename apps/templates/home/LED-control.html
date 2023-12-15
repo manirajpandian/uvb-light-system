@@ -139,8 +139,7 @@
   {% endif %}
 </div>
 
-
-{% if message%}
+{% if  message1 == None%}
 <div id="marquee" class='text-danger'> <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
   Raspberry pi が接続されていません。接続してもう一度お試しください。
   </marquee>
