@@ -25,7 +25,9 @@ from django.core.exceptions import ObjectDoesNotExist
 import codecs
 from django.http import StreamingHttpResponse
 from urllib.parse import quote
-
+from django.db import IntegrityError
+import csv
+import threading
 
 
 
@@ -230,13 +232,14 @@ def house_lights(request):
 
 # MQTT---Crdentials 
 
-broker_address = "52.192.209.112"  # Replace with your local broker address
+broker_address = "localhost" 
+# broker_address = "52.192.209.112"  # Replace with your local broker address
 port = 1883
 topic_rpi_to_ec2 = "rpi_to_ec2_topic"
 topic_ec2_to_rpi = "ec2_to_rpi_topic"
 
-mqtt_username = "dht"
-mqtt_password = "dht123"
+# mqtt_username = "dht"
+# mqtt_password = "dht123"
 
 
 # LED Control - Sensor and LED Access
@@ -326,7 +329,7 @@ def LED_control(request,farm_id=None):
        
         # MQTT client for receiving sensor data
         mqtt_client = mqtt.Client()
-        mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
+        # mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
         mqtt_client.on_message = on_message
 
         # Connect to the MQTT broker
@@ -404,7 +407,8 @@ def LED_control(request,farm_id=None):
                         led.save()
                     else:
                         # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address,)
                         led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
                 else:
@@ -424,7 +428,8 @@ def LED_control(request,farm_id=None):
                         
                     else:  
                     # Publish button_no data to the topic
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port,)
                         led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
             if user_role_id == '0':
@@ -585,7 +590,8 @@ def house_list(request, farm_id=None):
                         button_no = led.button_no
                         print(f"Button No: {button_no}")
                         # Publish data to MQTT
-                        publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no, "status": False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no, "status": False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                        publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no, "status": False}),hostname=broker_address,port=port,)
                         led.is_on = False
                         led.save() 
                     house_success_msg = f"{house.house_name} ハウスは無効化されました。"        #House Status is set to OFF
@@ -893,8 +899,8 @@ def delete_farm(request, farm_id):
                         print(f"Button No: {button_no}")
                         # Publish data to MQTT
                         
-                        publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no,"status": False,}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
-                     
+                        # publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no,"status": False,}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                        publish.single(topic_ec2_to_rpi,json.dumps({"button_no": button_no,"status": False,}),hostname=broker_address,port=port)
                     house.delete()
                 farm.delete()
                 farm_success_msg = '農場が正常に削除されました。'  # Farm successfully deleted
@@ -975,7 +981,8 @@ def delete_house(request, house_id, farm_id):
                     print(f"Button No: {button_no}")
 
                     # Publish data to MQTT
-                    publish.single(topic_ec2_to_rpi,json.dumps( {"button_no": button_no,"status":False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                    # publish.single(topic_ec2_to_rpi,json.dumps( {"button_no": button_no,"status":False}),hostname=broker_address,port=port,auth={'username': mqtt_username, 'password': mqtt_password})
+                    publish.single(topic_ec2_to_rpi,json.dumps( {"button_no": button_no,"status":False}),hostname=broker_address,port=port,)
                                       
                 
                 house.delete()
@@ -1035,62 +1042,227 @@ def LED_data_download(request):
 
     return HttpResponse("Error occurred during CSV download.")
 
+
+# Set your MQTT broker information
+topic = "sensor_data_topic"
+id_topic = "id_topic"
+relay_topic ='relay_topic'
+test ='test'
+# Set to store unique publisher IDs
+publisher_ids = set()
+publisher_ids_lock = threading.Lock()
+context={}
+print('publisher_ids>>>1',publisher_ids)
+
 def RPI_settings(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
-    context = {'user_profile_image': user_profile_image,
-            'user_role_id': user_role_id,}
-    return render(request, 'home/RPI_settings.html',context)
+    user_company = request.session.get('user_company')
+    def on_connect(client, userdata, flags, rc):
+        print("Connected with result code " + str(rc))
+        client.subscribe(topic)
+        client.subscribe(id_topic)
+ 
+
+    def print_available_ids():
+        # with publisher_ids_lock:
+            print("Available IDs:")
+            for i, publisher_id in enumerate(publisher_ids, start=1):
+                print(f"{i}. {publisher_id}")
+                # print('context>>>>>loop',context)
+
+    def on_message(client, userdata, msg):
+        received_data = msg.payload.decode()
+        
+        if not received_data:
+            print("Received empty message.")
+            return
+
+        if msg.topic == topic:
+         
+            try:
+                data = json.loads(received_data)
+                relay_id = data.get("relay_id")
+                if relay_id:
+                    with publisher_ids_lock:
+                        publisher_ids.add(relay_id)
+                    print_available_ids()
+                    print(f"Received data from ID {relay_id}: {received_data}")
+
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON: {e}")
+                
+        elif msg.topic == id_topic:
+            try:
+                data = json.loads(received_data)
+                RPI_id = data.get("id")
+                if RPI_id:
+                    with publisher_ids_lock:
+                        publisher_ids.add(RPI_id)
+                    print_available_ids()
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON: {e}")
+
+        else:
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>nothing')
+
+    # def on_relay():
+    #     while True:
+    #         relay_no = int(input("enter the relay number "))
+    #         status = True
+    #         message = {
+    #             'id': 'RPI5521',
+    #             "relay_no": relay_no,
+    #             "status": False,
+            
+    #         }
+
+    #         # Convert the dictionary to a JSON-formatted string
+    #         json_message = json.dumps(message)
+    #         client.publish(relay_topic, json_message)
+    #         print(f"Data Sent: {json_message}")
+    client = mqtt.Client() 
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(broker_address, port, 60)
     
-def raspberryid(request):
+
+    # Create threads for on_relay and on_message functions
+    # thread_on_relay = threading.Thread(target=on_relay)
+    thread_on_message = threading.Thread(target=client.loop_start)
+
+    # Start the threads
+    # thread_on_relay.start()
+    thread_on_message.start()
+    # Fetch all existing rbi values from the database
+    all_rbis = Rasp.objects.values_list('rbi', flat=True).order_by('rbi')
+
+    paginator = Paginator(all_rbis, 5)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    print('page>>>', page)
+    print('')
+    array_raspberry = list(publisher_ids)
+    print ('>>>>>>>>>>>>>>>>>>>>>>>', array_raspberry)
+    context = {
+            'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'page': page,  # Pass all rbi values to the template
+            'user_company': user_company,
+            'rbis': all_rbis,
+            'raspberry':list (publisher_ids) 
+            
+        }
+    # if request.method == 'POST':
+    #     # Retrieve the RpiID from the form data
+    #     rpi_id = request.POST.get('ras', None)
+    #     print("welcome///////?????????????????",rpi_id)
+    #     if not rpi_id:
+    #         error_msg = "RpiID is required"
+    #         messages.error(request, error_msg)
+    #     else:
+    #         try:
+    #             # Try to create a new entry
+    #             Rasp.objects.create(rbi=rpi_id)
+    #             # Pass all rbi values to the template
+    #             all_rbis = Rasp.objects.values_list('rbi', flat=True)
+    #             context = {
+    #                 'user_profile_image': user_profile_image,
+    #                 'user_role_id': user_role_id,
+    #                 'page': page,  # Pass all rbi values to the template
+    #                 'user_company': user_company,
+    #                 'success': True, 
+    #                 'rbis': all_rbis,
+    #                 'raspberry': list(publisher_ids)
+                    
+    #             }
+    #             print(context)
+    #             messages.success(request, 'RpiID added successfully')
+    #             return render(request, 'home/RPI_settings.html',context)
+    #         except IntegrityError:
+    #             # Handle IntegrityError when the entry already exists
+    #             error_msg = f"RpiID {rpi_id} already exists"
+    #             messages.error(request, error_msg)
+    # else:
+    #     # Fetch all existing rbi values from the database
+    #     # all_rbis = Rasp.objects.values_list('rbi', flat=True).order_by('rbi')
+    #     print('all_rbis', all_rbis)
+
+
+
+    #     context = {
+    #         'user_profile_image': user_profile_image,
+    #         'user_role_id': user_role_id,
+    #         'page': page,  # Pass all rbi values to the template
+    #         'user_company': user_company,
+    #         'rbis': all_rbis,
+    #         'raspberry': list(publisher_ids)
+            
+    #     }
+    #     print(context)
+    #     return render(request, 'home/RPI_settings.html', context)
+    
+    return render(request, 'home/RPI_settings.html', context)  
+    
+        
+from django.shortcuts import render, HttpResponse, redirect
+from django.core.paginator import Paginator
+from django.contrib import messages
+from django.db import IntegrityError  # Import IntegrityError from django.db
+
+def add_RPI(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
-    if request.method == 'POST':
-        # Get the manual ID from the form data
-        manual_id = request.POST.get('manual_id', '')
-        request.session['manual_raspberry_id'] = manual_id
-        broker_address = 'localhost'
-        port = 1883
-        topic = "sensor_data_topic"
-        id_topic = "id_topic"
-        
-        
-        def on_connect(client, userdata, flags, rc):
-            print("Connected with result code " + str(rc))
-            client.subscribe(topic)
-            client.subscribe(id_topic)
+    user_company = request.session.get('user_company')
 
-        def on_message(client, userdata, msg):
-            received_data = msg.payload.decode()
-            
-            if msg.topic == id_topic:
-                # Handle ID message
-                received_id = received_data.split(",")[0].strip()
-                print(f"Received ID from publisher: {received_id}")
-                client.publish(topic, f"ID: {received_id}")
-                print(f"ID Sent to publisher: {received_id}")
-            elif msg.topic == topic:
-                # for mqtt data handling 
-                pass
+    all_rbis = Rasp.objects.values_list('rbi', flat=True).order_by('rbi')
 
-        client = mqtt.Client()
-        client.on_connect = on_connect
-        client.on_message = on_message
-        client.connect(broker_address, port, 60)
-        client.loop_start()
-        client.publish(id_topic, manual_id)
-        print(f"Manually Assigned ID Published: {manual_id}")
-        # Set a status message to display on the RPI_settings page
-        status_message = f"Manually Assigned ID Published: {manual_id}"
-        context = {'user_profile_image': user_profile_image,
+    paginator = Paginator(all_rbis, 5)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    print('page>>>', page)
+    print('')
+    array_raspberry = list(publisher_ids)
+    print ('>>>>>>>>>>>>>>>>>>>>>>>', array_raspberry)
+    context = {
+            'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
-            'status': status_message}
-        
-        # Render the RPI_settings page with the status message
-        return render(request, 'home/RPI_settings.html', context)
+            'page': page,  # Pass all rbi values to the template
+            'user_company': user_company,
+            'rbis': all_rbis,
+            'raspberry':list (publisher_ids) 
+            
+        }
 
-    return render(request, 'home/RPI_settings.html')
-        
-        
-        
-    
+    if request.method == 'POST':
+        rpi_id = request.POST.get('ras', None)
+        print("welcome///////?????????????????", rpi_id)
+        if not rpi_id:
+            error_msg = "RpiID is required"
+            messages.error(request, error_msg)
+        else:
+            try:
+                Rasp.objects.create(rbi=rpi_id)
+                all_rbis = Rasp.objects.values_list('rbi', flat=True)
+                context.update({
+                    'success': True,
+                    'rbis': all_rbis,
+                    'user_profile_image': user_profile_image,
+                    'user_role_id': user_role_id,
+                    'page': page,
+                    'user_company': user_company,
+                 
+                    'raspberry': list(publisher_ids)
+                })
+                messages.success(request, 'RpiID added successfully')
+                print('>>>>>>>>>.befor success')
+                # return render(request, 'home/RPI_settings.html', context)
+                return redirect('/RPI_settings')
+            except IntegrityError as e:
+                print(f"Error: {e}")
+                messages.error(request, 'Error adding RpiID to the database. Duplicate entry.')
+            except Exception as e:
+                print(f"Error: {e}")
+                messages.error(request, 'Error adding RpiID to the database')
+
+    return render(request, 'home/RPI_settings.html', context)
