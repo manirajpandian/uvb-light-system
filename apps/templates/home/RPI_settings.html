@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %} {% block title %} 作物設定 {% endblock %}
+{% extends "layouts/base.html" %} {% block title %} RPI設定 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
@@ -174,12 +174,6 @@
         <form method="POST" id="addRpi" action=""> 
             {% csrf_token %} 
          <div class="modal-body"> {% if error_message %} <span id="errorMessage" class="text-danger">{{ error_message }}</span> {% endif %} 
-          <!-- <div class="my-4 form-group">
-              <label for="Raspberry_id" class="bmd-label-floating">ラズベリーID </label>
-              <input type="text" class="form-control" id="Rpi_id" maxlength="80" name="RpiID" value="{{ rbi }}" />
-
-              <span class="text-danger" id="Raspberrymsg"></span>
-            </div> -->
             <div class="table-responsive">
             <table class="table table-striped">
               <thead class="text-primary-emphasis table-success">
@@ -195,10 +189,7 @@
     </tr>
         
 {% endfor %}
-                <!-- <tr id="raspberryRow">
-                    <td>1</td>
-                    <td id="raspberryValue">{{ raspberry }}</td>
-                  </tr> -->
+                
               </tbody>
           </table>
         </div>
@@ -213,20 +204,8 @@
       </div>
     </div>
   </div>
-
-
-  
   <script>
     var raspberry = "{{ raspberry }}"
-
-   // function updateTable() {
-   //     console.log('resp>>>>>>>')
-    //    document.getElementById("raspberryValue").innerText = raspberry;
-    //  }
-      
-      // Update the table every 3 seconds
-    //  setInterval(updateTable, 3000);
-      
 document.addEventListener("DOMContentLoaded", function () {
 
     var form = document.getElementById('addRpi')
@@ -240,19 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("make a easy")
       form.action = `/add_RPI`;
       form.submit();
-    //   console.log('RaspberryID',RaspberryID.value)
-    //    if (RaspberryID.value === '') {
-    //     Raspberrymsg.innerText = 'ラズベリーパイIDを入力してください。';
-    //   } 
-    //   else if (RaspberryID.value ) {
-    //     form.action = `/add_RPI`;
-    //     form.submit();
-    //     if (loading) {
-    //       openSweetAlert();
-    //     } else {
-    //       closeSweetAlert();
-    //     }
-    //   }
+   
     })
 
 });
