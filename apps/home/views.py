@@ -232,14 +232,14 @@ def house_lights(request):
 
 # MQTT---Crdentials 
 
-broker_address = "localhost" 
-# broker_address = "52.192.209.112"  # Replace with your local broker address
+# broker_address = "localhost" 
+broker_address = "52.192.209.112"  # Replace with your local broker address
 port = 1883
 topic_rpi_to_ec2 = "rpi_to_ec2_topic"
 topic_ec2_to_rpi = "ec2_to_rpi_topic"
 
-# mqtt_username = "dht"
-# mqtt_password = "dht123"
+mqtt_username = "dht"
+mqtt_password = "dht123"
 
 
 # LED Control - Sensor and LED Access
@@ -329,7 +329,7 @@ def LED_control(request,farm_id=None):
        
         # MQTT client for receiving sensor data
         mqtt_client = mqtt.Client()
-        # mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
+        mqtt_client.username_pw_set(username=mqtt_username, password=mqtt_password)
         mqtt_client.on_message = on_message
 
         # Connect to the MQTT broker
@@ -407,8 +407,8 @@ def LED_control(request,farm_id=None):
                         led.save()
                     else:
                         # Publish button_no data to the topic
-                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address,)
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address,)
                         led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
                         messages.success(request, led_success_msg)
                 else:
@@ -428,8 +428,8 @@ def LED_control(request,farm_id=None):
                         
                     else:  
                     # Publish button_no data to the topic
-                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port,)
+                        publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port,)
                         led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
                         messages.success(request, led_success_msg)
             if user_role_id == '0':
@@ -1058,6 +1058,9 @@ def RPI_settings(request):
     user_profile_image = request.session.get('user_profile_image')
     user_role_id = request.session.get('role_id')
     user_company = request.session.get('user_company')
+    company_id = None
+    filter_house = None
+    house_id = None
     def on_connect(client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         client.subscribe(topic)
@@ -1122,6 +1125,7 @@ def RPI_settings(request):
     #         client.publish(relay_topic, json_message)
     #         print(f"Data Sent: {json_message}")
     client = mqtt.Client() 
+    client.username_pw_set(username=mqtt_username, password=mqtt_password)
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(broker_address, port, 60)
@@ -1135,24 +1139,90 @@ def RPI_settings(request):
     # thread_on_relay.start()
     thread_on_message.start()
     # Fetch all existing rbi values from the database
-    all_rbis = Rasp.objects.values_list('rbi', flat=True).order_by('rbi')
+    all_rbis = Rasp.objects.all()
 
-    paginator = Paginator(all_rbis, 5)
+    paginator = Paginator(all_rbis, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    print('page>>>', page)
-    print('')
+    company_id = request.GET.get('company_id')
+    house_id = request.GET.get('house_id')
+    
+    filter_farm = Farm.objects.filter(user_id=company_id)
+    for farm in filter_farm:
+        filter_house = House.objects.filter(farm_id=farm.farm_id)
+    
+    filtered_LEDs = LED.objects.filter(pole__line__house__house_id=house_id,rasp__isnull=True).order_by('led_id')
+    filtered_Rpi = Rasp.objects.filter(is_assigned__isnull=True)
+
+    group_size = 23
+    filter_LED_count = []
+    for i in range(0, len(filtered_LEDs), group_size):
+        start_index = i
+        end_index = min(i + group_size, len(filtered_LEDs))
+        current_group = filtered_LEDs[start_index:end_index]
+        
+        button_nos = [item.button_no for item in current_group]
+        first_id = current_group[0].led_id
+        last_id = current_group[-1].led_id
+        result = f'1-{(len(button_nos))},[{first_id} - {last_id}]'
+        filter_LED_count.append(result)
+
     array_raspberry = list(publisher_ids)
     print ('>>>>>>>>>>>>>>>>>>>>>>>', array_raspberry)
+   
+    choice_companies = Company.objects.filter(user__is_active=True, user__is_superuser = False)
     context = {
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
-            'page': page,  # Pass all rbi values to the template
+            'page': page,  
             'user_company': user_company,
             'rbis': all_rbis,
-            'raspberry':list (publisher_ids) 
-            
+            'raspberry':list (publisher_ids),
+            'choice_companies':choice_companies,
+            'company_id':company_id,
+            'house_id':house_id,
+            'filter_house':filter_house,
+            'filtered_LEDs':filtered_LEDs,
+            'filter_LED_count':filter_LED_count,
+            'filtered_Rpi':filtered_Rpi,
         }
+    if request.method == 'GET':
+        return render(request, 'home/RPI_settings.html', context)  
+    elif request.method == 'POST':
+
+        led_selection = request.POST.get('ledAssign')
+        rpi_selection = request.POST.get('rpiAssign')
+        company_id = request.POST.get('companyselect')
+        house_id = request.POST.get('houseselect')
+
+        led_selection_range = [led_id for led_id in led_selection.split(',')]
+        cleaned_string = led_selection_range[1].strip('[]')
+        led_selection_range = cleaned_string.split(' - ')
+        start_led_id, end_led_id = led_selection_range[0], led_selection_range[1]
+        rasp_instance = Rasp.objects.get(rbi=rpi_selection)
+        LEDs_to_update = LED.objects.filter(led_id__range=(start_led_id, end_led_id))
+        for led in LEDs_to_update:
+            led.rasp = rasp_instance
+            led.save()
+
+        house_name = House.objects.get(house_id=str(house_id))
+        company_name = Company.objects.get(id = company_id)
+        rasp_instance.is_assigned = f'{company_name.company_name} -> {house_name} -> {led_selection_range}'
+        rasp_instance.save()
+        context = {
+            'user_profile_image': user_profile_image,
+            'user_role_id': user_role_id,
+            'page': page,  
+            'user_company': user_company,
+            'rbis': all_rbis,
+            'raspberry':list (publisher_ids),
+            'choice_companies':choice_companies,
+            'filter_house':filter_house,
+            'filtered_LEDs':filtered_LEDs,
+            'filter_LED_count':filter_LED_count,
+            'filtered_Rpi':filtered_Rpi,
+        }
+        return render(request, 'home/RPI_settings.html',context)  
     # if request.method == 'POST':
     #     # Retrieve the RpiID from the form data
     #     rpi_id = request.POST.get('ras', None)
@@ -1202,13 +1272,14 @@ def RPI_settings(request):
     #     print(context)
     #     return render(request, 'home/RPI_settings.html', context)
     
-    return render(request, 'home/RPI_settings.html', context)  
+        
     
         
 from django.shortcuts import render, HttpResponse, redirect
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db import IntegrityError  # Import IntegrityError from django.db
+
 
 def add_RPI(request):
     user_profile_image = request.session.get('user_profile_image')
@@ -1224,16 +1295,18 @@ def add_RPI(request):
     print('')
     array_raspberry = list(publisher_ids)
     print ('>>>>>>>>>>>>>>>>>>>>>>>', array_raspberry)
+   
+
     context = {
             'user_profile_image': user_profile_image,
             'user_role_id': user_role_id,
             'page': page,  # Pass all rbi values to the template
             'user_company': user_company,
             'rbis': all_rbis,
-            'raspberry':list (publisher_ids) 
-            
+            'raspberry':list (publisher_ids),
         }
-
+    
+    
     if request.method == 'POST':
         rpi_id = request.POST.get('ras', None)
         print("welcome///////?????????????????", rpi_id)
@@ -1266,3 +1339,7 @@ def add_RPI(request):
                 messages.error(request, 'Error adding RpiID to the database')
 
     return render(request, 'home/RPI_settings.html', context)
+
+
+
+

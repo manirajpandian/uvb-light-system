@@ -122,6 +122,7 @@ class LED(models.Model):
     button_no = models.PositiveIntegerField(unique=False)
     led_on_date= models.DateTimeField(null=True, blank=True)
     led_off_date = models.DateTimeField(null=True, blank=True)
+    rasp = models.ForeignKey('Rasp', on_delete=models.SET_NULL, related_name='led', null=True, blank=True)
 
     def save(self, *args, **kwargs):  
         
@@ -138,7 +139,7 @@ class LED(models.Model):
             # Check if button_no is not set or it's a new instance
             last_instance_same_house = LED.objects.filter(pole__line__house=self.pole.line.house).order_by('-led_id').first()
             if last_instance_same_house:
-                new_button_no = (last_instance_same_house.button_no % 4) + 1
+                new_button_no = (last_instance_same_house.button_no % 23) + 1
             else:
                 new_button_no = 1
             self.button_no = new_button_no
@@ -150,6 +151,7 @@ class LED(models.Model):
 
 class Rasp(models.Model):
     rbi = models.CharField(max_length=20, primary_key=True)
+    is_assigned = models.CharField(max_length=200,null=True, blank=True)
 
 class data(models.Model):
     raspberry_id = models.ForeignKey(Rasp, on_delete=models.CASCADE, related_name='raspberry_instances')

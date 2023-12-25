@@ -91,11 +91,60 @@
 
 
   
-<div class="d-flex align-items-center justify-content-end">
+<div class="d-flex align-items-center justify-content-end" >
     <button type="button" name="search" class="btn btn-success" data-toggle="modal" data-target="#addRpimodal">
       <span class="material-icons">add_circle</span>&nbsp;&nbsp;追加
       </button>
   </div>
+  <form method="post" action="{% url 'RPI_settings' %}">
+    {% csrf_token %}
+  <div class="d-flex">
+    
+    <select name="companyselect" class="form-control" id="companyselect">
+      <option value="" >会社を選択してください</option>
+      {% for item in choice_companies %}
+      {% if company_id %}
+      <option  selected value="{{ item.id }}">  {{ item.company_name }}</option>
+      {% else %}
+        <option  value="{{ item.id }}">{{ item.company_name }}</option>
+        {% endif %}
+      {% endfor %}
+  </select>
+ 
+  <select name="houseselect" class="form-control" id="houseselect">
+    <option value="" >
+        ハウスを選択してください
+    </option>
+    {% for item in filter_house %}
+    {% if house_id %}
+    <option  selected value="{{ item.house_id }}">{{ item }}</option>
+    {% else %}
+    <option value="{{ item.house_id }}">{{ item }}</option>
+      {% endif %}
+            
+      {% endfor %}
+  </select>
+  <select name="ledAssign" class="form-control" id="ledAssign">
+    <option value="" >
+        LEDを選択してください
+    </option>
+    {% for item in filter_LED_count %}
+            <option value="{{ item }}">{{ item }}</option>
+        {% endfor %}
+  </select>  
+  <select name="rpiAssign" class="form-control" id="rpiAssign">
+    <option value="" >
+        Rpiを選択してください
+    </option>
+    {% for item in filtered_Rpi %}
+            <option value="{{ item.rbi }}">{{ item.rbi }}</option>
+        {% endfor %}
+  </select>  
+  <button type="submit" name="assign" class="btn btn-success">
+    <span class="material-icons"></span>&nbsp;&nbsp;割当
+    </button>
+</div>
+</form>
   <div class=" row">
     <div class="col-md-12">
         <div class="card">
@@ -105,13 +154,14 @@
                         <thead class="text-primary-emphasis table-success">
                             <th>S.no</th>
                             <th>Rpi ID</th>
+                            <th>LED割当</th>
                         </thead> 
                         <tbody>
                                 {% for rbi in page.object_list %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                      
-                                        <td>{{ rbi }}</td>
+                                        <td>{{ rbi.rbi }}</td>
+                                        <td>{{ rbi.is_assigned }}</td>
                                     </tr>
                                 {% endfor %}
                         </tbody>
@@ -204,14 +254,21 @@
       </div>
     </div>
   </div>
+
+
   <script>
     var raspberry = "{{ raspberry }}"
+    var company_id = "{{ company_id }}"
+
+    console.log('company_id',company_id)
+
 document.addEventListener("DOMContentLoaded", function () {
 
     var form = document.getElementById('addRpi')
     var RaspberryID = document.getElementById('Rpi_id')
     var Raspberrymsg = document.getElementById('Raspberrymsg')
     var addButton = document.getElementById('addButton')
+    var selected_company = document.getElementById('companyselect')
 
 
     // add form validation 
@@ -221,6 +278,21 @@ document.addEventListener("DOMContentLoaded", function () {
       form.submit();
    
     })
+
+    selected_company.addEventListener('change', function () {
+    console.log('selected_company.value:', selected_company.value);
+    window.location = `?company_id=${selected_company.value}`;
+});
+
+var houseselect = document.getElementById('houseselect');
+
+houseselect.addEventListener('change', function () {
+    console.log('houseselect.value:', houseselect.value);
+    window.location = `?company_id=${company_id}&house_id=${houseselect.value}`;
+});
+
+
+    
 
 });
   </script>

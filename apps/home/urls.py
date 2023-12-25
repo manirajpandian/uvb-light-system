@@ -28,7 +28,7 @@ urlpatterns = [
     path('update_plant/<str:pk>',views.update_plant,name='update_plant'),
     path('delete_plant/<int:plant_id>/', views.delete_plant, name='delete_plant'),
     path ('LED_data_download' , views.LED_data_download , name='LED_data_download'),
-    path ('RPI_settings', views.RPI_settings , name ='RPI_settings '),
+    path ('RPI_settings', views.RPI_settings , name ='RPI_settings'),
     path ('add_RPI', views.add_RPI, name= 'add_RPI'),
    
     # Matches any html file
