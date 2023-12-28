@@ -144,31 +144,31 @@
 </div>
 
 
-{% if not message1 %}
+
+  {% if houses|length > 0 %}
+      {% for house in houses %}
+      
+      <div class="d-inline-flex align-items-center">
+        <h3 class="m-0 d-none d-md-block">{{ house.house_name }}</h3><span class="d-none d-md-block">&nbsp;&nbsp;-&nbsp;&nbsp;{{ house.plant.plant_name }}</span>
+
+        <i class="material-icons text-success ml-3">router</i>
+        <span class="ml-1">{{ house.rbi}}</span>
+          <i class="material-icons text-danger ml-3">device_thermostat</i>
+          <span class="ml-1">{{ house.temp }}</span>
+          <i class="material-icons text-info ml-3">opacity</i>
+          <span class="ml-1">{{ house.hum }}</span>
+          <i class="material-icons text-success ml-3">grass</i>
+          <span class="ml-1">{{ house.mos }}</span>
+
+          <a href="{% url 'LED_data_download' %}?house_id={{ house.house_id }}" class="ml-3">
+            <span class="material-icons">sim_card_download</span>
+          </a>
+          {% if not message1 %}
 <div id="marquee" class='text-danger'> <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
   Raspberry pi が接続されていません。接続してもう一度お試しください。
   </marquee>
   </div>
 {%endif%}
-
-  {% if houses|length > 0 %}
-      {% for house in houses %}
-      <div class="d-inline-flex align-items-center">
-        <h3 class="m-0 d-none d-md-block">{{ house.house_name }}</h3><span class="d-none d-md-block">&nbsp;&nbsp;-&nbsp;&nbsp;{{ house.plant.plant_name }}</span>
-
-        <i class="material-icons text-success ml-3">router</i>
-        <span class="ml-1">{{Rbi}}</span>
-          <i class="material-icons text-danger ml-3">device_thermostat</i>
-          <span class="ml-1">{{temperature}}</span>
-          <i class="material-icons text-info ml-3">opacity</i>
-          <span class="ml-1">{{humidity}}</span>
-          <i class="material-icons text-success ml-3">grass</i>
-          <span class="ml-1">{{soil_moisture}}</span>
-
-          <a href="{% url 'LED_data_download' %}?house_id={{ house.house_id }}" class="ml-3">
-            <span class="material-icons">sim_card_download</span>
-          </a>
-          
       </div>
       <div id="accordion">
         {% for line in house.lines.all %}

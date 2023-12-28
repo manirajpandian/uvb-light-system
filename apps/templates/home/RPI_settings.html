@@ -110,13 +110,13 @@
         {% endif %}
       {% endfor %}
   </select>
- 
+ {{ house_id }}
   <select name="houseselect" class="form-control" id="houseselect">
     <option value="" >
         ハウスを選択してください
     </option>
     {% for item in filter_house %}
-    {% if house_id %}
+    {% if item.house_id  == selected_house_id %}
     <option  selected value="{{ item.house_id }}">{{ item }}</option>
     {% else %}
     <option value="{{ item.house_id }}">{{ item }}</option>
@@ -232,13 +232,13 @@
               </thead> 
               <tbody>
                 {% for rbi in raspberry %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ rbi }}</td>
-        <input type="hidden" name="ras" value="{{ rbi }}" >
-    </tr>
-        
-{% endfor %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ rbi }}</td>
+                        <input type="hidden" name="ras" value="{{ rbi }}" >
+                    </tr>
+                        
+               {% endfor %}
                 
               </tbody>
           </table>

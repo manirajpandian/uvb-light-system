@@ -17,6 +17,21 @@ from django.utils import timezone
 from django.db.models import Q, Count
 import random
 from django.db import models
+import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
+import json
+
+
+
+broker_address = "localhost" 
+# broker_address = "52.192.209.112"  # Replace with your local broker address
+port = 1883
+topic_rpi_to_ec2 = "rpi_to_ec2_topic"
+topic_ec2_to_rpi = "ec2_to_rpi_topic"
+data_receiving_topic = "data_receiving_topic"
+
+mqtt_username = "dht"
+mqtt_password = "dht123"
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -97,11 +112,31 @@ def user_list(request):
         if request.method == "POST":
             user_id = request.POST.get('user_id')
             is_active = request.POST.get('is_active')
+            
             try:
                 user_obj = User.objects.get(id=user_id)
-
+                
                 # Deactivate the main user
                 user_obj.is_active = is_active
+                houses = []
+                farms = Farm.objects.filter(user_id = user_id)
+                for farm in farms:
+                    house = House.objects.filter(farm_id=farm.farm_id)
+                    houses.extend(house)
+                
+                for house in houses:
+                    leds = LED.objects.filter(pole__line__house__house_id=house.house_id)
+                
+                for led in leds:
+                    button_data = led.led_id
+                    rasp_id = led.rasp_id
+                    message = {'button_no': button_data, 'status': False,  'raspberrypi_id': rasp_id}
+                    json_message =json.dumps(message)
+                     # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                    print(json_message )
+                    publish.single(topic_ec2_to_rpi,json_message, hostname=broker_address,)
+                    print(led.led_id,led.rasp_id)
+               
                 user_obj.save()
 
                 # Get all profile objects mapped under the user_id
@@ -471,10 +506,32 @@ def farmer_list(request):
             'page':page
             }
         if request.method == "POST":
+            
             user_id = request.POST.get('user_id')
             is_active = request.POST.get('is_active')
             try:
                 user_obj = User.objects.get(id=user_id)
+                houses = []
+                
+                # farms = Farm.objects.filter(user_id = user_id)
+                # for farm in farms:
+                #     house = House.objects.filter(farm_id=farm.farm_id)
+                #     houses.extend(house)
+                
+                # for house in houses:
+                #     leds = LED.objects.filter(pole__line__house__house_id=house.house_id)
+                
+                # for led in leds:
+                #     button_data = led.led_id
+                #     rasp_id = led.rasp_id
+                #     message = {'button_no': button_data, 'status': False,  'raspberrypi_id': rasp_id}
+                #     json_message =json.dumps(message)
+                #      # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                    
+                #     publish.single(topic_ec2_to_rpi,json_message, hostname=broker_address,)
+                #     print(led.led_id,led.rasp_id)
+                
+               
 
                 # Deactivate the main user
                 user_obj.is_active = is_active

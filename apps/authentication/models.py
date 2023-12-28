@@ -152,6 +152,7 @@ class LED(models.Model):
 class Rasp(models.Model):
     rbi = models.CharField(max_length=20, primary_key=True)
     is_assigned = models.CharField(max_length=200,null=True, blank=True)
+    
 
 class data(models.Model):
     raspberry_id = models.ForeignKey(Rasp, on_delete=models.CASCADE, related_name='raspberry_instances')
