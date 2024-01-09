@@ -152,6 +152,7 @@ class LED(models.Model):
 class Rasp(models.Model):
     rbi = models.CharField(max_length=20, primary_key=True)
     is_assigned = models.CharField(max_length=200,null=True, blank=True)
+    rasp_status  = models.CharField(max_length=200,null=True, blank=True)
     
 
 class data(models.Model):

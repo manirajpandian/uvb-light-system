@@ -245,14 +245,15 @@ latest_stored_date ={}
 current_date = date.today()
 
 rasp_dic = {}
+error_ID = None
+rasp_status = None 
 #LED Control - Sensor and LED Access
 @login_required(login_url="/login/")
-
 #LED Control - Sensor and LED Access
 def LED_control(request,farm_id=None):
    
     try:
-        global sensor_data , latest_stored_date
+        global sensor_data , latest_stored_date , rasp_status_ID, rasp_status
         user_profile_image = request.session.get('user_profile_image')
         user_role_id = request.session.get('role_id')
         user_company = request.session.get('user_company')
@@ -263,22 +264,43 @@ def LED_control(request,farm_id=None):
             print(f"Received message from MQTT: {payload}")
             # Extract data from payload and save to the database
             ID= payload.get('raspberry_id')
+            
             temp = payload.get('temperature')
             soil = payload.get('soil_moisture')
+            rasp_status = payload.get('message')
             matching_rasps = Rasp.objects.filter(rbi=ID)
 
             if matching_rasps.exists():
+               
+                # rasp_status_ID = payload.get('raspberry_id')
+                # rasp_status = payload.get('message')
+                # print ('rasp_status ', rasp_status)
+                rasp_status = None 
+                error_ID = payload.get('raspberry_id')
+                rasp_status = payload.get('message')
+
+                # Check if a record with the specified rbi exists
+                existing_rasp = Rasp.objects.filter(rbi=error_ID).first()
                 
-                
+                if existing_rasp:
+                    print(rasp_status)
+                    # Update the existing record
+                    existing_rasp.rasp_status = rasp_status
+                    existing_rasp.save()
+                else:
+                    print(rasp_status)
+                    # Create a new record
+                    new_rasp = Rasp(rbi=error_ID, rasp_status=rasp_status)
+                    new_rasp.save()
+
                 if temp and soil != None :
-                       
                         sensor_data['temperature'] = payload.get('temperature')
                         sensor_data['humidity'] = payload.get('humidity')
                         sensor_data['soil_moisture'] = payload.get('soil_moisture')
                         sensor_data['raspberry_id'] = payload.get('raspberry_id')
                         sensor_data['date'] = payload.get('date')
                         payload_date_str = sensor_data['date']
-                        sensor_data['message1'] = payload.get('message')
+                        sensor_data['message1'] = payload.get('message1')
                         if payload_date_str:
                             sensor_data['date'] = datetime.strptime(payload_date_str, "%Y-%m-%d %H:%M:%S").date()
                         else:
@@ -385,11 +407,16 @@ def LED_control(request,farm_id=None):
                 for items in rasp_dic[house.house_id]:
                     if items is not None:
                         try:
-                            display_data = data.objects.get(raspberry_id_id=items)
-                            selected_raspberry_id = items
-                            break  # Exit the loop once data for one Raspberry Pi is found
+                            # Use filter() instead of get() to handle multiple objects
+                            display_data_query = data.objects.filter(raspberry_id_id=items)
+                            
+                            if display_data_query.exists():
+                                # Choose the latest data if multiple objects exist
+                                display_data = display_data_query.latest('date')
+                                selected_raspberry_id = items
+                                break
                         except data.DoesNotExist:
-                            pass  # Handle the case where data doesn't exist for the current Raspberry Pi
+                            pass
                 else:
                     # This block will execute if the inner loop completes without a 'break'
                     selected_raspberry_id = None
@@ -405,6 +432,7 @@ def LED_control(request,farm_id=None):
                 house.hum = None
                 house.mos = None
                 house.rbi = None
+
 
                             
         context = {
@@ -426,6 +454,9 @@ def LED_control(request,farm_id=None):
             'selected_farm_name':selected_farm_name,
             'user_id':user_id,
             'selected_user_name':selected_user_name,
+            'error_id': None,
+            'rasp_status': None,
+          
             } 
     
         if request.method == "GET":
@@ -452,6 +483,9 @@ def LED_control(request,farm_id=None):
                     print('button no',led.button_no)
                     button_data = led.button_no
                     led_rasid = led.rasp_id
+                    error_relay = Rasp.objects.get(rbi=led_rasid)
+                    a= error_relay.rasp_status
+                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',a)
                     Relay_data= False
                     if button_data > sensor_data['led_count']:
                         led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"         #Led is set to OFF
@@ -462,14 +496,27 @@ def LED_control(request,farm_id=None):
                     else:
                         # Publish button_no data to the topic
                         message = {'button_no': button_data, 'status': Relay_data ,  'raspberrypi_id': led_rasid }
-                       
+                        
                         json_message = json.dumps(message)
-                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                        publish.single(relay_topic, json_message, hostname=broker_address,port=port)
-                        mqtt_client.publish(relay_topic, json_message)
-                        print('relay data published ', message )
-                        led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
-                        messages.success(request, led_success_msg)
+                        relay_rasp_check = Rasp.objects.filter(rbi=error_ID)
+
+                        if a != None:
+                            # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                            publish.single(topic_ec2_to_rpi, json_message, hostname=broker_address,port=port)
+                            publish.single(relay_topic, json_message, hostname=broker_address,port=port)
+                            mqtt_client.publish(relay_topic, json_message)
+                            publish.single (relay_topic, json_message )
+                            print('relay data published ', message )
+                            led_success_msg = f"{led.led_id} LEDがOFFされました。"       #Led is set to OFF
+                            messages.success(request, led_success_msg)
+                            led.is_on = False  
+                            led.save()
+                        else:
+                            led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"       #Led is set to OFF
+                            messages.error(request, led_success_msg)
+                            led.is_on = False  
+                            led.save()
+                            
                 else:
                     led.is_on = True  # Set to True
                     led.led_on_date = timezone.now() 
@@ -478,6 +525,8 @@ def LED_control(request,farm_id=None):
                     print('button no',led.button_no)
                     button_data = led.button_no
                     led_rasid = led.rasp_id
+                    error_relay = Rasp.objects.get(rbi=led_rasid)
+                    a= error_relay.rasp_status
                     Relay_data = True 
                     if button_data > sensor_data['led_count']:
                         led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"       #Led is set to OFF
@@ -491,13 +540,20 @@ def LED_control(request,farm_id=None):
                         message = {'button_no': button_data, 'status': Relay_data ,  'raspberrypi_id': led_rasid }
                         print(message)
                         json_message = json.dumps(message)
-                       
-                        # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
-                        publish.single(relay_topic, json_message,hostname=broker_address, port=port,)
-                        mqtt_client.publish(relay_topic, json_message,)
-                        print('relay data published ', message )
-                        led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
-                        messages.success(request, led_success_msg)
+                        relay_rasp_check = Rasp.objects.filter(rbi=error_ID)
+
+                        if a != None:
+                            # publish.single(topic_ec2_to_rpi, json.dumps({"button_no": button_data, "status": Relay_data}), hostname=broker_address, port=port, auth={'username': mqtt_username, 'password': mqtt_password})
+                            publish.single(topic_ec2_to_rpi, json_message,hostname=broker_address, port=port,)
+                            mqtt_client.publish(relay_topic, json_message,)
+                            print('relay data published ', message )
+                            led_success_msg = f"{led.led_id} LEDがONされました。"       #LED is set to ON
+                            messages.success(request, led_success_msg)
+                        else:
+                            led_success_msg = f"Raspberry Piはその{led.led_id}に接続されていません。"       #Led is set to OFF
+                            messages.error(request, led_success_msg)
+                            led.is_on = False  
+                            led.save()
             if user_role_id == '0':
                 url = reverse('LED_control_farm_id', kwargs={'farm_id': farm_id}) + f'?user={user_id}'
                 return redirect(url)
